@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { NavigationBar } from "@/components/navigation-bar"
@@ -7,7 +9,7 @@ import { PromptSetTabs } from "@/components/prompt-set-tabs"
 import { PromptEditor } from "@/components/prompt-editor"
 import { PromptPreview } from "@/components/prompt-preview"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, Download } from "lucide-react"
+import { PlusIcon, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import type { Project, PromptSet, PromptVariable, Prompt } from "@/types/prompt"
 import { EditModeToggle } from "@/components/edit-mode-toggle"
@@ -54,6 +56,10 @@ export default function PromptSetsPage() {
               content: "Now, as a {role}, for the {task}",
             },
           ],
+          uiPreferences: {
+            splitPosition: 50,
+            variablesPanelVisible: true,
+          },
         },
         {
           id: "set2",
@@ -68,6 +74,10 @@ export default function PromptSetsPage() {
               content: "Hola {name}, como {role}, ¿podrías ayudarme?",
             },
           ],
+          uiPreferences: {
+            splitPosition: 50,
+            variablesPanelVisible: true,
+          },
         },
       ],
     },
@@ -82,6 +92,16 @@ export default function PromptSetsPage() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [activeVariableId, setActiveVariableId] = useState<string | null>(null)
   const [activePromptId, setActivePromptId] = useState<string | null>(null)
+
+  // Añade estos estados después de los otros estados
+  const [isDraggingSplitter, setIsDraggingSplitter] = useState(false)
+
+  // Get the active prompt set based on the ID
+  const activePromptSet = currentProject?.promptSets.find((set) => set.id === activePromptSetId)
+
+  // Obtener las preferencias de UI del prompt set activo o usar valores predeterminados
+  const splitPosition = activePromptSet?.uiPreferences?.splitPosition ?? 50
+  const variablesPanelVisible = activePromptSet?.uiPreferences?.variablesPanelVisible ?? true
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -110,9 +130,6 @@ export default function PromptSetsPage() {
     // Otherwise, use the first prompt set
     setActivePromptSetId(currentProject.promptSets[0].id)
   }, [currentProject, setIdFromUrl])
-
-  // Get the active prompt set based on the ID
-  const activePromptSet = currentProject?.promptSets.find((set) => set.id === activePromptSetId)
 
   // Handle selecting a different prompt set
   const handleSelectPromptSet = (id: string) => {
@@ -285,6 +302,10 @@ export default function PromptSetsPage() {
       name: `Nuevo Set ${currentProject.promptSets.length + 1}`,
       variables: [],
       prompts: [{ id: `prompt-${Date.now()}`, content: "Nuevo prompt" }],
+      uiPreferences: {
+        splitPosition: 50,
+        variablesPanelVisible: true,
+      },
     }
 
     const updatedProjects = projects.map((project) => {
@@ -306,9 +327,15 @@ export default function PromptSetsPage() {
     const updatedProjects = projects.map((project) => {
       if (project.id !== currentProject.id) return project
 
-      const updatedPromptSets = project.promptSets.filter((set) => set.id !== promptSetId)
+      const updatedPromptSets = project.promptSets.map((set) => {
+        if (set.id !== promptSetId) return set
 
-      return { ...project, promptSets: updatedPromptSets }
+        return { ...set }
+      })
+
+      const updatedPromptSetsFiltered = updatedPromptSets.filter((set) => set.id !== promptSetId)
+
+      return { ...project, promptSets: updatedPromptSetsFiltered }
     })
 
     setProjects(updatedProjects)
@@ -462,6 +489,72 @@ export default function PromptSetsPage() {
     setActivePromptId(null)
   }
 
+  const updateUIPreferences = (updates: Partial<{ splitPosition: number; variablesPanelVisible: boolean }>) => {
+    if (!currentProject || !activePromptSet) return
+
+    const updatedProjects = projects.map((project) => {
+      if (project.id !== currentProject.id) return project
+
+      const updatedPromptSets = project.promptSets.map((set) => {
+        if (set.id !== activePromptSet.id) return set
+
+        return {
+          ...set,
+          uiPreferences: {
+            splitPosition: updates.splitPosition ?? set.uiPreferences?.splitPosition ?? 50,
+            variablesPanelVisible: updates.variablesPanelVisible ?? set.uiPreferences?.variablesPanelVisible ?? true,
+          },
+        }
+      })
+
+      return { ...project, promptSets: updatedPromptSets }
+    })
+
+    setProjects(updatedProjects)
+  }
+
+  // Añade estas funciones antes del return
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDraggingSplitter(true)
+    document.body.style.cursor = "col-resize"
+    document.body.style.userSelect = "none"
+  }
+
+  const handleMouseUp = () => {
+    if (isDraggingSplitter) {
+      setIsDraggingSplitter(false)
+      document.body.style.cursor = ""
+      document.body.style.userSelect = ""
+    }
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingSplitter) return
+
+    const container = e.currentTarget as HTMLElement
+    const rect = container.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const newSplitPosition = Math.min(Math.max((x / rect.width) * 100, 20), 80)
+
+    updateUIPreferences({ splitPosition: newSplitPosition })
+  }
+
+  // Añade un efecto para limpiar los eventos del mouse
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDraggingSplitter) {
+        setIsDraggingSplitter(false)
+        document.body.style.cursor = ""
+        document.body.style.userSelect = ""
+      }
+    }
+
+    document.addEventListener("mouseup", handleGlobalMouseUp)
+    return () => {
+      document.removeEventListener("mouseup", handleGlobalMouseUp)
+    }
+  }, [isDraggingSplitter])
+
   if (!currentProject) return null
 
   return (
@@ -516,30 +609,72 @@ export default function PromptSetsPage() {
 
         {/* Content Area */}
         {activePromptSet && (
-          <div className="flex-1 grid grid-cols-2 gap-4 p-4 overflow-hidden h-0 min-h-0">
+          <div
+            className="flex-1 flex overflow-hidden h-0 min-h-0 p-4"
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+          >
             {/* Variables Column - Fixed height, no scroll */}
-            <div className="flex flex-col min-h-0 h-full">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleVariableDragStart}
-                onDragEnd={handleVariableDragEnd}
-                disabled={!isEditMode}
+            {variablesPanelVisible && (
+              <div className="flex flex-col min-h-0 h-full overflow-hidden" style={{ width: `${splitPosition}%` }}>
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm font-medium">Variables</h3>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => updateUIPreferences({ variablesPanelVisible: false })}
+                    className="h-6 w-6 hover:bg-zinc-700"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                </div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleVariableDragStart}
+                  onDragEnd={handleVariableDragEnd}
+                  disabled={!isEditMode}
+                >
+                  <PromptEditor
+                    variables={activePromptSet.variables}
+                    onUpdateVariable={updateVariable}
+                    onUpdateVariableName={updateVariableName}
+                    onAddVariable={addVariable}
+                    onDeleteVariable={deleteVariable}
+                    onClearAllValues={clearAllVariableValues}
+                    isEditMode={isEditMode}
+                  />
+                </DndContext>
+              </div>
+            )}
+
+            {/* Splitter */}
+            {variablesPanelVisible && (
+              <div
+                className="w-2 h-full flex items-center justify-center cursor-col-resize mx-2 group"
+                onMouseDown={handleMouseDown}
               >
-                <PromptEditor
-                  variables={activePromptSet.variables}
-                  onUpdateVariable={updateVariable}
-                  onUpdateVariableName={updateVariableName}
-                  onAddVariable={addVariable}
-                  onDeleteVariable={deleteVariable}
-                  onClearAllValues={clearAllVariableValues}
-                  isEditMode={isEditMode}
-                />
-              </DndContext>
-            </div>
+                <div className="w-0.5 h-full bg-zinc-700 group-hover:bg-zinc-500 group-active:bg-zinc-400"></div>
+              </div>
+            )}
 
             {/* Prompts Column - With scroll */}
-            <div className="flex flex-col min-h-0 h-full">
+            <div
+              className="flex flex-col min-h-0 h-full overflow-hidden"
+              style={{ width: variablesPanelVisible ? `${100 - splitPosition}%` : "100%" }}
+            >
+              {!variablesPanelVisible && (
+                <div className="mb-2 flex justify-end">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => updateUIPreferences({ variablesPanelVisible: true })}
+                    className="h-6 w-6 hover:bg-zinc-700"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}

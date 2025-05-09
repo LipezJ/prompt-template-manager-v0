@@ -3,7 +3,7 @@ import "./globals.css"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Lipez's tool",
+  title: "Prompt Manager",
   description: "Manage your AI prompts",
     generator: 'v0.dev'
 }

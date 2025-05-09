@@ -14,6 +14,10 @@ export interface PromptSet {
   name: string
   variables: PromptVariable[]
   prompts: Prompt[]
+  uiPreferences?: {
+    splitPosition: number
+    variablesPanelVisible: boolean
+  }
 }
 
 export interface Project {
