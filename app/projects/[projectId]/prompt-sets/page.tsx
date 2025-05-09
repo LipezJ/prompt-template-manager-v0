@@ -658,23 +658,25 @@ export default function PromptSetsPage() {
               </div>
             )}
 
+            {/* Botón para mostrar variables cuando están ocultas */}
+            {!variablesPanelVisible && (
+              <div className="mb-2 ml-1 mr-3 flex items-start">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => updateUIPreferences({ variablesPanelVisible: true })}
+                  className="h-6 w-6 hover:bg-zinc-700"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
             {/* Prompts Column - With scroll */}
             <div
               className="flex flex-col min-h-0 h-full overflow-hidden"
               style={{ width: variablesPanelVisible ? `${100 - splitPosition}%` : "100%" }}
             >
-              {!variablesPanelVisible && (
-                <div className="mb-2 flex justify-end">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => updateUIPreferences({ variablesPanelVisible: true })}
-                    className="h-6 w-6 hover:bg-zinc-700"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
