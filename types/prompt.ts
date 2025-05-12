@@ -17,6 +17,7 @@ export interface PromptSet {
   uiPreferences?: {
     splitPosition: number
     variablesPanelVisible: boolean
+    cardView: boolean
   }
 }
 

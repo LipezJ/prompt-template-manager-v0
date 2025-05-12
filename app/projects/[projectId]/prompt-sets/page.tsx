@@ -7,22 +7,15 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { NavigationBar } from "@/components/navigation-bar"
 import { PromptSetTabs } from "@/components/prompt-set-tabs"
 import { PromptEditor } from "@/components/prompt-editor"
-import { PromptPreview } from "@/components/prompt-preview"
+import { PromptsArea } from "@/components/prompts-area"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import type { Project, PromptSet, PromptVariable, Prompt } from "@/types/prompt"
 import { EditModeToggle } from "@/components/edit-mode-toggle"
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-} from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { ViewToggle } from "@/components/view-toggle"
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function PromptSetsPage() {
@@ -59,6 +52,7 @@ export default function PromptSetsPage() {
           uiPreferences: {
             splitPosition: 50,
             variablesPanelVisible: true,
+            cardView: false,
           },
         },
         {
@@ -77,6 +71,7 @@ export default function PromptSetsPage() {
           uiPreferences: {
             splitPosition: 50,
             variablesPanelVisible: true,
+            cardView: false,
           },
         },
       ],
@@ -102,6 +97,7 @@ export default function PromptSetsPage() {
   // Obtener las preferencias de UI del prompt set activo o usar valores predeterminados
   const splitPosition = activePromptSet?.uiPreferences?.splitPosition ?? 50
   const variablesPanelVisible = activePromptSet?.uiPreferences?.variablesPanelVisible ?? true
+  const cardView = activePromptSet?.uiPreferences?.cardView ?? false
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -305,6 +301,7 @@ export default function PromptSetsPage() {
       uiPreferences: {
         splitPosition: 50,
         variablesPanelVisible: true,
+        cardView: false,
       },
     }
 
@@ -349,6 +346,7 @@ export default function PromptSetsPage() {
     }
   }
 
+  // Solo actualizar esta función para eliminar el parámetro name
   const updatePrompt = (promptId: string, content: string) => {
     if (!currentProject || !activePromptSet) return
 
@@ -417,6 +415,10 @@ export default function PromptSetsPage() {
 
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode)
+  }
+
+  const toggleCardView = () => {
+    updateUIPreferences({ cardView: !cardView })
   }
 
   const handleVariableDragStart = (event: any) => {
@@ -489,7 +491,9 @@ export default function PromptSetsPage() {
     setActivePromptId(null)
   }
 
-  const updateUIPreferences = (updates: Partial<{ splitPosition: number; variablesPanelVisible: boolean }>) => {
+  const updateUIPreferences = (
+    updates: Partial<{ splitPosition: number; variablesPanelVisible: boolean; cardView: boolean }>,
+  ) => {
     if (!currentProject || !activePromptSet) return
 
     const updatedProjects = projects.map((project) => {
@@ -503,6 +507,7 @@ export default function PromptSetsPage() {
           uiPreferences: {
             splitPosition: updates.splitPosition ?? set.uiPreferences?.splitPosition ?? 50,
             variablesPanelVisible: updates.variablesPanelVisible ?? set.uiPreferences?.variablesPanelVisible ?? true,
+            cardView: updates.cardView !== undefined ? updates.cardView : (set.uiPreferences?.cardView ?? false),
           },
         }
       })
@@ -585,6 +590,7 @@ export default function PromptSetsPage() {
               >
                 <PlusIcon className="h-3.5 w-3.5 text-zinc-300" />
               </Button>
+              <ViewToggle isCardView={cardView} onToggle={toggleCardView} />
               <EditModeToggle isEditMode={isEditMode} onToggle={toggleEditMode} />
               <TooltipProvider>
                 <Tooltip>
@@ -684,50 +690,16 @@ export default function PromptSetsPage() {
                 onDragEnd={handlePromptDragEnd}
                 disabled={!isEditMode}
               >
-                <SortableContext
-                  items={activePromptSet.prompts.map((prompt) => prompt.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="flex-1 overflow-y-auto pr-2 space-y-4 min-h-0 custom-scrollbar">
-                    {activePromptSet.prompts.map((prompt) => (
-                      <PromptPreview
-                        key={prompt.id}
-                        prompt={prompt}
-                        variables={activePromptSet.variables}
-                        onUpdatePrompt={(content) => updatePrompt(prompt.id, content)}
-                        onDeletePrompt={() => deletePrompt(prompt.id)}
-                        isEditMode={isEditMode}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-
-                <DragOverlay>
-                  {activePromptId ? (
-                    <div className="bg-zinc-800 rounded-md p-4 shadow-xl opacity-80">
-                      <pre className="whitespace-pre-wrap text-sm p-2 bg-zinc-900 rounded min-h-[100px] max-h-[300px] overflow-y-auto">
-                        {activePromptSet.prompts.find((p) => p.id === activePromptId)?.content.substring(0, 100)}
-                        {activePromptSet.prompts.find((p) => p.id === activePromptId)?.content.length > 100
-                          ? "..."
-                          : ""}
-                      </pre>
-                    </div>
-                  ) : null}
-                </DragOverlay>
+                <PromptsArea
+                  prompts={activePromptSet.prompts}
+                  variables={activePromptSet.variables}
+                  isCardView={cardView}
+                  isEditMode={isEditMode}
+                  onUpdatePrompt={updatePrompt}
+                  onDeletePrompt={deletePrompt}
+                  onAddPrompt={addPrompt}
+                />
               </DndContext>
-
-              {!isEditMode && (
-                <div className="pt-4 flex justify-end sticky bottom-0 bg-zinc-900">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={addPrompt}
-                    className="h-8 w-8 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
-                  >
-                    <PlusIcon className="h-4 w-4 text-zinc-300" />
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         )}
