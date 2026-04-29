@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { useState, useEffect } from "react"
 import { GripVertical } from "lucide-react"
 import { replaceVariables } from "@/lib/prompt-utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface PromptCardProps {
   prompt: Prompt
@@ -35,10 +36,10 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
     }
 
     const processedText = replaceVariables(prompt.content, variables)
-    navigator.clipboard.writeText(processedText)
+    void navigator.clipboard.writeText(processedText)
 
     setCopied(true)
-    setTimeout(() => setCopied(false), 300)
+    setTimeout(() => setCopied(false), 600)
   }
 
   useEffect(() => {
@@ -46,28 +47,34 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
   }, [prompt.id])
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`bg-zinc-800 rounded-md p-4 cursor-pointer relative w-50 h-50 ${
-        isDragging ? "shadow-lg" : ""
-      } hover:bg-zinc-750 transition-colors ${copied ? "bg-zinc-700" : ""}`}
-      onClick={handleClick}
-    >
-      {isEditMode && (
-        <button
-          type="button"
-          aria-label="Reordenar prompt"
-          className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
-        </button>
-      )}
-      <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar ${isEditMode ? "ml-6" : ""}`}>
-        <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden">{prompt.content}</pre>
-      </div>
-    </div>
+    <TooltipProvider>
+      <Tooltip open={copied && !isEditMode}>
+        <TooltipTrigger asChild>
+          <div
+            ref={setNodeRef}
+            style={style}
+            className={`bg-zinc-800 rounded-md p-4 cursor-pointer relative w-50 h-50 ${isDragging ? "shadow-lg" : ""
+              } hover:bg-zinc-750 transition-colors ${copied ? "bg-zinc-700" : ""}`}
+            onClick={handleClick}
+          >
+            {isEditMode && (
+              <button
+                type="button"
+                aria-label="Reordenar prompt"
+                className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
+                {...attributes}
+                {...listeners}
+              >
+                <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+              </button>
+            )}
+            <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar ${isEditMode ? "ml-6" : ""}`}>
+              <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden">{prompt.content}</pre>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top">¡Copiado!</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }

@@ -9,6 +9,7 @@ import type { Prompt, PromptVariable } from "@/types/prompt"
 import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-react"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { replaceVariables } from "@/lib/prompt-utils"
@@ -32,6 +33,7 @@ export function PromptPreview({
   const [content, setContent] = useState(prompt.content)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [copied, setCopied] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -48,7 +50,9 @@ export function PromptPreview({
 
   const handleCopy = () => {
     const processedText = replaceVariables(prompt.content, variables)
-    navigator.clipboard.writeText(processedText)
+    void navigator.clipboard.writeText(processedText)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 600)
   }
 
   const handleEdit = () => {
@@ -199,10 +203,17 @@ export function PromptPreview({
                 <EyeIcon className="h-4 w-4 text-zinc-300" />
                 <span className="sr-only">Preview</span>
               </Button>
-              <Button size="icon" onClick={handleCopy} className="bg-zinc-600 hover:bg-zinc-500">
-                <CopyIcon className="h-4 w-4 text-zinc-300" />
-                <span className="sr-only">Copy</span>
-              </Button>
+                <TooltipProvider>
+                  <Tooltip open={copied}>
+                    <TooltipTrigger asChild>
+                      <Button size="icon" onClick={handleCopy} className="bg-zinc-600 hover:bg-zinc-500">
+                        <CopyIcon className="h-4 w-4 text-zinc-300" />
+                        <span className="sr-only">Copy</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">¡Copiado!</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
             </div>
           )}
         </div>
