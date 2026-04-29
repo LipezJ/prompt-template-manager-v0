@@ -57,7 +57,7 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-zinc-800 rounded-md p-4 cursor-pointer relative w-[200px] h-[200px] ${
+      className={`bg-zinc-800 rounded-md p-4 cursor-pointer relative w-50 h-50 ${
         isDragging ? "shadow-lg" : ""
       } hover:bg-zinc-750 transition-colors ${copied ? "bg-zinc-700" : ""}`}
       onClick={handleClick}

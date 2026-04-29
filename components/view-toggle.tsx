@@ -18,7 +18,7 @@ export function ViewToggle({ isCardView, onToggle }: ViewToggleProps) {
             variant="outline"
             size="icon"
             onClick={onToggle}
-            className={`h-7 w-7 flex-shrink-0 ${
+            className={`h-7 w-7 shrink-0 ${
               isCardView
                 ? "bg-zinc-600 hover:bg-zinc-500 text-white"
                 : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"

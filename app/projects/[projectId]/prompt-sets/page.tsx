@@ -586,7 +586,7 @@ export default function PromptSetsPage() {
                 variant="outline"
                 size="icon"
                 onClick={addPromptSet}
-                className="h-7 w-7 flex-shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
+                className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
               >
                 <PlusIcon className="h-3.5 w-3.5 text-zinc-300" />
               </Button>
@@ -599,7 +599,7 @@ export default function PromptSetsPage() {
                       variant="outline"
                       size="icon"
                       onClick={exportActivePromptSet}
-                      className="h-7 w-7 flex-shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
+                      className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
                     >
                       <Download className="h-3.5 w-3.5 text-zinc-300" />
                     </Button>
@@ -635,11 +635,10 @@ export default function PromptSetsPage() {
                   </Button>
                 </div>
                 <DndContext
-                  sensors={sensors}
+                  sensors={isEditMode ? sensors : []}
                   collisionDetection={closestCenter}
                   onDragStart={handleVariableDragStart}
                   onDragEnd={handleVariableDragEnd}
-                  disabled={!isEditMode}
                 >
                   <PromptEditor
                     variables={activePromptSet.variables}
@@ -684,11 +683,10 @@ export default function PromptSetsPage() {
               style={{ width: variablesPanelVisible ? `${100 - splitPosition}%` : "100%" }}
             >
               <DndContext
-                sensors={sensors}
+                sensors={isEditMode ? sensors : []}
                 collisionDetection={closestCenter}
                 onDragStart={handlePromptDragStart}
                 onDragEnd={handlePromptDragEnd}
-                disabled={!isEditMode}
               >
                 <PromptsArea
                   prompts={activePromptSet.prompts}

@@ -25,7 +25,7 @@ interface SortableVariableItemProps {
   onUpdateVariable: (id: string, value: string) => void
   onEditingNameChange: (value: string) => void
   onTextareaFocus: (e: React.FocusEvent<HTMLTextAreaElement>) => void
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef: React.Ref<HTMLTextAreaElement>
 }
 
 function SortableVariableItem({
@@ -83,7 +83,7 @@ function SortableVariableItem({
         </div>
         <div>
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-zinc-700 hover:text-zinc-300">
                 <MoreVertical className="h-3 w-3 text-zinc-400" />
               </Button>
@@ -217,7 +217,9 @@ export function PromptEditor({
               onUpdateVariable={onUpdateVariable}
               onEditingNameChange={setEditingName}
               onTextareaFocus={handleTextareaFocus}
-              textareaRef={(el) => (textareaRefs.current[variable.id] = el)}
+              textareaRef={(el) => {
+                textareaRefs.current[variable.id] = el
+              }}
             />
           ))}
         </SortableContext>

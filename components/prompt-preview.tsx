@@ -164,7 +164,7 @@ export function PromptPreview({
               </div>
             )}
             <pre
-              className={`whitespace-pre-wrap text-sm p-2 bg-zinc-900 rounded min-h-[100px] max-h-[300px] overflow-y-auto cursor-pointer custom-scrollbar ${
+              className={`whitespace-pre-wrap text-sm p-2 bg-zinc-900 rounded min-h-25 max-h-75 overflow-y-auto cursor-pointer custom-scrollbar ${
                 isEditMode ? "pl-10" : ""
               }`}
               onClick={!isEditMode ? handleEdit : undefined}
@@ -173,7 +173,7 @@ export function PromptPreview({
             </pre>
             <div className="absolute top-1 right-1">
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-zinc-800 hover:text-zinc-300">
                     <MoreVertical className="h-3 w-3 text-zinc-400" />
                   </Button>

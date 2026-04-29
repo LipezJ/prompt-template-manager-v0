@@ -78,7 +78,7 @@ export function PromptSetTabs({
   return (
     <div className="flex space-x-2 overflow-x-auto pb-2">
       {promptSets.map((set) => (
-        <div key={set.id} className="flex-shrink-0">
+        <div key={set.id} className="shrink-0">
           {editingId === set.id ? (
             <Input
               ref={inputRef}
@@ -90,45 +90,50 @@ export function PromptSetTabs({
             />
           ) : (
             <div className="flex items-center">
-              <div className="flex items-center">
-                <Button
-                  variant={activePromptSetId === set.id ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleSelectPromptSet(set.id)}
-                  className={cn(
-                    "h-7 pr-1",
-                    activePromptSetId === set.id
-                      ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
-                      : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+              <Button
+                variant={activePromptSetId === set.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleSelectPromptSet(set.id)}
+                className={cn(
+                  "h-7 rounded-r-none pr-2",
+                  activePromptSetId === set.id
+                    ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
+                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+                )}
+              >
+                {set.name}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={activePromptSetId === set.id ? "default" : "outline"}
+                    size="icon"
+                    className={cn(
+                      "h-7 w-6 rounded-l-none border-l-0",
+                      activePromptSetId === set.id
+                        ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
+                        : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+                    )}
+                  >
+                    <MoreVertical className="h-3 w-3 text-zinc-400" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white">
+                  <DropdownMenuItem onClick={() => handleStartEditing(set)} className="cursor-pointer">
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Editar nombre
+                  </DropdownMenuItem>
+                  {promptSets.length > 1 && (
+                    <DropdownMenuItem
+                      onClick={() => handleDeleteClick(set.id)}
+                      className="text-red-400 focus:text-red-400 cursor-pointer"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Eliminar
+                    </DropdownMenuItem>
                   )}
-                >
-                  <span className="mr-1">{set.name}</span>
-                  <div className="ml-1">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon" className="h-5 w-5 hover:bg-zinc-600 hover:text-zinc-300">
-                          <MoreVertical className="h-3 w-3 text-zinc-400" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white">
-                        <DropdownMenuItem onClick={() => handleStartEditing(set)} className="cursor-pointer">
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Editar nombre
-                        </DropdownMenuItem>
-                        {promptSets.length > 1 && (
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteClick(set.id)}
-                            className="text-red-400 focus:text-red-400 cursor-pointer"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Eliminar
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </Button>
-              </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
         </div>
