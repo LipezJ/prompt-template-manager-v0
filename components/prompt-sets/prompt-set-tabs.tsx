@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import type { PromptSet } from "@/types/prompt"
 import { cn } from "@/lib/utils"
 import { MoreVertical, Pencil, Trash2 } from "lucide-react"
-import { ConfirmationDialog } from "./confirmation-dialog"
+import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface PromptSetTabsProps {

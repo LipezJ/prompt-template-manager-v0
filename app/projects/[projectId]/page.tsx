@@ -5,16 +5,19 @@ import type React from "react"
 import { useState, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { NavigationBar } from "@/components/navigation-bar"
+import { NavigationBar } from "@/components/layout/navigation-bar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PlusIcon, FileTextIcon, MoreVertical, Pencil, Trash2, Download, GripVertical, Upload } from "lucide-react"
 import { useLocalStorage } from "@/hooks/use-local-storage"
+import { STORAGE_KEYS } from "@/lib/constants"
+import { createDefaultProjects } from "@/lib/seed"
+import { newId } from "@/lib/ids"
 import type { Project, PromptSet } from "@/types/prompt"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ConfirmationDialog } from "@/components/confirmation-dialog"
-import { EditModeToggle } from "@/components/edit-mode-toggle"
-import { ImportPromptSetDialog } from "@/components/import-prompt-set-dialog"
+import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
+import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
+import { ImportPromptSetDialog } from "@/components/dialogs/import-prompt-set-dialog"
 import {
   DndContext,
   closestCenter,
@@ -136,47 +139,7 @@ export default function ProjectPage() {
   const router = useRouter()
   const projectId = params.projectId as string
 
-  const [projects, setProjects] = useLocalStorage<Project[]>("projects", [
-    {
-      id: "default",
-      name: "Mi Primer Proyecto",
-      promptSets: [
-        {
-          id: "set1",
-          name: "prompt set",
-          variables: [
-            { id: "name", name: "name", value: "Juan" },
-            { id: "role", name: "role", value: "asistente" },
-            { id: "task", name: "task", value: "crear un plan de marketing" },
-          ],
-          prompts: [
-            {
-              id: "prompt1",
-              content: "Hello {name}\nYou are {role}\nplease help me with {task}",
-            },
-            {
-              id: "prompt2",
-              content: "Now, as a {role}, for the {task}",
-            },
-          ],
-        },
-        {
-          id: "set2",
-          name: "prompt set 2",
-          variables: [
-            { id: "name", name: "name", value: "María" },
-            { id: "role", name: "role", value: "experto" },
-          ],
-          prompts: [
-            {
-              id: "prompt1",
-              content: "Hola {name}, como {role}, ¿podrías ayudarme?",
-            },
-          ],
-        },
-      ],
-    },
-  ])
+  const [projects, setProjects] = useLocalStorage<Project[]>(STORAGE_KEYS.projects, createDefaultProjects())
 
   const currentProject = projects.find((p) => p.id === projectId) || projects[0]
 
@@ -213,10 +176,10 @@ export default function ProjectPage() {
     if (!currentProject) return
 
     const newPromptSet = {
-      id: `set-${Date.now()}`,
+      id: newId("set"),
       name: `Nuevo Set ${currentProject.promptSets.length + 1}`,
       variables: [],
-      prompts: [{ id: `prompt-${Date.now()}`, content: "Nuevo prompt" }],
+      prompts: [{ id: newId("prompt"), content: "Nuevo prompt" }],
     }
 
     const updatedProjects = projects.map((project) => {

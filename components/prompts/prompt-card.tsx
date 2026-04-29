@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useState, useEffect } from "react"
 import { GripVertical } from "lucide-react"
+import { replaceVariables } from "@/lib/prompt-utils"
 
 interface PromptCardProps {
   prompt: Prompt
@@ -27,22 +28,13 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
     opacity: isDragging ? 0.5 : 1,
   }
 
-  const replaceVariables = (text: string): string => {
-    let result = text
-    variables.forEach((variable) => {
-      const regex = new RegExp(`{${variable.name}}`, "g")
-      result = result.replace(regex, variable.value)
-    })
-    return result
-  }
-
   const handleClick = () => {
     if (isEditMode && onOpenModal) {
       onOpenModal(prompt)
       return
     }
 
-    const processedText = replaceVariables(prompt.content)
+    const processedText = replaceVariables(prompt.content, variables)
     navigator.clipboard.writeText(processedText)
 
     setCopied(true)

@@ -3,17 +3,17 @@
 import type React from "react"
 
 import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useLocalStorage } from "@/hooks/use-local-storage"
+import { STORAGE_KEYS } from "@/lib/constants"
+import { createDefaultProjects } from "@/lib/seed"
+import { newId } from "@/lib/ids"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, FolderIcon, MoreVertical, Trash2, Download, Upload, GripVertical } from "lucide-react"
-import { ConfirmationDialog } from "./confirmation-dialog"
-import { ImportProjectDialog } from "./import-project-dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { PlusIcon, FolderIcon, Upload } from "lucide-react"
+import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
+import { ImportProjectDialog } from "@/components/dialogs/import-project-dialog"
 import type { Project } from "@/types/prompt"
-import { NavigationBar } from "./navigation-bar"
-import { EditModeToggle } from "./edit-mode-toggle"
+import { NavigationBar } from "@/components/layout/navigation-bar"
+import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
 import {
   DndContext,
   closestCenter,
@@ -27,120 +27,13 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-
-interface SortableProjectItemProps {
-  project: Project
-  isEditMode: boolean
-  onDeleteClick: (e: React.MouseEvent, id: string) => void
-  onExportProject: (e: React.MouseEvent, project: Project) => void
-  handleProjectOptions: (e: React.MouseEvent) => void
-}
-
-function SortableProjectItem({
-  project,
-  isEditMode,
-  onDeleteClick,
-  onExportProject,
-  handleProjectOptions,
-}: SortableProjectItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: project.id,
-  })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 10 : 1,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 hover:border-zinc-600 transition-colors relative ${
-        isDragging ? "shadow-lg" : ""
-      }`}
-    >
-      {isEditMode && (
-        <div
-          className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center cursor-grab active:cursor-grabbing z-10"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-5 w-5 text-zinc-500" />
-        </div>
-      )}
-      <Link href={`/projects/${project.id}`} className={`block p-4 ${isEditMode ? "pointer-events-none pl-12" : ""}`}>
-        <div className="flex items-center mb-2">
-          <FolderIcon className="h-5 w-5 text-zinc-400 mr-2" />
-          <h2 className="text-base font-medium truncate">{project.name}</h2>
-        </div>
-        <div className="text-xs text-zinc-400">
-          {project.promptSets.length} conjunto{project.promptSets.length !== 1 ? "s" : ""} de prompts
-        </div>
-      </Link>
-      <div className="absolute top-2 right-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-zinc-700" onClick={handleProjectOptions}>
-              <MoreVertical className="h-3.5 w-3.5 text-zinc-400" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white z-50">
-            <DropdownMenuItem onClick={(e) => onExportProject(e, project)} className="cursor-pointer">
-              <Download className="mr-2 h-4 w-4" />
-              Exportar
-            </DropdownMenuItem>
-            {/* Only show delete option if there's more than one project */}
-            <DropdownMenuItem
-              onClick={(e) => onDeleteClick(e, project.id)}
-              className="text-red-400 focus:text-red-400 cursor-pointer"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Eliminar proyecto
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
-  )
-}
+import { ProjectItem } from "./project-item"
 
 export function ProjectGrid() {
-  const router = useRouter()
-  const [projects, setProjects] = useLocalStorage<Project[]>("projects", [
-    {
-      id: "default",
-      name: "Mi Primer Proyecto",
-      promptSets: [
-        {
-          id: "set1",
-          name: "prompt set",
-          variables: [
-            { id: "name", name: "name", value: "Juan" },
-            { id: "role", name: "role", value: "asistente" },
-            { id: "task", name: "task", value: "crear un plan de marketing" },
-          ],
-          prompts: [
-            {
-              id: "prompt1",
-              content: "Hello {name}\nYou are {role}\nplease help me with {task}",
-            },
-            {
-              id: "prompt2",
-              content: "Now, as a {role}, for the {task}",
-            },
-          ],
-        },
-      ],
-    },
-  ])
+  const [projects, setProjects] = useLocalStorage<Project[]>(STORAGE_KEYS.projects, createDefaultProjects())
 
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
@@ -160,14 +53,14 @@ export function ProjectGrid() {
 
   const addProject = () => {
     const newProject: Project = {
-      id: `project-${Date.now()}`,
+      id: newId("project"),
       name: `Nuevo Proyecto ${projects.length + 1}`,
       promptSets: [
         {
-          id: `set-${Date.now()}`,
+          id: newId("set"),
           name: "Prompt Set 1",
           variables: [],
-          prompts: [{ id: `prompt-${Date.now()}`, content: "Nuevo prompt" }],
+          prompts: [{ id: newId("prompt"), content: "Nuevo prompt" }],
         },
       ],
     }
@@ -292,7 +185,7 @@ export function ProjectGrid() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <SortableContext items={projects.map((p) => p.id)} strategy={verticalListSortingStrategy}>
                 {projects.map((project) => (
-                  <SortableProjectItem
+                  <ProjectItem
                     key={project.id}
                     project={project}
                     isEditMode={isEditMode}

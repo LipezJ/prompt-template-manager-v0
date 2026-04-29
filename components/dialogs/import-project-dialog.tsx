@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import type { Project } from "@/types/prompt"
+import { newId } from "@/lib/ids"
 
 interface ImportProjectDialogProps {
   isOpen: boolean
@@ -36,7 +37,7 @@ export function ImportProjectDialog({ isOpen, onClose, onImport }: ImportProject
       // Generate a new ID to avoid conflicts
       const newProject: Project = {
         ...projectData,
-        id: `project-${Date.now()}`,
+        id: newId("project"),
       }
 
       onImport(newProject)

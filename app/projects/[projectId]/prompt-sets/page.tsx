@@ -4,16 +4,19 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { NavigationBar } from "@/components/navigation-bar"
-import { PromptSetTabs } from "@/components/prompt-set-tabs"
-import { PromptEditor } from "@/components/prompt-editor"
-import { PromptsArea } from "@/components/prompts-area"
+import { NavigationBar } from "@/components/layout/navigation-bar"
+import { PromptSetTabs } from "@/components/prompt-sets/prompt-set-tabs"
+import { VariablesEditor } from "@/components/variables/variables-editor"
+import { PromptsArea } from "@/components/prompts/prompts-area"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import { useLocalStorage } from "@/hooks/use-local-storage"
+import { STORAGE_KEYS } from "@/lib/constants"
+import { createDefaultProjects } from "@/lib/seed"
+import { newId } from "@/lib/ids"
 import type { Project, PromptSet, PromptVariable, Prompt } from "@/types/prompt"
-import { EditModeToggle } from "@/components/edit-mode-toggle"
-import { ViewToggle } from "@/components/view-toggle"
+import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
+import { ViewToggle } from "@/components/layout/view-toggle"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -26,57 +29,7 @@ export default function PromptSetsPage() {
   const searchParams = useSearchParams()
   const setIdFromUrl = searchParams.get("set")
 
-  const [projects, setProjects] = useLocalStorage<Project[]>("projects", [
-    {
-      id: "default",
-      name: "Mi Primer Proyecto",
-      promptSets: [
-        {
-          id: "set1",
-          name: "prompt set",
-          variables: [
-            { id: "name", name: "name", value: "Juan" },
-            { id: "role", name: "role", value: "asistente" },
-            { id: "task", name: "task", value: "crear un plan de marketing" },
-          ],
-          prompts: [
-            {
-              id: "prompt1",
-              content: "Hello {name}\nYou are {role}\nplease help me with {task}",
-            },
-            {
-              id: "prompt2",
-              content: "Now, as a {role}, for the {task}",
-            },
-          ],
-          uiPreferences: {
-            splitPosition: 50,
-            variablesPanelVisible: true,
-            cardView: false,
-          },
-        },
-        {
-          id: "set2",
-          name: "prompt set 2",
-          variables: [
-            { id: "name", name: "name", value: "María" },
-            { id: "role", name: "role", value: "experto" },
-          ],
-          prompts: [
-            {
-              id: "prompt1",
-              content: "Hola {name}, como {role}, ¿podrías ayudarme?",
-            },
-          ],
-          uiPreferences: {
-            splitPosition: 50,
-            variablesPanelVisible: true,
-            cardView: false,
-          },
-        },
-      ],
-    },
-  ])
+  const [projects, setProjects] = useLocalStorage<Project[]>(STORAGE_KEYS.projects, createDefaultProjects())
 
   const currentProject = projects.find((p) => p.id === projectId) || projects[0]
 
@@ -187,7 +140,7 @@ export default function PromptSetsPage() {
     if (!currentProject || !activePromptSet) return
 
     const newVariable: PromptVariable = {
-      id: `var-${Date.now()}`,
+      id: newId("var"),
       name: "nueva_variable",
       value: "",
     }
@@ -252,7 +205,7 @@ export default function PromptSetsPage() {
     if (!currentProject || !activePromptSet) return
 
     const newPrompt: Prompt = {
-      id: `prompt-${Date.now()}`,
+      id: newId("prompt"),
       content: "Nuevo prompt",
     }
 
@@ -294,10 +247,10 @@ export default function PromptSetsPage() {
     if (!currentProject) return
 
     const newPromptSet: PromptSet = {
-      id: `set-${Date.now()}`,
+      id: newId("set"),
       name: `Nuevo Set ${currentProject.promptSets.length + 1}`,
       variables: [],
-      prompts: [{ id: `prompt-${Date.now()}`, content: "Nuevo prompt" }],
+      prompts: [{ id: newId("prompt"), content: "Nuevo prompt" }],
       uiPreferences: {
         splitPosition: 50,
         variablesPanelVisible: true,
@@ -640,7 +593,7 @@ export default function PromptSetsPage() {
                   onDragStart={handleVariableDragStart}
                   onDragEnd={handleVariableDragEnd}
                 >
-                  <PromptEditor
+                  <VariablesEditor
                     variables={activePromptSet.variables}
                     onUpdateVariable={updateVariable}
                     onUpdateVariableName={updateVariableName}

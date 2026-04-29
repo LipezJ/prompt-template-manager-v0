@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import type { PromptSet } from "@/types/prompt"
+import { newId } from "@/lib/ids"
 
 interface ImportPromptSetDialogProps {
   isOpen: boolean
@@ -41,7 +42,7 @@ export function ImportPromptSetDialog({ isOpen, onClose, onImport }: ImportPromp
       // Generate a new ID to avoid conflicts
       const newPromptSet: PromptSet = {
         ...promptSetData,
-        id: `set-${Date.now()}`,
+        id: newId("set"),
       }
 
       onImport(newPromptSet)

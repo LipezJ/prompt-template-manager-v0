@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button"
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea"
 import type { Prompt, PromptVariable } from "@/types/prompt"
 import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-react"
-import { ConfirmationDialog } from "./confirmation-dialog"
+import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { replaceVariables } from "@/lib/prompt-utils"
 
 interface PromptPreviewProps {
   prompt: Prompt
@@ -45,17 +46,8 @@ export function PromptPreview({
     opacity: isDragging ? 0.5 : 1,
   }
 
-  const replaceVariables = (text: string): string => {
-    let result = text
-    variables.forEach((variable) => {
-      const regex = new RegExp(`{${variable.name}}`, "g")
-      result = result.replace(regex, variable.value)
-    })
-    return result
-  }
-
   const handleCopy = () => {
-    const processedText = replaceVariables(prompt.content)
+    const processedText = replaceVariables(prompt.content, variables)
     navigator.clipboard.writeText(processedText)
   }
 
@@ -169,7 +161,7 @@ export function PromptPreview({
               }`}
               onClick={!isEditMode ? handleEdit : undefined}
             >
-              {isPreviewMode ? replaceVariables(prompt.content) : prompt.content}
+              {isPreviewMode ? replaceVariables(prompt.content, variables) : prompt.content}
             </pre>
             <div className="absolute top-1 right-1">
               <DropdownMenu>
