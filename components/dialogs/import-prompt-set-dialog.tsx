@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import type { PromptSet } from "@/types/prompt"
 import { newId } from "@/lib/ids"
+import { parseImportedPromptSet } from "@/lib/storage/projects-repository"
 
 interface ImportPromptSetDialogProps {
   isOpen: boolean
@@ -25,33 +26,16 @@ export function ImportPromptSetDialog({ isOpen, onClose, onImport }: ImportPromp
   const [error, setError] = useState<string | null>(null)
 
   const handleImport = () => {
-    try {
-      // Try to parse the JSON
-      const promptSetData = JSON.parse(jsonInput)
-
-      // Basic validation
-      if (
-        !promptSetData.id ||
-        !promptSetData.name ||
-        !Array.isArray(promptSetData.variables) ||
-        !Array.isArray(promptSetData.prompts)
-      ) {
-        throw new Error("El JSON no tiene el formato correcto de un conjunto de prompts")
-      }
-
-      // Generate a new ID to avoid conflicts
-      const newPromptSet: PromptSet = {
-        ...promptSetData,
-        id: newId("set"),
-      }
-
-      onImport(newPromptSet)
-      onClose()
-      setJsonInput("")
-      setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al procesar el JSON")
+    const result = parseImportedPromptSet(jsonInput)
+    if (!result.ok) {
+      setError(result.error)
+      return
     }
+    const newPromptSet: PromptSet = { ...result.value, id: newId("set") }
+    onImport(newPromptSet)
+    onClose()
+    setJsonInput("")
+    setError(null)
   }
 
   return (

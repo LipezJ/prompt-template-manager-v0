@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import type { Project } from "@/types/prompt"
 import { newId } from "@/lib/ids"
+import { parseImportedProject } from "@/lib/storage/projects-repository"
 
 interface ImportProjectDialogProps {
   isOpen: boolean
@@ -25,28 +26,16 @@ export function ImportProjectDialog({ isOpen, onClose, onImport }: ImportProject
   const [error, setError] = useState<string | null>(null)
 
   const handleImport = () => {
-    try {
-      // Try to parse the JSON
-      const projectData = JSON.parse(jsonInput)
-
-      // Basic validation
-      if (!projectData.id || !projectData.name || !Array.isArray(projectData.promptSets)) {
-        throw new Error("El JSON no tiene el formato correcto de un proyecto")
-      }
-
-      // Generate a new ID to avoid conflicts
-      const newProject: Project = {
-        ...projectData,
-        id: newId("project"),
-      }
-
-      onImport(newProject)
-      onClose()
-      setJsonInput("")
-      setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al procesar el JSON")
+    const result = parseImportedProject(jsonInput)
+    if (!result.ok) {
+      setError(result.error)
+      return
     }
+    const newProject: Project = { ...result.value, id: newId("project") }
+    onImport(newProject)
+    onClose()
+    setJsonInput("")
+    setError(null)
   }
 
   return (
