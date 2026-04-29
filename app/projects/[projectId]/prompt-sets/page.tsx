@@ -3,359 +3,67 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 import { NavigationBar } from "@/components/layout/navigation-bar"
 import { PromptSetTabs } from "@/components/prompt-sets/prompt-set-tabs"
 import { VariablesEditor } from "@/components/variables/variables-editor"
 import { PromptsArea } from "@/components/prompts/prompts-area"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, Download, ChevronLeft, ChevronRight } from "lucide-react"
-import { useLocalStorage } from "@/hooks/use-local-storage"
-import { STORAGE_KEYS } from "@/lib/constants"
-import { createDefaultProjects } from "@/lib/seed"
-import { newId } from "@/lib/ids"
-import type { Project, PromptSet, PromptVariable, Prompt } from "@/types/prompt"
+import { useProjects } from "@/lib/hooks/use-projects"
+import { useActivePromptSet } from "@/lib/hooks/use-active-prompt-set"
 import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
 import { ViewToggle } from "@/components/layout/view-toggle"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function PromptSetsPage() {
   const params = useParams()
-  const router = useRouter()
   const projectId = params.projectId as string
 
-  const searchParams = useSearchParams()
-  const setIdFromUrl = searchParams.get("set")
+  const projectsState = useProjects()
+  const { projects } = projectsState
+  const activeState = useActivePromptSet(projectId, projectsState)
+  const {
+    currentProject,
+    activePromptSet,
+    activePromptSetId,
+    selectPromptSet,
+    addPromptSet,
+    deletePromptSet,
+    renameActivePromptSet,
+    updateUiPreferences,
+    addVariable,
+    updateVariable,
+    updateVariableName,
+    deleteVariable,
+    clearAllVariableValues,
+    reorderVariables,
+    addPrompt,
+    updatePrompt,
+    deletePrompt,
+    reorderPrompts,
+  } = activeState
 
-  const [projects, setProjects] = useLocalStorage<Project[]>(STORAGE_KEYS.projects, createDefaultProjects())
-
-  const currentProject = projects.find((p) => p.id === projectId) || projects[0]
-
-  // Initialize with a default value to prevent undefined
-  const [activePromptSetId, setActivePromptSetId] = useState<string>(currentProject?.promptSets[0]?.id || "")
-
-  // State for edit mode
   const [isEditMode, setIsEditMode] = useState(false)
-  const [activeVariableId, setActiveVariableId] = useState<string | null>(null)
-  const [activePromptId, setActivePromptId] = useState<string | null>(null)
-
-  // Añade estos estados después de los otros estados
   const [isDraggingSplitter, setIsDraggingSplitter] = useState(false)
 
-  // Get the active prompt set based on the ID
-  const activePromptSet = currentProject?.promptSets.find((set) => set.id === activePromptSetId)
-
-  // Obtener las preferencias de UI del prompt set activo o usar valores predeterminados
   const splitPosition = activePromptSet?.uiPreferences?.splitPosition ?? 50
   const variablesPanelVisible = activePromptSet?.uiPreferences?.variablesPanelVisible ?? true
   const cardView = activePromptSet?.uiPreferences?.cardView ?? false
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
-
-  // Effect to handle URL parameter and project changes
-  useEffect(() => {
-    if (!currentProject?.promptSets?.length) return
-
-    // If there's a set ID in the URL and it exists in this project, use it
-    if (setIdFromUrl) {
-      const setExists = currentProject.promptSets.some((set) => set.id === setIdFromUrl)
-      if (setExists) {
-        setActivePromptSetId(setIdFromUrl)
-        return
-      }
-    }
-
-    // Otherwise, use the first prompt set
-    setActivePromptSetId(currentProject.promptSets[0].id)
-  }, [currentProject, setIdFromUrl])
-
-  // Handle selecting a different prompt set
-  const handleSelectPromptSet = (id: string) => {
-    setActivePromptSetId(id)
-
-    // Update the URL to reflect the selected prompt set
-    const url = new URL(window.location.href)
-    url.searchParams.set("set", id)
-    window.history.pushState({}, "", url.toString())
-  }
-
-  const updateVariable = (variableId: string, value: string) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        const updatedVariables = set.variables.map((variable) => {
-          if (variable.id !== variableId) return variable
-          return { ...variable, value }
-        })
-
-        return { ...set, variables: updatedVariables }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const updateVariableName = (variableId: string, name: string) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        const updatedVariables = set.variables.map((variable) => {
-          if (variable.id !== variableId) return variable
-          return { ...variable, name }
-        })
-
-        return { ...set, variables: updatedVariables }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const addVariable = () => {
-    if (!currentProject || !activePromptSet) return
-
-    const newVariable: PromptVariable = {
-      id: newId("var"),
-      name: "nueva_variable",
-      value: "",
-    }
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-        return { ...set, variables: [...set.variables, newVariable] }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const deleteVariable = (variableId: string) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        const updatedVariables = set.variables.filter((variable) => variable.id !== variableId)
-
-        return { ...set, variables: updatedVariables }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const clearAllVariableValues = () => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        const updatedVariables = set.variables.map((variable) => {
-          return { ...variable, value: "" }
-        })
-
-        return { ...set, variables: updatedVariables }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const addPrompt = () => {
-    if (!currentProject || !activePromptSet) return
-
-    const newPrompt: Prompt = {
-      id: newId("prompt"),
-      content: "Nuevo prompt",
-    }
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-        return { ...set, prompts: [...set.prompts, newPrompt] }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const deletePrompt = (promptId: string) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        const updatedPrompts = set.prompts.filter((prompt) => prompt.id !== promptId)
-
-        return { ...set, prompts: updatedPrompts }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const addPromptSet = () => {
-    if (!currentProject) return
-
-    const newPromptSet: PromptSet = {
-      id: newId("set"),
-      name: `Nuevo Set ${currentProject.promptSets.length + 1}`,
-      variables: [],
-      prompts: [{ id: newId("prompt"), content: "Nuevo prompt" }],
-      uiPreferences: {
-        splitPosition: 50,
-        variablesPanelVisible: true,
-        cardView: false,
-      },
-    }
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-      return {
-        ...project,
-        promptSets: [...project.promptSets, newPromptSet],
-      }
-    })
-
-    setProjects(updatedProjects)
-    handleSelectPromptSet(newPromptSet.id)
-  }
-
-  const deletePromptSet = (promptSetId: string) => {
-    if (!currentProject) return
-    if (currentProject.promptSets.length <= 1) return // Prevent deleting the last prompt set
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== promptSetId) return set
-
-        return { ...set }
-      })
-
-      const updatedPromptSetsFiltered = updatedPromptSets.filter((set) => set.id !== promptSetId)
-
-      return { ...project, promptSets: updatedPromptSetsFiltered }
-    })
-
-    setProjects(updatedProjects)
-
-    // If the active prompt set is deleted, select another one
-    if (promptSetId === activePromptSetId) {
-      const updatedProject = updatedProjects.find((p) => p.id === currentProject.id)
-      if (updatedProject && updatedProject.promptSets.length > 0) {
-        handleSelectPromptSet(updatedProject.promptSets[0].id)
-      }
-    }
-  }
-
-  // Solo actualizar esta función para eliminar el parámetro name
-  const updatePrompt = (promptId: string, content: string) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        const updatedPrompts = set.prompts.map((prompt) => {
-          if (prompt.id !== promptId) return prompt
-          return { ...prompt, content }
-        })
-
-        return { ...set, prompts: updatedPrompts }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const updatePromptSetName = (name: string) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-        return { ...set, name }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
 
   const exportActivePromptSet = () => {
     if (!activePromptSet) return
-
     try {
-      // Create a copy of the prompt set to export
-      const promptSetToExport = { ...activePromptSet }
-
-      // Convert to JSON string with pretty formatting
-      const jsonString = JSON.stringify(promptSetToExport, null, 2)
-
-      // Copy to clipboard
       navigator.clipboard
-        .writeText(jsonString)
-        .then(() => {
-          alert("Conjunto de prompts exportado al portapapeles")
-        })
+        .writeText(JSON.stringify(activePromptSet, null, 2))
+        .then(() => alert("Conjunto de prompts exportado al portapapeles"))
         .catch((err) => {
           console.error("Error al copiar al portapapeles:", err)
           alert("Error al exportar. Consulta la consola para más detalles.")
@@ -366,113 +74,23 @@ export default function PromptSetsPage() {
     }
   }
 
-  const toggleEditMode = () => {
-    setIsEditMode(!isEditMode)
-  }
-
-  const toggleCardView = () => {
-    updateUIPreferences({ cardView: !cardView })
-  }
-
-  const handleVariableDragStart = (event: any) => {
-    setActiveVariableId(event.active.id)
-  }
-
   const handleVariableDragEnd = (event: any) => {
     const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      setProjects((items) => {
-        return items.map((project) => {
-          if (project.id !== currentProject.id) return project
-
-          const updatedPromptSets = project.promptSets.map((set) => {
-            if (set.id !== activePromptSet?.id) return set
-
-            const oldIndex = set.variables.findIndex((variable) => variable.id === active.id)
-            const newIndex = set.variables.findIndex((variable) => variable.id === over.id)
-
-            return {
-              ...set,
-              variables: arrayMove(set.variables, oldIndex, newIndex),
-            }
-          })
-
-          return {
-            ...project,
-            promptSets: updatedPromptSets,
-          }
-        })
-      })
-    }
-
-    setActiveVariableId(null)
-  }
-
-  const handlePromptDragStart = (event: any) => {
-    setActivePromptId(event.active.id)
+    if (!over || active.id === over.id || !activePromptSet) return
+    const oldIndex = activePromptSet.variables.findIndex((v) => v.id === active.id)
+    const newIndex = activePromptSet.variables.findIndex((v) => v.id === over.id)
+    if (oldIndex !== -1 && newIndex !== -1) reorderVariables(oldIndex, newIndex)
   }
 
   const handlePromptDragEnd = (event: any) => {
     const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      setProjects((items) => {
-        return items.map((project) => {
-          if (project.id !== currentProject.id) return project
-
-          const updatedPromptSets = project.promptSets.map((set) => {
-            if (set.id !== activePromptSet?.id) return set
-
-            const oldIndex = set.prompts.findIndex((prompt) => prompt.id === active.id)
-            const newIndex = set.prompts.findIndex((prompt) => prompt.id === over.id)
-
-            return {
-              ...set,
-              prompts: arrayMove(set.prompts, oldIndex, newIndex),
-            }
-          })
-
-          return {
-            ...project,
-            promptSets: updatedPromptSets,
-          }
-        })
-      })
-    }
-
-    setActivePromptId(null)
+    if (!over || active.id === over.id || !activePromptSet) return
+    const oldIndex = activePromptSet.prompts.findIndex((p) => p.id === active.id)
+    const newIndex = activePromptSet.prompts.findIndex((p) => p.id === over.id)
+    if (oldIndex !== -1 && newIndex !== -1) reorderPrompts(oldIndex, newIndex)
   }
 
-  const updateUIPreferences = (
-    updates: Partial<{ splitPosition: number; variablesPanelVisible: boolean; cardView: boolean }>,
-  ) => {
-    if (!currentProject || !activePromptSet) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.map((set) => {
-        if (set.id !== activePromptSet.id) return set
-
-        return {
-          ...set,
-          uiPreferences: {
-            splitPosition: updates.splitPosition ?? set.uiPreferences?.splitPosition ?? 50,
-            variablesPanelVisible: updates.variablesPanelVisible ?? set.uiPreferences?.variablesPanelVisible ?? true,
-            cardView: updates.cardView !== undefined ? updates.cardView : (set.uiPreferences?.cardView ?? false),
-          },
-        }
-      })
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  // Añade estas funciones antes del return
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = () => {
     setIsDraggingSplitter(true)
     document.body.style.cursor = "col-resize"
     document.body.style.userSelect = "none"
@@ -488,16 +106,13 @@ export default function PromptSetsPage() {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDraggingSplitter) return
-
     const container = e.currentTarget as HTMLElement
     const rect = container.getBoundingClientRect()
     const x = e.clientX - rect.left
     const newSplitPosition = Math.min(Math.max((x / rect.width) * 100, 20), 80)
-
-    updateUIPreferences({ splitPosition: newSplitPosition })
+    updateUiPreferences({ splitPosition: newSplitPosition })
   }
 
-  // Añade un efecto para limpiar los eventos del mouse
   useEffect(() => {
     const handleGlobalMouseUp = () => {
       if (isDraggingSplitter) {
@@ -506,31 +121,25 @@ export default function PromptSetsPage() {
         document.body.style.userSelect = ""
       }
     }
-
     document.addEventListener("mouseup", handleGlobalMouseUp)
-    return () => {
-      document.removeEventListener("mouseup", handleGlobalMouseUp)
-    }
+    return () => document.removeEventListener("mouseup", handleGlobalMouseUp)
   }, [isDraggingSplitter])
 
   if (!currentProject) return null
 
   return (
     <div className="flex flex-col h-screen bg-zinc-900 text-white overflow-hidden">
-      {/* Navigation Bar with Tabs */}
       <NavigationBar projects={projects} currentProject={currentProject} />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Prompt Set Tabs - more compact */}
         <div className="py-2 px-4 border-b border-zinc-700">
           <div className="flex items-center">
             <div className="flex-1 overflow-x-auto custom-scrollbar">
               <PromptSetTabs
                 promptSets={currentProject.promptSets}
                 activePromptSetId={activePromptSetId}
-                onSelectPromptSet={handleSelectPromptSet}
-                onUpdateName={updatePromptSetName}
+                onSelectPromptSet={selectPromptSet}
+                onUpdateName={renameActivePromptSet}
                 onDeletePromptSet={deletePromptSet}
               />
             </div>
@@ -543,8 +152,8 @@ export default function PromptSetsPage() {
               >
                 <PlusIcon className="h-3.5 w-3.5 text-zinc-300" />
               </Button>
-              <ViewToggle isCardView={cardView} onToggle={toggleCardView} />
-              <EditModeToggle isEditMode={isEditMode} onToggle={toggleEditMode} />
+              <ViewToggle isCardView={cardView} onToggle={() => updateUiPreferences({ cardView: !cardView })} />
+              <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -566,14 +175,12 @@ export default function PromptSetsPage() {
           </div>
         </div>
 
-        {/* Content Area */}
         {activePromptSet && (
           <div
             className="flex-1 flex overflow-hidden h-0 min-h-0 p-4"
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            {/* Variables Column - Fixed height, no scroll */}
             {variablesPanelVisible && (
               <div className="flex flex-col min-h-0 h-full overflow-hidden" style={{ width: `${splitPosition}%` }}>
                 <div className="flex justify-between items-center mb-2">
@@ -581,7 +188,7 @@ export default function PromptSetsPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => updateUIPreferences({ variablesPanelVisible: false })}
+                    onClick={() => updateUiPreferences({ variablesPanelVisible: false })}
                     className="h-6 w-6 hover:bg-zinc-700"
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -590,7 +197,6 @@ export default function PromptSetsPage() {
                 <DndContext
                   sensors={isEditMode ? sensors : []}
                   collisionDetection={closestCenter}
-                  onDragStart={handleVariableDragStart}
                   onDragEnd={handleVariableDragEnd}
                 >
                   <VariablesEditor
@@ -606,7 +212,6 @@ export default function PromptSetsPage() {
               </div>
             )}
 
-            {/* Splitter */}
             {variablesPanelVisible && (
               <div
                 className="w-2 h-full flex items-center justify-center cursor-col-resize mx-2 group"
@@ -616,13 +221,12 @@ export default function PromptSetsPage() {
               </div>
             )}
 
-            {/* Botón para mostrar variables cuando están ocultas */}
             {!variablesPanelVisible && (
               <div className="mb-2 ml-1 mr-3 flex items-start">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => updateUIPreferences({ variablesPanelVisible: true })}
+                  onClick={() => updateUiPreferences({ variablesPanelVisible: true })}
                   className="h-6 w-6 hover:bg-zinc-700"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -630,7 +234,6 @@ export default function PromptSetsPage() {
               </div>
             )}
 
-            {/* Prompts Column - With scroll */}
             <div
               className="flex flex-col min-h-0 h-full overflow-hidden"
               style={{ width: variablesPanelVisible ? `${100 - splitPosition}%` : "100%" }}
@@ -638,7 +241,6 @@ export default function PromptSetsPage() {
               <DndContext
                 sensors={isEditMode ? sensors : []}
                 collisionDetection={closestCenter}
-                onDragStart={handlePromptDragStart}
                 onDragEnd={handlePromptDragEnd}
               >
                 <PromptsArea

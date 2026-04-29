@@ -106,7 +106,6 @@ test.describe("crud and persistence", () => {
   })
 
   test("corrupted localStorage does not crash the app", async ({ page }) => {
-    test.fail(true, "Until Phase 2 (zod repository) lands, useLocalStorage parses non-array JSON and the app crashes.")
     const errors = captureFatalErrors(page)
     await page.addInitScript(() => {
       window.localStorage.setItem("projects", '{"this": "is not an array"}')
@@ -115,5 +114,9 @@ test.describe("crud and persistence", () => {
     await page.waitForLoadState("networkidle")
     await expect(page.locator("body")).toBeVisible()
     expect(errors, errors.join("\n")).toHaveLength(0)
+    const backupKey = await page.evaluate(() =>
+      Object.keys(window.localStorage).find((k) => k.startsWith("projects.corrupt.")),
+    )
+    expect(backupKey, "expected a backup of the corrupted blob").toBeTruthy()
   })
 })

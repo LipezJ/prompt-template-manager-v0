@@ -3,10 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useLocalStorage } from "@/hooks/use-local-storage"
-import { STORAGE_KEYS } from "@/lib/constants"
-import { createDefaultProjects } from "@/lib/seed"
-import { newId } from "@/lib/ids"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, FolderIcon, Upload } from "lucide-react"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
@@ -23,17 +19,13 @@ import {
   useSensors,
   DragOverlay,
 } from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useProjects } from "@/lib/hooks/use-projects"
 import { ProjectItem } from "./project-item"
 
 export function ProjectGrid() {
-  const [projects, setProjects] = useLocalStorage<Project[]>(STORAGE_KEYS.projects, createDefaultProjects())
+  const { projects, addProject, deleteProject, importProject, reorderProjects } = useProjects()
 
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
@@ -41,38 +33,9 @@ export function ProjectGrid() {
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
-
-  const addProject = () => {
-    const newProject: Project = {
-      id: newId("project"),
-      name: `Nuevo Proyecto ${projects.length + 1}`,
-      promptSets: [
-        {
-          id: newId("set"),
-          name: "Prompt Set 1",
-          variables: [],
-          prompts: [{ id: newId("prompt"), content: "Nuevo prompt" }],
-        },
-      ],
-    }
-
-    setProjects([...projects, newProject])
-  }
-
-  const deleteProject = (projectId: string) => {
-    if (projects.length <= 1) return // Prevent deleting the last project
-    const updatedProjects = projects.filter((project) => project.id !== projectId)
-    setProjects(updatedProjects)
-  }
 
   const handleDeleteClick = (e: React.MouseEvent, id: string) => {
     e.preventDefault()
@@ -88,7 +51,6 @@ export function ProjectGrid() {
   }
 
   const handleProjectOptions = (e: React.MouseEvent) => {
-    // Prevent navigation when clicking the dropdown
     e.preventDefault()
     e.stopPropagation()
   }
@@ -98,18 +60,10 @@ export function ProjectGrid() {
     e.stopPropagation()
 
     try {
-      // Create a copy of the project to export
-      const projectToExport = { ...project }
-
-      // Convert to JSON string with pretty formatting
-      const jsonString = JSON.stringify(projectToExport, null, 2)
-
-      // Copy to clipboard
+      const jsonString = JSON.stringify(project, null, 2)
       navigator.clipboard
         .writeText(jsonString)
-        .then(() => {
-          alert("Proyecto exportado al portapapeles")
-        })
+        .then(() => alert("Proyecto exportado al portapapeles"))
         .catch((err) => {
           console.error("Error al copiar al portapapeles:", err)
           alert("Error al exportar. Consulta la consola para más detalles.")
@@ -120,30 +74,18 @@ export function ProjectGrid() {
     }
   }
 
-  const handleImportProject = (project: Project) => {
-    setProjects([...projects, project])
-  }
-
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id)
   }
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event
-
     if (over && active.id !== over.id) {
-      setProjects((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-        return arrayMove(items, oldIndex, newIndex)
-      })
+      const oldIndex = projects.findIndex((p) => p.id === active.id)
+      const newIndex = projects.findIndex((p) => p.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) reorderProjects(oldIndex, newIndex)
     }
-
     setActiveId(null)
-  }
-
-  const toggleEditMode = () => {
-    setIsEditMode(!isEditMode)
   }
 
   return (
@@ -155,7 +97,7 @@ export function ProjectGrid() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl font-bold">Mis Proyectos</h1>
             <div className="flex space-x-2">
-              <EditModeToggle isEditMode={isEditMode} onToggle={toggleEditMode} />
+              <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -196,10 +138,9 @@ export function ProjectGrid() {
                 ))}
               </SortableContext>
 
-              {/* Add new project card */}
               {!isEditMode && (
                 <button
-                  onClick={addProject}
+                  onClick={() => addProject()}
                   className="bg-zinc-800 rounded-lg border border-zinc-700 border-dashed hover:border-zinc-500 hover:bg-zinc-750 transition-colors flex flex-col items-center justify-center p-5 h-full"
                 >
                   <PlusIcon className="h-6 w-6 text-zinc-500 mb-2" />
@@ -233,7 +174,7 @@ export function ProjectGrid() {
       <ImportProjectDialog
         isOpen={isImportDialogOpen}
         onClose={() => setIsImportDialogOpen(false)}
-        onImport={handleImportProject}
+        onImport={importProject}
       />
     </div>
   )

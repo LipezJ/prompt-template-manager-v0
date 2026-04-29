@@ -9,11 +9,9 @@ import { NavigationBar } from "@/components/layout/navigation-bar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PlusIcon, FileTextIcon, MoreVertical, Pencil, Trash2, Download, GripVertical, Upload } from "lucide-react"
-import { useLocalStorage } from "@/hooks/use-local-storage"
-import { STORAGE_KEYS } from "@/lib/constants"
-import { createDefaultProjects } from "@/lib/seed"
 import { newId } from "@/lib/ids"
-import type { Project, PromptSet } from "@/types/prompt"
+import { useProjects } from "@/lib/hooks/use-projects"
+import type { PromptSet } from "@/types/prompt"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
@@ -139,74 +137,46 @@ export default function ProjectPage() {
   const router = useRouter()
   const projectId = params.projectId as string
 
-  const [projects, setProjects] = useLocalStorage<Project[]>(STORAGE_KEYS.projects, createDefaultProjects())
+  const { projects, updateProject, deleteProject } = useProjects()
+  const currentProject = projects.find((p) => p.id === projectId) ?? projects[0]
 
-  const currentProject = projects.find((p) => p.id === projectId) || projects[0]
-
-  // State for editing project name
   const [isEditingName, setIsEditingName] = useState(false)
-  const [projectName, setProjectName] = useState(currentProject?.name || "")
+  const [projectName, setProjectName] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // State for delete confirmation
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
-
-  // State for prompt set options
   const [promptSetToDelete, setPromptSetToDelete] = useState<string | null>(null)
-
-  // State for edit mode
   const [isEditMode, setIsEditMode] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
-
-  // State for import prompt set dialog
   const [isImportPromptSetDialogOpen, setIsImportPromptSetDialogOpen] = useState(false)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
   const addPromptSet = () => {
     if (!currentProject) return
-
-    const newPromptSet = {
+    const newPromptSet: PromptSet = {
       id: newId("set"),
       name: `Nuevo Set ${currentProject.promptSets.length + 1}`,
       variables: [],
       prompts: [{ id: newId("prompt"), content: "Nuevo prompt" }],
     }
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-      return {
-        ...project,
-        promptSets: [...project.promptSets, newPromptSet],
-      }
-    })
-
-    setProjects(updatedProjects)
+    updateProject(currentProject.id, (project) => ({
+      ...project,
+      promptSets: [...project.promptSets, newPromptSet],
+    }))
   }
 
   const updateProjectName = (name: string) => {
     if (!currentProject || name.trim() === "") return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-      return { ...project, name }
-    })
-
-    setProjects(updatedProjects)
+    updateProject(currentProject.id, (project) => ({ ...project, name }))
   }
 
   const handleEditName = () => {
     setIsEditingName(true)
-    setProjectName(currentProject?.name || "")
+    setProjectName(currentProject?.name ?? "")
     setTimeout(() => {
       inputRef.current?.focus()
       inputRef.current?.select()
@@ -218,118 +188,65 @@ export default function ProjectPage() {
     setIsEditingName(false)
   }
 
-  const handleDeleteProject = () => {
-    setShowDeleteConfirmation(true)
-  }
-
   const confirmDeleteProject = () => {
-    if (projects.length <= 1) return // Prevent deleting the last project
-
-    const updatedProjects = projects.filter((project) => project.id !== currentProject.id)
-    setProjects(updatedProjects)
-
-    // Navigate to the first project
-    if (updatedProjects.length > 0) {
-      router.push(`/projects/${updatedProjects[0].id}`)
+    if (!currentProject) return
+    if (projects.length <= 1) return
+    deleteProject(currentProject.id)
+    const remaining = projects.filter((p) => p.id !== currentProject.id)
+    if (remaining.length > 0) {
+      router.push(`/projects/${remaining[0].id}`)
     } else {
       router.push("/")
     }
   }
 
-  const deletePromptSet = (promptSetId: string) => {
+  const removePromptSet = (promptSetId: string) => {
     if (!currentProject) return
-    if (currentProject.promptSets.length <= 1) return // Prevent deleting the last prompt set
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-
-      const updatedPromptSets = project.promptSets.filter((set) => set.id !== promptSetId)
-
-      return { ...project, promptSets: updatedPromptSets }
-    })
-
-    setProjects(updatedProjects)
+    if (currentProject.promptSets.length <= 1) return
+    updateProject(currentProject.id, (project) => ({
+      ...project,
+      promptSets: project.promptSets.filter((s) => s.id !== promptSetId),
+    }))
     setPromptSetToDelete(null)
   }
 
-  const handlePromptSetOptions = (e: React.MouseEvent, promptSetId: string) => {
-    // Prevent navigation when clicking the dropdown
+  const handlePromptSetOptions = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  const handleExportProject = () => {
-    if (!currentProject) return
-
+  const exportToClipboard = (label: string, payload: unknown) => {
     try {
-      // Create a copy of the project to export
-      const projectToExport = { ...currentProject }
-
-      // Convert to JSON string with pretty formatting
-      const jsonString = JSON.stringify(projectToExport, null, 2)
-
-      // Copy to clipboard
       navigator.clipboard
-        .writeText(jsonString)
-        .then(() => {
-          alert("Proyecto exportado al portapapeles")
-        })
+        .writeText(JSON.stringify(payload, null, 2))
+        .then(() => alert(`${label} exportado al portapapeles`))
         .catch((err) => {
           console.error("Error al copiar al portapapeles:", err)
           alert("Error al exportar. Consulta la consola para más detalles.")
         })
     } catch (error) {
-      console.error("Error al exportar el proyecto:", error)
+      console.error("Error al exportar:", error)
       alert("Error al exportar. Consulta la consola para más detalles.")
     }
   }
 
-  const handleExportPromptSet = (promptSetId: string) => {
+  const handleExportProject = () => {
     if (!currentProject) return
+    exportToClipboard("Proyecto", currentProject)
+  }
 
-    try {
-      // Find the prompt set
-      const promptSet = currentProject.promptSets.find((set) => set.id === promptSetId)
-      if (!promptSet) return
-
-      // Create a copy of the prompt set to export
-      const promptSetToExport = { ...promptSet }
-
-      // Convert to JSON string with pretty formatting
-      const jsonString = JSON.stringify(promptSetToExport, null, 2)
-
-      // Copy to clipboard
-      navigator.clipboard
-        .writeText(jsonString)
-        .then(() => {
-          alert("Conjunto de prompts exportado al portapapeles")
-        })
-        .catch((err) => {
-          console.error("Error al copiar al portapapeles:", err)
-          alert("Error al exportar. Consulta la consola para más detalles.")
-        })
-    } catch (error) {
-      console.error("Error al exportar el conjunto de prompts:", error)
-      alert("Error al exportar. Consulta la consola para más detalles.")
-    }
+  const handleExportPromptSet = (promptSetId: string) => {
+    const promptSet = currentProject?.promptSets.find((s) => s.id === promptSetId)
+    if (!promptSet) return
+    exportToClipboard("Conjunto de prompts", promptSet)
   }
 
   const handleImportPromptSet = (promptSet: PromptSet) => {
     if (!currentProject) return
-
-    const updatedProjects = projects.map((project) => {
-      if (project.id !== currentProject.id) return project
-      return {
-        ...project,
-        promptSets: [...project.promptSets, promptSet],
-      }
-    })
-
-    setProjects(updatedProjects)
-  }
-
-  const toggleEditMode = () => {
-    setIsEditMode(!isEditMode)
+    updateProject(currentProject.id, (project) => ({
+      ...project,
+      promptSets: [...project.promptSets, promptSet],
+    }))
   }
 
   const handleDragStart = (event: any) => {
@@ -338,23 +255,16 @@ export default function ProjectPage() {
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      setProjects((items) => {
-        return items.map((project) => {
-          if (project.id !== currentProject.id) return project
-
-          const oldIndex = project.promptSets.findIndex((set) => set.id === active.id)
-          const newIndex = project.promptSets.findIndex((set) => set.id === over.id)
-
-          return {
-            ...project,
-            promptSets: arrayMove(project.promptSets, oldIndex, newIndex),
-          }
-        })
-      })
+    if (over && active.id !== over.id && currentProject) {
+      const oldIndex = currentProject.promptSets.findIndex((s) => s.id === active.id)
+      const newIndex = currentProject.promptSets.findIndex((s) => s.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) {
+        updateProject(currentProject.id, (project) => ({
+          ...project,
+          promptSets: arrayMove(project.promptSets, oldIndex, newIndex),
+        }))
+      }
     }
-
     setActiveId(null)
   }
 
@@ -362,10 +272,8 @@ export default function ProjectPage() {
 
   return (
     <div className="flex flex-col h-screen bg-zinc-900 text-white">
-      {/* Navigation Bar */}
       <NavigationBar projects={projects} currentProject={currentProject} />
 
-      {/* Main Content */}
       <div className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-6">
@@ -398,9 +306,8 @@ export default function ProjectPage() {
                 </h1>
               )}
             </div>
-            {/* Actualizar la sección de botones en la parte superior */}
             <div className="flex items-center space-x-2">
-              <EditModeToggle isEditMode={isEditMode} onToggle={toggleEditMode} />
+              <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -432,7 +339,7 @@ export default function ProjectPage() {
                   </DropdownMenuItem>
                   {projects.length > 1 && (
                     <DropdownMenuItem
-                      onClick={handleDeleteProject}
+                      onClick={() => setShowDeleteConfirmation(true)}
                       className="text-red-400 focus:text-red-400 cursor-pointer"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -459,7 +366,6 @@ export default function ProjectPage() {
           </div>
 
           <div className="mb-6">
-            {/* Actualizar el botón de nuevo conjunto */}
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-lg font-semibold">Conjuntos de Prompts</h2>
               {!isEditMode && (
@@ -509,7 +415,7 @@ export default function ProjectPage() {
               onDragEnd={handleDragEnd}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <SortableContext items={currentProject.promptSets.map((set) => set.id)} strategy={rectSortingStrategy}>
+                <SortableContext items={currentProject.promptSets.map((s) => s.id)} strategy={rectSortingStrategy}>
                   {currentProject.promptSets.map((promptSet) => (
                     <SortablePromptSetItem
                       key={promptSet.id}
@@ -526,7 +432,6 @@ export default function ProjectPage() {
                   ))}
                 </SortableContext>
 
-                {/* Add new prompt set card */}
                 {!isEditMode && (
                   <button
                     onClick={addPromptSet}
@@ -545,7 +450,7 @@ export default function ProjectPage() {
                       <FileTextIcon className="h-4 w-4 text-zinc-400 mr-2 mt-0.5" />
                       <div>
                         <h3 className="font-medium text-sm">
-                          {currentProject.promptSets.find((set) => set.id === activeId)?.name}
+                          {currentProject.promptSets.find((s) => s.id === activeId)?.name}
                         </h3>
                       </div>
                     </div>
@@ -557,7 +462,6 @@ export default function ProjectPage() {
         </div>
       </div>
 
-      {/* Delete Project Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={showDeleteConfirmation}
         onClose={() => setShowDeleteConfirmation(false)}
@@ -566,16 +470,14 @@ export default function ProjectPage() {
         description="¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer."
       />
 
-      {/* Delete Prompt Set Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={!!promptSetToDelete}
         onClose={() => setPromptSetToDelete(null)}
-        onConfirm={() => promptSetToDelete && deletePromptSet(promptSetToDelete)}
+        onConfirm={() => promptSetToDelete && removePromptSet(promptSetToDelete)}
         title="Eliminar conjunto de prompts"
         description="¿Estás seguro de que deseas eliminar este conjunto de prompts? Esta acción no se puede deshacer."
       />
 
-      {/* Import Prompt Set Dialog */}
       <ImportPromptSetDialog
         isOpen={isImportPromptSetDialogOpen}
         onClose={() => setIsImportPromptSetDialogOpen(false)}
