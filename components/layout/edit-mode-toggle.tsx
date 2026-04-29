@@ -18,13 +18,15 @@ export function EditModeToggle({ isEditMode, onToggle }: EditModeToggleProps) {
             variant="outline"
             size="icon"
             onClick={onToggle}
+            aria-label={isEditMode ? "Finalizar reordenamiento" : "Reordenar elementos"}
+            aria-pressed={isEditMode}
             className={`h-7 w-7 ${
               isEditMode
                 ? "bg-zinc-600 hover:bg-zinc-500 text-white"
                 : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
             }`}
           >
-            <MoveIcon className="h-3.5 w-3.5" />
+            <MoveIcon aria-hidden="true" className="h-3.5 w-3.5" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>

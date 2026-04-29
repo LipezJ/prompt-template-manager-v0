@@ -23,6 +23,7 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useProjects } from "@/lib/hooks/use-projects"
 import { copyToClipboard } from "@/lib/toast"
+import { dndAnnouncements } from "@/lib/dnd-announcements"
 import { ProjectItem } from "./project-item"
 
 export function ProjectGrid() {
@@ -111,6 +112,7 @@ export function ProjectGrid() {
             collisionDetection={closestCenter}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
+            accessibility={{ announcements: dndAnnouncements }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <SortableContext items={projects.map((p) => p.id)} strategy={verticalListSortingStrategy}>

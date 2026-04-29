@@ -18,6 +18,7 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { copyToClipboard } from "@/lib/toast"
 import { ErrorBoundary } from "@/components/layout/error-boundary"
+import { dndAnnouncements } from "@/lib/dnd-announcements"
 
 export default function PromptSetsPage() {
   const params = useParams()
@@ -141,6 +142,7 @@ export default function PromptSetsPage() {
                   sensors={isEditMode ? sensors : []}
                   collisionDetection={closestCenter}
                   onDragEnd={handleVariableDragEnd}
+                  accessibility={{ announcements: dndAnnouncements }}
                 >
                   <VariablesEditor
                     variables={activePromptSet.variables}
@@ -160,6 +162,7 @@ export default function PromptSetsPage() {
                   sensors={isEditMode ? sensors : []}
                   collisionDetection={closestCenter}
                   onDragEnd={handlePromptDragEnd}
+                  accessibility={{ announcements: dndAnnouncements }}
                 >
                   <PromptsArea
                     prompts={activePromptSet.prompts}

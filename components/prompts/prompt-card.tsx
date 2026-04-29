@@ -55,13 +55,15 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
       onClick={handleClick}
     >
       {isEditMode && (
-        <div
-          className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing z-10"
+        <button
+          type="button"
+          aria-label="Reordenar prompt"
+          className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="h-5 w-5 text-zinc-500" />
-        </div>
+          <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+        </button>
       )}
       <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar ${isEditMode ? "ml-6" : ""}`}>
         <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden">{prompt.content}</pre>

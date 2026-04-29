@@ -56,13 +56,15 @@ export function PromptSetItem({
       }`}
     >
       {isEditMode && (
-        <div
-          className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center cursor-grab active:cursor-grabbing z-10"
+        <button
+          type="button"
+          aria-label={`Reordenar conjunto: ${name}`}
+          className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="h-5 w-5 text-zinc-500" />
-        </div>
+          <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+        </button>
       )}
       <Link
         href={`/projects/${projectId}/prompt-sets?set=${promptSetId}`}

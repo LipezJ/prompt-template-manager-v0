@@ -16,6 +16,7 @@ import { SortableContext, rectSortingStrategy, sortableKeyboardCoordinates } fro
 import type { Project } from "@/types/prompt"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { dndAnnouncements } from "@/lib/dnd-announcements"
 import { PromptSetItem } from "./prompt-set-item"
 
 interface PromptSetGridProps {
@@ -112,6 +113,7 @@ export function PromptSetGrid({
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        accessibility={{ announcements: dndAnnouncements }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <SortableContext items={project.promptSets.map((s) => s.id)} strategy={rectSortingStrategy}>

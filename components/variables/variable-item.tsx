@@ -58,9 +58,15 @@ export function VariableItem({
       <div className="flex items-center justify-between">
         <div className="flex-1 flex items-center">
           {isEditMode && (
-            <div className="mr-2 cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
-              <GripVertical className="h-4 w-4 text-zinc-500" />
-            </div>
+            <button
+              type="button"
+              aria-label={`Reordenar variable: ${variable.name}`}
+              className="mr-2 cursor-grab active:cursor-grabbing bg-transparent border-0 p-0"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical aria-hidden="true" className="h-4 w-4 text-zinc-500" />
+            </button>
           )}
           {isEditing ? (
             <Textarea
