@@ -2,6 +2,7 @@ import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
 import { Toaster } from "@/components/ui/sonner"
+import { ErrorBoundary } from "@/components/layout/error-boundary"
 
 export const metadata: Metadata = {
   title: "Prompt Manager",
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-zinc-900 text-white">
-        {children}
+        <ErrorBoundary fallbackLabel="La aplicación encontró un error inesperado">
+          {children}
+        </ErrorBoundary>
         <Toaster />
       </body>
     </html>

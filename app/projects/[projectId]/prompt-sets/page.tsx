@@ -17,6 +17,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { copyToClipboard } from "@/lib/toast"
+import { ErrorBoundary } from "@/components/layout/error-boundary"
 
 export default function PromptSetsPage() {
   const params = useParams()
@@ -135,38 +136,42 @@ export default function PromptSetsPage() {
             onSetLeftVisible={(visible) => updateUiPreferences({ variablesPanelVisible: visible })}
             leftHeader={<h3 className="text-sm font-medium">Variables</h3>}
             left={
-              <DndContext
-                sensors={isEditMode ? sensors : []}
-                collisionDetection={closestCenter}
-                onDragEnd={handleVariableDragEnd}
-              >
-                <VariablesEditor
-                  variables={activePromptSet.variables}
-                  onUpdateVariable={updateVariable}
-                  onUpdateVariableName={updateVariableName}
-                  onAddVariable={addVariable}
-                  onDeleteVariable={deleteVariable}
-                  onClearAllValues={clearAllVariableValues}
-                  isEditMode={isEditMode}
-                />
-              </DndContext>
+              <ErrorBoundary fallbackLabel="No se pudo renderizar el panel de variables">
+                <DndContext
+                  sensors={isEditMode ? sensors : []}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleVariableDragEnd}
+                >
+                  <VariablesEditor
+                    variables={activePromptSet.variables}
+                    onUpdateVariable={updateVariable}
+                    onUpdateVariableName={updateVariableName}
+                    onAddVariable={addVariable}
+                    onDeleteVariable={deleteVariable}
+                    onClearAllValues={clearAllVariableValues}
+                    isEditMode={isEditMode}
+                  />
+                </DndContext>
+              </ErrorBoundary>
             }
             right={
-              <DndContext
-                sensors={isEditMode ? sensors : []}
-                collisionDetection={closestCenter}
-                onDragEnd={handlePromptDragEnd}
-              >
-                <PromptsArea
-                  prompts={activePromptSet.prompts}
-                  variables={activePromptSet.variables}
-                  isCardView={cardView}
-                  isEditMode={isEditMode}
-                  onUpdatePrompt={updatePrompt}
-                  onDeletePrompt={deletePrompt}
-                  onAddPrompt={addPrompt}
-                />
-              </DndContext>
+              <ErrorBoundary fallbackLabel="No se pudo renderizar el panel de prompts">
+                <DndContext
+                  sensors={isEditMode ? sensors : []}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handlePromptDragEnd}
+                >
+                  <PromptsArea
+                    prompts={activePromptSet.prompts}
+                    variables={activePromptSet.variables}
+                    isCardView={cardView}
+                    isEditMode={isEditMode}
+                    onUpdatePrompt={updatePrompt}
+                    onDeletePrompt={deletePrompt}
+                    onAddPrompt={addPrompt}
+                  />
+                </DndContext>
+              </ErrorBoundary>
             }
           />
         )}

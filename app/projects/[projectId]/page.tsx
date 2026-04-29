@@ -11,6 +11,7 @@ import { ImportPromptSetDialog } from "@/components/dialogs/import-prompt-set-di
 import { ProjectInfoCard } from "@/components/projects/project-info-card"
 import { ProjectHeader } from "@/components/projects/project-header"
 import { PromptSetGrid } from "@/components/prompt-sets/prompt-set-grid"
+import { ErrorBoundary } from "@/components/layout/error-boundary"
 import { copyToClipboard } from "@/lib/toast"
 
 export default function ProjectPage() {
@@ -111,15 +112,17 @@ export default function ProjectPage() {
 
           <ProjectInfoCard name={currentProject.name} promptSetsCount={currentProject.promptSets.length} />
 
-          <PromptSetGrid
-            project={currentProject}
-            isEditMode={isEditMode}
-            onAddPromptSet={addPromptSet}
-            onDeletePromptSet={setPromptSetToDelete}
-            onExportPromptSet={handleExportPromptSet}
-            onReorderPromptSets={reorderPromptSets}
-            onImportClick={() => setIsImportPromptSetDialogOpen(true)}
-          />
+          <ErrorBoundary fallbackLabel="No se pudo renderizar la lista de conjuntos de prompts">
+            <PromptSetGrid
+              project={currentProject}
+              isEditMode={isEditMode}
+              onAddPromptSet={addPromptSet}
+              onDeletePromptSet={setPromptSetToDelete}
+              onExportPromptSet={handleExportPromptSet}
+              onReorderPromptSets={reorderPromptSets}
+              onImportClick={() => setIsImportPromptSetDialogOpen(true)}
+            />
+          </ErrorBoundary>
         </div>
       </div>
 
