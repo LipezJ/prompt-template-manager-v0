@@ -19,7 +19,7 @@ export default function ProjectPage() {
   const router = useRouter()
   const projectId = params.projectId as string
 
-  const { projects, updateProject, deleteProject } = useProjects()
+  const { projects, isLoaded, updateProject, deleteProject } = useProjects()
   const currentProject = projects.find((p) => p.id === projectId) ?? projects[0]
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
@@ -92,37 +92,41 @@ export default function ProjectPage() {
     }))
   }
 
-  if (!currentProject) return null
+  const ready = isLoaded && Boolean(currentProject)
 
   return (
     <div className="flex flex-col h-screen bg-zinc-900 text-white">
-      <NavigationBar projects={projects} currentProject={currentProject} />
+      <NavigationBar projects={ready ? projects : []} currentProject={ready ? currentProject : undefined} />
 
       <div className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl mx-auto">
-          <ProjectHeader
-            project={currentProject}
-            isEditMode={isEditMode}
-            canDelete={projects.length > 1}
-            onToggleEditMode={() => setIsEditMode((v) => !v)}
-            onRename={renameProject}
-            onExport={handleExportProject}
-            onDelete={() => setShowDeleteConfirmation(true)}
-          />
+          {ready && currentProject && (
+            <>
+              <ProjectHeader
+                project={currentProject}
+                isEditMode={isEditMode}
+                canDelete={projects.length > 1}
+                onToggleEditMode={() => setIsEditMode((v) => !v)}
+                onRename={renameProject}
+                onExport={handleExportProject}
+                onDelete={() => setShowDeleteConfirmation(true)}
+              />
 
-          <ProjectInfoCard name={currentProject.name} promptSetsCount={currentProject.promptSets.length} />
+              <ProjectInfoCard name={currentProject.name} promptSetsCount={currentProject.promptSets.length} />
 
-          <ErrorBoundary fallbackLabel="No se pudo renderizar la lista de conjuntos de prompts">
-            <PromptSetGrid
-              project={currentProject}
-              isEditMode={isEditMode}
-              onAddPromptSet={addPromptSet}
-              onDeletePromptSet={setPromptSetToDelete}
-              onExportPromptSet={handleExportPromptSet}
-              onReorderPromptSets={reorderPromptSets}
-              onImportClick={() => setIsImportPromptSetDialogOpen(true)}
-            />
-          </ErrorBoundary>
+              <ErrorBoundary fallbackLabel="No se pudo renderizar la lista de conjuntos de prompts">
+                <PromptSetGrid
+                  project={currentProject}
+                  isEditMode={isEditMode}
+                  onAddPromptSet={addPromptSet}
+                  onDeletePromptSet={setPromptSetToDelete}
+                  onExportPromptSet={handleExportPromptSet}
+                  onReorderPromptSets={reorderPromptSets}
+                  onImportClick={() => setIsImportPromptSetDialogOpen(true)}
+                />
+              </ErrorBoundary>
+            </>
+          )}
         </div>
       </div>
 

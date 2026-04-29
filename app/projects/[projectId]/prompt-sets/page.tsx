@@ -25,7 +25,7 @@ export default function PromptSetsPage() {
   const projectId = params.projectId as string
 
   const projectsState = useProjects()
-  const { projects } = projectsState
+  const { projects, isLoaded } = projectsState
   const {
     currentProject,
     activePromptSet,
@@ -79,29 +79,32 @@ export default function PromptSetsPage() {
     if (oldIndex !== -1 && newIndex !== -1) reorderPrompts(oldIndex, newIndex)
   }
 
-  if (!currentProject) return null
+  const ready = isLoaded && Boolean(currentProject)
 
   return (
     <div className="flex flex-col h-screen bg-zinc-900 text-white overflow-hidden">
-      <NavigationBar projects={projects} currentProject={currentProject} />
+      <NavigationBar projects={ready ? projects : []} currentProject={ready ? currentProject : undefined} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="py-2 px-4 border-b border-zinc-700">
           <div className="flex items-center">
             <div className="flex-1 overflow-x-auto custom-scrollbar">
-              <PromptSetTabs
-                promptSets={currentProject.promptSets}
-                activePromptSetId={activePromptSetId}
-                onSelectPromptSet={selectPromptSet}
-                onUpdateName={renameActivePromptSet}
-                onDeletePromptSet={deletePromptSet}
-              />
+              {ready && currentProject && (
+                <PromptSetTabs
+                  promptSets={currentProject.promptSets}
+                  activePromptSetId={activePromptSetId}
+                  onSelectPromptSet={selectPromptSet}
+                  onUpdateName={renameActivePromptSet}
+                  onDeletePromptSet={deletePromptSet}
+                />
+              )}
             </div>
             <div className="flex space-x-2 ml-2">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={addPromptSet}
+                disabled={!ready}
                 className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
               >
                 <PlusIcon className="h-3.5 w-3.5 text-zinc-300" />
@@ -115,6 +118,7 @@ export default function PromptSetsPage() {
                       variant="outline"
                       size="icon"
                       onClick={exportActivePromptSet}
+                      disabled={!ready}
                       className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
                     >
                       <Download className="h-3.5 w-3.5 text-zinc-300" />
@@ -129,7 +133,7 @@ export default function PromptSetsPage() {
           </div>
         </div>
 
-        {activePromptSet && (
+        {ready && activePromptSet && (
           <SplitPane
             splitPosition={splitPosition}
             leftVisible={variablesPanelVisible}

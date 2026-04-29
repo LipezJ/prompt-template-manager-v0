@@ -93,6 +93,11 @@ body {
     @apply bg-zinc-900 text-white;
   }
 
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: rgba(82, 82, 91, 0.4) rgba(39, 39, 42, 0.2);
