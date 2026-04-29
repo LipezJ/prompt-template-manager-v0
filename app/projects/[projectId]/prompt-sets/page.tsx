@@ -16,6 +16,7 @@ import { SplitPane } from "@/components/layout/split-pane"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { copyToClipboard } from "@/lib/toast"
 
 export default function PromptSetsPage() {
   const params = useParams()
@@ -57,18 +58,7 @@ export default function PromptSetsPage() {
 
   const exportActivePromptSet = () => {
     if (!activePromptSet) return
-    try {
-      navigator.clipboard
-        .writeText(JSON.stringify(activePromptSet, null, 2))
-        .then(() => alert("Conjunto de prompts exportado al portapapeles"))
-        .catch((err) => {
-          console.error("Error al copiar al portapapeles:", err)
-          alert("Error al exportar. Consulta la consola para más detalles.")
-        })
-    } catch (error) {
-      console.error("Error al exportar el conjunto de prompts:", error)
-      alert("Error al exportar. Consulta la consola para más detalles.")
-    }
+    void copyToClipboard(JSON.stringify(activePromptSet, null, 2), "Conjunto de prompts exportado al portapapeles")
   }
 
   const handleVariableDragEnd = (event: any) => {

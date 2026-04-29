@@ -11,6 +11,7 @@ import { ImportPromptSetDialog } from "@/components/dialogs/import-prompt-set-di
 import { ProjectInfoCard } from "@/components/projects/project-info-card"
 import { ProjectHeader } from "@/components/projects/project-header"
 import { PromptSetGrid } from "@/components/prompt-sets/prompt-set-grid"
+import { copyToClipboard } from "@/lib/toast"
 
 export default function ProjectPage() {
   const params = useParams()
@@ -71,30 +72,15 @@ export default function ProjectPage() {
     })
   }
 
-  const exportToClipboard = (label: string, payload: unknown) => {
-    try {
-      navigator.clipboard
-        .writeText(JSON.stringify(payload, null, 2))
-        .then(() => alert(`${label} exportado al portapapeles`))
-        .catch((err) => {
-          console.error("Error al copiar al portapapeles:", err)
-          alert("Error al exportar. Consulta la consola para más detalles.")
-        })
-    } catch (error) {
-      console.error("Error al exportar:", error)
-      alert("Error al exportar. Consulta la consola para más detalles.")
-    }
-  }
-
   const handleExportProject = () => {
     if (!currentProject) return
-    exportToClipboard("Proyecto", currentProject)
+    void copyToClipboard(JSON.stringify(currentProject, null, 2), "Proyecto exportado al portapapeles")
   }
 
   const handleExportPromptSet = (promptSetId: string) => {
     const promptSet = currentProject?.promptSets.find((s) => s.id === promptSetId)
     if (!promptSet) return
-    exportToClipboard("Conjunto de prompts", promptSet)
+    void copyToClipboard(JSON.stringify(promptSet, null, 2), "Conjunto de prompts exportado al portapapeles")
   }
 
   const handleImportPromptSet = (promptSet: PromptSet) => {

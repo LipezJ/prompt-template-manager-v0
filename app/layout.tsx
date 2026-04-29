@@ -1,6 +1,7 @@
 import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "Prompt Manager",
@@ -15,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-zinc-900 text-white">{children}</body>
+      <body className="bg-zinc-900 text-white">
+        {children}
+        <Toaster />
+      </body>
     </html>
   )
 }

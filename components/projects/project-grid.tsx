@@ -22,6 +22,7 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useProjects } from "@/lib/hooks/use-projects"
+import { copyToClipboard } from "@/lib/toast"
 import { ProjectItem } from "./project-item"
 
 export function ProjectGrid() {
@@ -58,20 +59,7 @@ export function ProjectGrid() {
   const handleExportProject = (e: React.MouseEvent, project: Project) => {
     e.preventDefault()
     e.stopPropagation()
-
-    try {
-      const jsonString = JSON.stringify(project, null, 2)
-      navigator.clipboard
-        .writeText(jsonString)
-        .then(() => alert("Proyecto exportado al portapapeles"))
-        .catch((err) => {
-          console.error("Error al copiar al portapapeles:", err)
-          alert("Error al exportar. Consulta la consola para más detalles.")
-        })
-    } catch (error) {
-      console.error("Error al exportar el proyecto:", error)
-      alert("Error al exportar. Consulta la consola para más detalles.")
-    }
+    void copyToClipboard(JSON.stringify(project, null, 2), "Proyecto exportado al portapapeles")
   }
 
   const handleDragStart = (event: any) => {
