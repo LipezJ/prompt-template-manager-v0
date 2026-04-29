@@ -3,10 +3,13 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react"
 import { arrayMove } from "@dnd-kit/sortable"
 import type { Project } from "@/types/prompt"
-import { STORAGE_KEYS } from "@/lib/constants"
 import { newId } from "@/lib/ids"
 import { createDefaultProjects } from "@/lib/seed"
-import { loadProjects, saveProjects } from "@/lib/storage/projects-repository"
+import {
+  loadProjects,
+  saveProjects,
+  subscribeToProjectsChanges,
+} from "@/lib/storage/projects-repository"
 
 export interface UseProjectsResult {
   projects: Project[]
@@ -25,19 +28,24 @@ export function useProjects(): UseProjectsResult {
   const remoteUpdateRef = useRef(false)
 
   useEffect(() => {
-    setProjects(loadProjects())
-    setIsLoaded(true)
+    let cancelled = false
+    loadProjects().then((loaded) => {
+      if (cancelled) return
+      setProjects(loaded)
+      setIsLoaded(true)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
-    const onStorage = (e: StorageEvent) => {
-      if (e.key !== STORAGE_KEYS.projects) return
-      remoteUpdateRef.current = true
-      setProjects(loadProjects())
-    }
-    window.addEventListener("storage", onStorage)
-    return () => window.removeEventListener("storage", onStorage)
+    return subscribeToProjectsChanges(() => {
+      loadProjects().then((loaded) => {
+        remoteUpdateRef.current = true
+        setProjects(loaded)
+      })
+    })
   }, [])
 
   useEffect(() => {
@@ -46,7 +54,7 @@ export function useProjects(): UseProjectsResult {
       remoteUpdateRef.current = false
       return
     }
-    saveProjects(projects)
+    void saveProjects(projects)
   }, [projects, isLoaded])
 
   const addProject = useCallback<UseProjectsResult["addProject"]>(() => {

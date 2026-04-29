@@ -1,3 +1,4 @@
+import { get as idbGet, set as idbSet } from "idb-keyval"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { STORAGE_KEYS } from "@/lib/constants"
 import { createDefaultProjects } from "@/lib/seed"
@@ -26,54 +27,73 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {})
 })
 
-describe("loadProjects", () => {
-  it("returns the default seed when storage is empty", () => {
-    const result = loadProjects()
-    expect(result).toEqual(createDefaultProjects())
+describe("loadProjects (IndexedDB)", () => {
+  it("returns the default seed when storage is empty", async () => {
+    expect(await loadProjects()).toEqual(createDefaultProjects())
   })
 
-  it("returns the parsed array when storage holds valid data", () => {
+  it("returns the parsed array when IDB holds valid data", async () => {
+    await idbSet(STORAGE_KEYS.projects, [VALID_PROJECT])
+    expect(await loadProjects()).toEqual([VALID_PROJECT])
+  })
+
+  it("falls back to seed when IDB holds an invalid shape", async () => {
+    await idbSet(STORAGE_KEYS.projects, { not: "an array" })
+    expect(await loadProjects()).toEqual(createDefaultProjects())
+  })
+
+  it("falls back to seed when a project is missing the prompts field", async () => {
+    await idbSet(STORAGE_KEYS.projects, [
+      { id: "x", name: "y", promptSets: [{ id: "s", name: "n", variables: [] }] },
+    ])
+    expect(await loadProjects()).toEqual(createDefaultProjects())
+  })
+})
+
+describe("loadProjects (legacy localStorage migration)", () => {
+  it("migrates valid localStorage data into IDB and clears the legacy key", async () => {
     window.localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify([VALID_PROJECT]))
-    expect(loadProjects()).toEqual([VALID_PROJECT])
+
+    const loaded = await loadProjects()
+    expect(loaded).toEqual([VALID_PROJECT])
+
+    expect(window.localStorage.getItem(STORAGE_KEYS.projects)).toBeNull()
+    expect(await idbGet(STORAGE_KEYS.projects)).toEqual([VALID_PROJECT])
   })
 
-  it("falls back to seed and backs up when storage holds invalid JSON", () => {
+  it("backs up corrupted JSON in localStorage and falls back to seed", async () => {
     window.localStorage.setItem(STORAGE_KEYS.projects, "{not json")
-    const result = loadProjects()
-    expect(result).toEqual(createDefaultProjects())
+
+    const loaded = await loadProjects()
+    expect(loaded).toEqual(createDefaultProjects())
+
     const backup = Object.keys(window.localStorage).find((k) => k.startsWith("projects.corrupt."))
     expect(backup).toBeTruthy()
     expect(window.localStorage.getItem(backup!)).toBe("{not json")
+    expect(window.localStorage.getItem(STORAGE_KEYS.projects)).toBeNull()
   })
 
-  it("falls back to seed and backs up when storage holds an invalid shape", () => {
+  it("backs up invalid-shape localStorage and falls back to seed", async () => {
     window.localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify({ not: "an array" }))
-    const result = loadProjects()
-    expect(result).toEqual(createDefaultProjects())
+
+    const loaded = await loadProjects()
+    expect(loaded).toEqual(createDefaultProjects())
+
     const backup = Object.keys(window.localStorage).find((k) => k.startsWith("projects.corrupt."))
     expect(backup).toBeTruthy()
-  })
-
-  it("falls back to seed when a project is missing the prompts field", () => {
-    const broken = [{ id: "x", name: "y", promptSets: [{ id: "s", name: "n", variables: [] }] }]
-    window.localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(broken))
-    expect(loadProjects()).toEqual(createDefaultProjects())
   })
 })
 
 describe("saveProjects", () => {
-  it("round-trips through localStorage", () => {
-    saveProjects([VALID_PROJECT])
-    const raw = window.localStorage.getItem(STORAGE_KEYS.projects)
-    expect(raw).not.toBeNull()
-    expect(JSON.parse(raw!)).toEqual([VALID_PROJECT])
+  it("round-trips through IDB", async () => {
+    await saveProjects([VALID_PROJECT])
+    expect(await idbGet(STORAGE_KEYS.projects)).toEqual([VALID_PROJECT])
   })
 })
 
 describe("parseImportedProject", () => {
   it("returns ok for a valid project JSON", () => {
-    const result = parseImportedProject(JSON.stringify(VALID_PROJECT))
-    expect(result).toEqual({ ok: true, value: VALID_PROJECT })
+    expect(parseImportedProject(JSON.stringify(VALID_PROJECT))).toEqual({ ok: true, value: VALID_PROJECT })
   })
 
   it("returns ok:false for invalid JSON", () => {
@@ -91,13 +111,11 @@ describe("parseImportedProject", () => {
 
 describe("parseImportedPromptSet", () => {
   it("returns ok for a valid prompt set JSON", () => {
-    const result = parseImportedPromptSet(JSON.stringify(VALID_SET))
-    expect(result).toEqual({ ok: true, value: VALID_SET })
+    expect(parseImportedPromptSet(JSON.stringify(VALID_SET))).toEqual({ ok: true, value: VALID_SET })
   })
 
   it("returns ok:false for invalid JSON", () => {
-    const result = parseImportedPromptSet("nope")
-    expect(result.ok).toBe(false)
+    expect(parseImportedPromptSet("nope").ok).toBe(false)
   })
 
   it("returns ok:false when the prompt set is missing prompts", () => {

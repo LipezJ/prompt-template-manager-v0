@@ -1,7 +1,9 @@
+import { get as idbGet } from "idb-keyval"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { STORAGE_KEYS } from "@/lib/constants"
 import { useProjects } from "@/lib/hooks/use-projects"
+import type { Project } from "@/types/prompt"
 
 beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {})
@@ -75,19 +77,17 @@ describe("useProjects", () => {
     expect(result.current.projects.map((p) => p.id)).toEqual([ids[1], ids[0]])
   })
 
-  it("persists changes to localStorage after isLoaded", async () => {
+  it("persists changes to IndexedDB after isLoaded", async () => {
     const { result } = renderHook(() => useProjects())
     await waitFor(() => expect(result.current.isLoaded).toBe(true))
 
     act(() => {
       result.current.addProject()
     })
-    await waitFor(() => {
-      const raw = window.localStorage.getItem(STORAGE_KEYS.projects)
-      expect(raw).not.toBeNull()
+    await waitFor(async () => {
+      const stored = (await idbGet(STORAGE_KEYS.projects)) as Project[] | undefined
+      expect(stored).toBeDefined()
+      expect(stored!.length).toBe(result.current.projects.length)
     })
-    const raw = window.localStorage.getItem(STORAGE_KEYS.projects)
-    const parsed = JSON.parse(raw!) as Array<{ id: string }>
-    expect(parsed.length).toBe(result.current.projects.length)
   })
 })

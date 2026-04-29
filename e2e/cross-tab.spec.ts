@@ -24,7 +24,7 @@ function captureFatalErrors(page: Page) {
 }
 
 test.describe("cross-tab sync", () => {
-  test("a write in one tab is reflected in another tab via storage event", async ({ context }) => {
+  test("a write from another tab is reflected via BroadcastChannel", async ({ context }) => {
     await context.addInitScript((data) => {
       window.localStorage.setItem("projects", JSON.stringify(data))
     }, SAMPLE_PROJECTS)
@@ -42,9 +42,8 @@ test.describe("cross-tab sync", () => {
     await expect(tabA.getByText("Mi Primer Proyecto")).toBeVisible()
     await expect(tabB.getByText("Mi Primer Proyecto")).toBeVisible()
 
-    // Tab A renames the project by writing directly to localStorage and emitting a storage event.
-    // (Real-world: any mutation in A persists via saveProjects, which the browser broadcasts to B.)
-    await tabA.evaluate(() => {
+    // Tab A writes new data directly to IndexedDB and broadcasts a "projects-updated" message.
+    await tabA.evaluate(async () => {
       const renamed = [
         {
           id: "default",
@@ -60,18 +59,21 @@ test.describe("cross-tab sync", () => {
           ],
         },
       ]
-      window.localStorage.setItem("projects", JSON.stringify(renamed))
-      // Browsers only fire storage events on OTHER tabs/windows automatically. Playwright's storage
-      // event delivery between pages in the same context is not guaranteed, so dispatch explicitly
-      // on the other tab below.
-    })
-
-    // Trigger the storage event on tab B as it would arrive in real browsers.
-    await tabB.evaluate(() => {
-      const newValue = window.localStorage.getItem("projects")
-      window.dispatchEvent(
-        new StorageEvent("storage", { key: "projects", newValue, oldValue: null, storageArea: window.localStorage }),
-      )
+      const req = indexedDB.open("keyval-store")
+      const db: IDBDatabase = await new Promise((resolve, reject) => {
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => reject(req.error)
+      })
+      const tx = db.transaction("keyval", "readwrite")
+      tx.objectStore("keyval").put(renamed, "projects")
+      await new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve()
+        tx.onerror = () => reject(tx.error)
+      })
+      db.close()
+      const channel = new BroadcastChannel("projects-sync")
+      channel.postMessage({ type: "projects-updated" })
+      channel.close()
     })
 
     await expect(tabB.getByText("Renombrado desde A")).toBeVisible({ timeout: 3000 })

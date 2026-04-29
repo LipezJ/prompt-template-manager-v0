@@ -58,15 +58,28 @@ test.describe("crud and persistence", () => {
     expect(errors, errors.join("\n")).toHaveLength(0)
   })
 
-  test("localStorage shape is preserved after a page load", async ({ page }) => {
+  test("persisted shape is preserved after a page load", async ({ page }) => {
     const errors = captureFatalErrors(page)
     await seedProjects(page, SAMPLE_PROJECTS)
     await page.goto("/projects/default/prompt-sets")
     await page.waitForLoadState("networkidle")
 
-    const stored = await page.evaluate(() => window.localStorage.getItem("projects"))
-    expect(stored).not.toBeNull()
-    const parsed = JSON.parse(stored!) as typeof SAMPLE_PROJECTS
+    // After migration, data lives in IDB (legacy LS key is cleared).
+    const parsed = (await page.evaluate(async () => {
+      const req = indexedDB.open("keyval-store")
+      const db: IDBDatabase = await new Promise((resolve, reject) => {
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => reject(req.error)
+      })
+      const store = db.transaction("keyval", "readonly").objectStore("keyval")
+      const value = await new Promise((resolve, reject) => {
+        const r = store.get("projects")
+        r.onsuccess = () => resolve(r.result)
+        r.onerror = () => reject(r.error)
+      })
+      db.close()
+      return value
+    })) as typeof SAMPLE_PROJECTS
 
     expect(parsed).toHaveLength(1)
     expect(parsed[0]).toMatchObject({ id: "default", name: "Mi Primer Proyecto" })
@@ -105,7 +118,7 @@ test.describe("crud and persistence", () => {
     expect(errors, errors.join("\n")).toHaveLength(0)
   })
 
-  test("corrupted localStorage does not crash the app", async ({ page }) => {
+  test("corrupted legacy localStorage does not crash the app", async ({ page }) => {
     const errors = captureFatalErrors(page)
     await page.addInitScript(() => {
       window.localStorage.setItem("projects", '{"this": "is not an array"}')
@@ -118,5 +131,38 @@ test.describe("crud and persistence", () => {
       Object.keys(window.localStorage).find((k) => k.startsWith("projects.corrupt.")),
     )
     expect(backupKey, "expected a backup of the corrupted blob").toBeTruthy()
+    // The migration path also clears the bad legacy key.
+    const stillThere = await page.evaluate(() => window.localStorage.getItem("projects"))
+    expect(stillThere).toBeNull()
+  })
+
+  test("legacy localStorage is migrated to IndexedDB on first load", async ({ page }) => {
+    const errors = captureFatalErrors(page)
+    await seedProjects(page, SAMPLE_PROJECTS)
+    await page.goto("/projects/default/prompt-sets")
+    await page.waitForLoadState("networkidle")
+
+    // After load, the legacy key should be gone and IDB should hold the data.
+    const lsAfter = await page.evaluate(() => window.localStorage.getItem("projects"))
+    expect(lsAfter).toBeNull()
+
+    const idbAfter = await page.evaluate(async () => {
+      const req = indexedDB.open("keyval-store")
+      const db: IDBDatabase = await new Promise((resolve, reject) => {
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => reject(req.error)
+      })
+      const store = db.transaction("keyval", "readonly").objectStore("keyval")
+      const value = await new Promise((resolve, reject) => {
+        const r = store.get("projects")
+        r.onsuccess = () => resolve(r.result)
+        r.onerror = () => reject(r.error)
+      })
+      db.close()
+      return value
+    })
+    expect(idbAfter).toEqual(SAMPLE_PROJECTS)
+
+    expect(errors, errors.join("\n")).toHaveLength(0)
   })
 })
