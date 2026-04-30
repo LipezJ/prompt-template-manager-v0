@@ -25,11 +25,13 @@ interface EditPromptModalProps {
 
 export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: EditPromptModalProps) {
   const [content, setContent] = useState(prompt.content)
+  const [description, setDescription] = useState(prompt.description ?? "")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     if (isOpen) {
       setContent(prompt.content)
+      setDescription(prompt.description ?? "")
     }
   }, [isOpen, prompt])
 
@@ -37,6 +39,7 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
     onSave({
       ...prompt,
       content,
+      description: description.trim() === "" ? undefined : description,
     })
     onClose()
   }
@@ -67,6 +70,21 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
               minRows={10}
               maxRows={20}
               onFocus={handleTextareaFocus}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="prompt-description" className="text-sm font-medium mb-1 block">
+              Descripción <span className="text-xs text-zinc-500 font-normal">(opcional)</span>
+            </label>
+            <AutoResizeTextarea
+              id="prompt-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+              minRows={2}
+              maxRows={6}
+              placeholder="Describe el propósito o contexto de este prompt"
             />
           </div>
 

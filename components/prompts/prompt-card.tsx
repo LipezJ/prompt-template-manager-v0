@@ -68,8 +68,13 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
                 <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
               </button>
             )}
-            <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar ${isEditMode ? "ml-6" : ""}`}>
-              <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden">{prompt.content}</pre>
+            <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar flex flex-col ${isEditMode ? "ml-6" : ""}`}>
+              <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden flex-1">{prompt.content}</pre>
+              {prompt.description && (
+                <p className="mt-1 pt-1 border-t border-zinc-800 text-[10px] text-zinc-500 italic line-clamp-2">
+                  {prompt.description}
+                </p>
+              )}
             </div>
           </div>
         </TooltipTrigger>

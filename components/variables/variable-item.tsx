@@ -3,7 +3,7 @@
 import type React from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { GripVertical, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { GripVertical, MoreVertical, Pencil, Trash2, FileText } from "lucide-react"
 import type { PromptVariable } from "@/types/prompt"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -22,6 +22,7 @@ interface VariableItemProps {
   editingName: string
   onStartEditingName: (variable: PromptVariable) => void
   onSaveVariableName: (variable: PromptVariable) => void
+  onEditDescription: (variable: PromptVariable) => void
   onDeleteClick: (id: string) => void
   onUpdateVariable: (id: string, value: string) => void
   onEditingNameChange: (value: string) => void
@@ -36,6 +37,7 @@ export function VariableItem({
   editingName,
   onStartEditingName,
   onSaveVariableName,
+  onEditDescription,
   onDeleteClick,
   onUpdateVariable,
   onEditingNameChange,
@@ -100,6 +102,10 @@ export function VariableItem({
                 <Pencil className="mr-2 h-4 w-4" />
                 Editar nombre
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEditDescription(variable)} className="cursor-pointer">
+                <FileText className="mr-2 h-4 w-4" />
+                {variable.description ? "Editar descripción" : "Añadir descripción"}
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDeleteClick(variable.id)}
                 className="text-red-400 focus:text-red-400 cursor-pointer"
@@ -120,6 +126,9 @@ export function VariableItem({
         maxRows={10}
         onFocus={onTextareaFocus}
       />
+      {variable.description && (
+        <p className="text-xs text-zinc-500 italic whitespace-pre-wrap">{variable.description}</p>
+      )}
     </div>
   )
 }

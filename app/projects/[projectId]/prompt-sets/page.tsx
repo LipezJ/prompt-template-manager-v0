@@ -38,11 +38,13 @@ export default function PromptSetsPage() {
     addVariable,
     updateVariable,
     updateVariableName,
+    updateVariableDescription,
     deleteVariable,
     clearAllVariableValues,
     reorderVariables,
     addPrompt,
     updatePrompt,
+    updatePromptDescription,
     deletePrompt,
     reorderPrompts,
   } = useActivePromptSet(projectId, projectsState)
@@ -152,6 +154,7 @@ export default function PromptSetsPage() {
                     variables={activePromptSet.variables}
                     onUpdateVariable={updateVariable}
                     onUpdateVariableName={updateVariableName}
+                    onUpdateVariableDescription={updateVariableDescription}
                     onAddVariable={addVariable}
                     onDeleteVariable={deleteVariable}
                     onClearAllValues={clearAllVariableValues}
@@ -174,6 +177,7 @@ export default function PromptSetsPage() {
                     isCardView={cardView}
                     isEditMode={isEditMode}
                     onUpdatePrompt={updatePrompt}
+                    onUpdatePromptDescription={updatePromptDescription}
                     onDeletePrompt={deletePrompt}
                     onAddPrompt={addPrompt}
                   />

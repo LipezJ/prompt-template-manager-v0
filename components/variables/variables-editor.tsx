@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { PlusIcon, Eraser } from "lucide-react"
 import type { PromptVariable } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
+import { DescriptionDialog } from "@/components/dialogs/description-dialog"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { VariableItem } from "./variable-item"
@@ -15,6 +16,7 @@ interface VariablesEditorProps {
   variables: PromptVariable[]
   onUpdateVariable: (id: string, value: string) => void
   onUpdateVariableName: (id: string, name: string) => void
+  onUpdateVariableDescription: (id: string, description: string) => void
   onAddVariable: () => void
   onDeleteVariable: (id: string) => void
   onClearAllValues: () => void
@@ -25,6 +27,7 @@ export function VariablesEditor({
   variables,
   onUpdateVariable,
   onUpdateVariableName,
+  onUpdateVariableDescription,
   onAddVariable,
   onDeleteVariable,
   onClearAllValues,
@@ -34,6 +37,7 @@ export function VariablesEditor({
   const [editingName, setEditingName] = useState("")
   const [variableToDelete, setVariableToDelete] = useState<string | null>(null)
   const [showClearConfirmation, setShowClearConfirmation] = useState(false)
+  const [descriptionTarget, setDescriptionTarget] = useState<PromptVariable | null>(null)
   const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({})
 
   const handleStartEditingName = (variable: PromptVariable) => {
@@ -107,6 +111,7 @@ export function VariablesEditor({
               editingName={editingName}
               onStartEditingName={handleStartEditingName}
               onSaveVariableName={handleSaveVariableName}
+              onEditDescription={setDescriptionTarget}
               onDeleteClick={handleDeleteClick}
               onUpdateVariable={onUpdateVariable}
               onEditingNameChange={setEditingName}
@@ -145,6 +150,16 @@ export function VariablesEditor({
         onConfirm={handleConfirmClearAll}
         title="Vaciar valores"
         description="¿Estás seguro de que deseas vaciar todos los valores de las variables? Esta acción no se puede deshacer."
+      />
+
+      <DescriptionDialog
+        isOpen={!!descriptionTarget}
+        onClose={() => setDescriptionTarget(null)}
+        onSave={(description) => {
+          if (descriptionTarget) onUpdateVariableDescription(descriptionTarget.id, description)
+        }}
+        title={`Descripción de ${descriptionTarget?.name ?? "variable"}`}
+        initialValue={descriptionTarget?.description ?? ""}
       />
     </div>
   )

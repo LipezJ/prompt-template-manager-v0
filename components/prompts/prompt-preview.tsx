@@ -6,8 +6,9 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea"
 import type { Prompt, PromptVariable } from "@/types/prompt"
-import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-react"
+import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical, FileText } from "lucide-react"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
+import { DescriptionDialog } from "@/components/dialogs/description-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSortable } from "@dnd-kit/sortable"
@@ -18,6 +19,7 @@ interface PromptPreviewProps {
   prompt: Prompt
   variables: PromptVariable[]
   onUpdatePrompt: (content: string) => void
+  onUpdateDescription: (description: string) => void
   onDeletePrompt: () => void
   isEditMode?: boolean
 }
@@ -26,6 +28,7 @@ export function PromptPreview({
   prompt,
   variables,
   onUpdatePrompt,
+  onUpdateDescription,
   onDeletePrompt,
   isEditMode = false,
 }: PromptPreviewProps) {
@@ -33,6 +36,7 @@ export function PromptPreview({
   const [content, setContent] = useState(prompt.content)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [showDescriptionDialog, setShowDescriptionDialog] = useState(false)
   const [copied, setCopied] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -181,6 +185,10 @@ export function PromptPreview({
                     <Pencil className="mr-2 h-4 w-4" />
                     Editar
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowDescriptionDialog(true)} className="cursor-pointer">
+                    <FileText className="mr-2 h-4 w-4" />
+                    {prompt.description ? "Editar descripción" : "Añadir descripción"}
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
                     className="text-red-400 focus:text-red-400 cursor-pointer"
@@ -192,28 +200,39 @@ export function PromptPreview({
               </DropdownMenu>
             </div>
           </div>
-          {!isEditMode && (
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={togglePreview}
-                className={`bg-zinc-700 hover:bg-zinc-600 border-zinc-600 ${isPreviewMode ? "ring-2 ring-zinc-500" : ""}`}
-              >
-                <EyeIcon className="h-4 w-4 text-zinc-300" />
-                <span className="sr-only">Preview</span>
-              </Button>
-                <TooltipProvider>
-                  <Tooltip open={copied}>
-                    <TooltipTrigger asChild>
-                      <Button size="icon" onClick={handleCopy} className="bg-zinc-600 hover:bg-zinc-500">
-                        <CopyIcon className="h-4 w-4 text-zinc-300" />
-                        <span className="sr-only">Copy</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">¡Copiado!</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+          {(prompt.description || !isEditMode) && (
+            <div className="flex items-start justify-between gap-2">
+              {prompt.description ? (
+                <p className="text-xs text-zinc-500 italic whitespace-pre-wrap flex-1 min-w-0">
+                  {prompt.description}
+                </p>
+              ) : (
+                <div className="flex-1" />
+              )}
+              {!isEditMode && (
+                <div className="flex space-x-2 shrink-0">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={togglePreview}
+                    className={`bg-zinc-700 hover:bg-zinc-600 border-zinc-600 ${isPreviewMode ? "ring-2 ring-zinc-500" : ""}`}
+                  >
+                    <EyeIcon className="h-4 w-4 text-zinc-300" />
+                    <span className="sr-only">Preview</span>
+                  </Button>
+                  <TooltipProvider>
+                    <Tooltip open={copied}>
+                      <TooltipTrigger asChild>
+                        <Button size="icon" onClick={handleCopy} className="bg-zinc-600 hover:bg-zinc-500">
+                          <CopyIcon className="h-4 w-4 text-zinc-300" />
+                          <span className="sr-only">Copy</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">¡Copiado!</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -225,6 +244,14 @@ export function PromptPreview({
         onConfirm={handleConfirmDelete}
         title="Eliminar prompt"
         description="¿Estás seguro de que deseas eliminar este prompt? Esta acción no se puede deshacer."
+      />
+
+      <DescriptionDialog
+        isOpen={showDescriptionDialog}
+        onClose={() => setShowDescriptionDialog(false)}
+        onSave={onUpdateDescription}
+        title="Descripción del prompt"
+        initialValue={prompt.description ?? ""}
       />
     </div>
   )

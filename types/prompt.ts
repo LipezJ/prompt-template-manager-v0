@@ -2,11 +2,13 @@ export interface PromptVariable {
   id: string
   name: string
   value: string
+  description?: string
 }
 
 export interface Prompt {
   id: string
   content: string
+  description?: string
 }
 
 export interface PromptSet {

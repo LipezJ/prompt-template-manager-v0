@@ -14,6 +14,7 @@ interface PromptsAreaProps {
   isCardView: boolean
   isEditMode: boolean
   onUpdatePrompt: (promptId: string, content: string) => void
+  onUpdatePromptDescription: (promptId: string, description: string) => void
   onDeletePrompt: (promptId: string) => void
   onAddPrompt: () => void
 }
@@ -24,6 +25,7 @@ export function PromptsArea({
   isCardView,
   isEditMode,
   onUpdatePrompt,
+  onUpdatePromptDescription,
   onDeletePrompt,
   onAddPrompt,
 }: PromptsAreaProps) {
@@ -35,6 +37,7 @@ export function PromptsArea({
 
   const handleSaveEdit = (updatedPrompt: Prompt) => {
     onUpdatePrompt(updatedPrompt.id, updatedPrompt.content)
+    onUpdatePromptDescription(updatedPrompt.id, updatedPrompt.description ?? "")
     setEditingPrompt(null)
   }
 
@@ -64,6 +67,7 @@ export function PromptsArea({
                 prompt={prompt}
                 variables={variables}
                 onUpdatePrompt={(content) => onUpdatePrompt(prompt.id, content)}
+                onUpdateDescription={(description) => onUpdatePromptDescription(prompt.id, description)}
                 onDeletePrompt={() => onDeletePrompt(prompt.id)}
                 isEditMode={isEditMode}
               />

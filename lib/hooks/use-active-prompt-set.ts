@@ -29,12 +29,14 @@ export interface UseActivePromptSetResult {
   addVariable: () => void
   updateVariable: (id: string, value: string) => void
   updateVariableName: (id: string, name: string) => void
+  updateVariableDescription: (id: string, description: string) => void
   deleteVariable: (id: string) => void
   clearAllVariableValues: () => void
   reorderVariables: (oldIndex: number, newIndex: number) => void
 
   addPrompt: () => void
   updatePrompt: (id: string, content: string) => void
+  updatePromptDescription: (id: string, description: string) => void
   deletePrompt: (id: string) => void
   reorderPrompts: (oldIndex: number, newIndex: number) => void
 }
@@ -158,6 +160,18 @@ export function useActivePromptSet(
     [patchActiveSet],
   )
 
+  const updateVariableDescription = useCallback(
+    (id: string, description: string) => {
+      patchActiveSet((set) => ({
+        ...set,
+        variables: set.variables.map((v) =>
+          v.id === id ? { ...v, description: description.trim() === "" ? undefined : description } : v,
+        ),
+      }))
+    },
+    [patchActiveSet],
+  )
+
   const deleteVariable = useCallback(
     (id: string) => {
       patchActiveSet((set) => ({ ...set, variables: set.variables.filter((v) => v.id !== id) }))
@@ -191,6 +205,18 @@ export function useActivePromptSet(
     [patchActiveSet],
   )
 
+  const updatePromptDescription = useCallback(
+    (id: string, description: string) => {
+      patchActiveSet((set) => ({
+        ...set,
+        prompts: set.prompts.map((p) =>
+          p.id === id ? { ...p, description: description.trim() === "" ? undefined : description } : p,
+        ),
+      }))
+    },
+    [patchActiveSet],
+  )
+
   const deletePrompt = useCallback(
     (id: string) => {
       patchActiveSet((set) => ({ ...set, prompts: set.prompts.filter((p) => p.id !== id) }))
@@ -217,11 +243,13 @@ export function useActivePromptSet(
     addVariable,
     updateVariable,
     updateVariableName,
+    updateVariableDescription,
     deleteVariable,
     clearAllVariableValues,
     reorderVariables,
     addPrompt,
     updatePrompt,
+    updatePromptDescription,
     deletePrompt,
     reorderPrompts,
   }

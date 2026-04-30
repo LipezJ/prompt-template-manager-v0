@@ -5,11 +5,13 @@ export const PromptVariableSchema = z.object({
   id: z.string(),
   name: z.string(),
   value: z.string(),
+  description: z.string().optional(),
 })
 
 export const PromptSchema = z.object({
   id: z.string(),
   content: z.string(),
+  description: z.string().optional(),
 })
 
 export const UiPreferencesSchema = z.object({
