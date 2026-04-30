@@ -77,9 +77,9 @@ export function VariablesEditor({
   }
 
   return (
-    <div className="bg-zinc-800 rounded-md p-4 h-full flex flex-col min-h-0">
+    <div className="bg-card border border-border rounded-lg p-4 h-full flex flex-col min-h-0">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium">Variables</h3>
+        <h3 className="text-sm font-medium text-foreground">Variables</h3>
         {variables.length > 0 && (
           <TooltipProvider>
             <Tooltip>
@@ -88,9 +88,9 @@ export function VariablesEditor({
                   variant="outline"
                   size="icon"
                   onClick={handleClearAllClick}
-                  className="h-7 w-7 bg-zinc-700 hover:bg-zinc-600 border-zinc-600"
+                  className="h-7 w-7"
                 >
-                  <Eraser className="h-3.5 w-3.5 text-zinc-300" />
+                  <Eraser className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -124,14 +124,14 @@ export function VariablesEditor({
         </SortableContext>
       </div>
       {!isEditMode && (
-        <div className="pt-4 sticky bottom-0 bg-zinc-800">
+        <div className="pt-4 sticky bottom-0 bg-card">
           <Button
             variant="outline"
             size="icon"
             onClick={onAddVariable}
-            className="w-full h-8 bg-zinc-700 hover:bg-zinc-600 border-zinc-600"
+            className="w-full h-8"
           >
-            <PlusIcon className="h-4 w-4 text-zinc-300" />
+            <PlusIcon className="h-4 w-4" />
           </Button>
         </div>
       )}
@@ -141,7 +141,7 @@ export function VariablesEditor({
         onClose={() => setVariableToDelete(null)}
         onConfirm={handleConfirmDelete}
         title="Eliminar variable"
-        description="¿Estás seguro de que deseas eliminar esta variable? Esta acción no se puede deshacer."
+        description="Esta accion eliminara la variable y no se puede deshacer."
       />
 
       <ConfirmationDialog
@@ -149,7 +149,7 @@ export function VariablesEditor({
         onClose={() => setShowClearConfirmation(false)}
         onConfirm={handleConfirmClearAll}
         title="Vaciar valores"
-        description="¿Estás seguro de que deseas vaciar todos los valores de las variables? Esta acción no se puede deshacer."
+        description="Esta accion vaciara todos los valores de las variables y no se puede deshacer."
       />
 
       <DescriptionDialog
@@ -158,7 +158,7 @@ export function VariablesEditor({
         onSave={(description) => {
           if (descriptionTarget) onUpdateVariableDescription(descriptionTarget.id, description)
         }}
-        title={`Descripción de ${descriptionTarget?.name ?? "variable"}`}
+        title={`Descripcion de ${descriptionTarget?.name ?? "variable"}`}
         initialValue={descriptionTarget?.description ?? ""}
       />
     </div>

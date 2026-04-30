@@ -73,7 +73,7 @@ export function SplitPane({
               variant="ghost"
               size="icon"
               onClick={() => onSetLeftVisible(false)}
-              className="h-6 w-6 hover:bg-zinc-700"
+              className="h-6 w-6 hover:bg-accent"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -87,7 +87,7 @@ export function SplitPane({
           className="w-2 h-full flex items-center justify-center cursor-col-resize mx-2 group"
           onMouseDown={handleMouseDown}
         >
-          <div className="w-0.5 h-full bg-zinc-700 group-hover:bg-zinc-500 group-active:bg-zinc-400"></div>
+          <div className="w-0.5 h-full bg-border group-hover:bg-muted-foreground group-active:bg-foreground transition-colors"></div>
         </div>
       )}
 
@@ -97,7 +97,7 @@ export function SplitPane({
             variant="ghost"
             size="icon"
             onClick={() => onSetLeftVisible(true)}
-            className="h-6 w-6 hover:bg-zinc-700"
+            className="h-6 w-6 hover:bg-accent"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

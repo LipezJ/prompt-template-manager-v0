@@ -6,7 +6,7 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea"
 import type { Prompt, PromptVariable } from "@/types/prompt"
-import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical, FileText } from "lucide-react"
+import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical, FileText, X, Check } from "lucide-react"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DescriptionDialog } from "@/components/dialogs/description-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { replaceVariables } from "@/lib/prompt-utils"
+import { cn } from "@/lib/utils"
 
 interface PromptPreviewProps {
   prompt: Prompt
@@ -100,14 +101,21 @@ export function PromptPreview({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={`bg-zinc-800 rounded-md p-4 ${isDragging ? "shadow-lg" : ""}`}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "bg-card border border-border rounded-lg p-4",
+        isDragging && "shadow-lg"
+      )}
+    >
       {isEditing ? (
         <div className="space-y-2">
           <AutoResizeTextarea
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+            className="bg-secondary border-border custom-scrollbar"
             minRows={3}
             maxRows={20}
             onFocus={handleTextareaFocus}
@@ -117,37 +125,13 @@ export function PromptPreview({
               variant="outline"
               size="icon"
               onClick={handleCancel}
-              className="bg-zinc-700 hover:bg-zinc-600 border-zinc-600"
             >
               <span className="sr-only">Cancelar</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-zinc-300"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+              <X className="h-4 w-4" />
             </Button>
-            <Button size="icon" onClick={handleSave} className="bg-zinc-600 hover:bg-zinc-500">
+            <Button size="icon" onClick={handleSave}>
               <span className="sr-only">Guardar</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-zinc-300"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <Check className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -162,13 +146,14 @@ export function PromptPreview({
                 {...attributes}
                 {...listeners}
               >
-                <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+                <GripVertical aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
               </button>
             )}
             <pre
-              className={`whitespace-pre-wrap text-sm p-2 bg-zinc-900 rounded min-h-25 max-h-75 overflow-y-auto cursor-pointer custom-scrollbar ${
-                isEditMode ? "pl-10" : ""
-              }`}
+              className={cn(
+                "whitespace-pre-wrap text-sm p-3 bg-secondary rounded-md min-h-25 max-h-75 overflow-y-auto cursor-pointer custom-scrollbar text-foreground",
+                isEditMode && "pl-10"
+              )}
               onClick={!isEditMode ? handleEdit : undefined}
             >
               {isPreviewMode ? replaceVariables(prompt.content, variables) : prompt.content}
@@ -176,22 +161,22 @@ export function PromptPreview({
             <div className="absolute top-1 right-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-zinc-800 hover:text-zinc-300">
-                    <MoreVertical className="h-3 w-3 text-zinc-400" />
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <MoreVertical className="h-3 w-3 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white z-50">
+                <DropdownMenuContent align="end" className="z-50">
                   <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Editar
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setShowDescriptionDialog(true)} className="cursor-pointer">
                     <FileText className="mr-2 h-4 w-4" />
-                    {prompt.description ? "Editar descripción" : "Añadir descripción"}
+                    {prompt.description ? "Editar descripcion" : "Agregar descripcion"}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
-                    className="text-red-400 focus:text-red-400 cursor-pointer"
+                    className="text-destructive focus:text-destructive cursor-pointer"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Eliminar
@@ -203,7 +188,7 @@ export function PromptPreview({
           {(prompt.description || !isEditMode) && (
             <div className="flex items-start justify-between gap-2">
               {prompt.description ? (
-                <p className="text-xs text-zinc-500 italic whitespace-pre-wrap flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground italic whitespace-pre-wrap flex-1 min-w-0">
                   {prompt.description}
                 </p>
               ) : (
@@ -215,20 +200,20 @@ export function PromptPreview({
                     variant="outline"
                     size="icon"
                     onClick={togglePreview}
-                    className={`bg-zinc-700 hover:bg-zinc-600 border-zinc-600 ${isPreviewMode ? "ring-2 ring-zinc-500" : ""}`}
+                    className={cn(isPreviewMode && "ring-2 ring-primary")}
                   >
-                    <EyeIcon className="h-4 w-4 text-zinc-300" />
+                    <EyeIcon className="h-4 w-4" />
                     <span className="sr-only">Preview</span>
                   </Button>
                   <TooltipProvider>
                     <Tooltip open={copied}>
                       <TooltipTrigger asChild>
-                        <Button size="icon" onClick={handleCopy} className="bg-zinc-600 hover:bg-zinc-500">
-                          <CopyIcon className="h-4 w-4 text-zinc-300" />
+                        <Button size="icon" onClick={handleCopy}>
+                          <CopyIcon className="h-4 w-4" />
                           <span className="sr-only">Copy</span>
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="top">¡Copiado!</TooltipContent>
+                      <TooltipContent side="top">Copiado</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
@@ -243,14 +228,14 @@ export function PromptPreview({
         onClose={() => setShowDeleteConfirmation(false)}
         onConfirm={handleConfirmDelete}
         title="Eliminar prompt"
-        description="¿Estás seguro de que deseas eliminar este prompt? Esta acción no se puede deshacer."
+        description="Esta accion eliminara el prompt y no se puede deshacer."
       />
 
       <DescriptionDialog
         isOpen={showDescriptionDialog}
         onClose={() => setShowDescriptionDialog(false)}
         onSave={onUpdateDescription}
-        title="Descripción del prompt"
+        title="Descripcion del prompt"
         initialValue={prompt.description ?? ""}
       />
     </div>

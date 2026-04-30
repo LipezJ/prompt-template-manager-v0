@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { useParams } from "next/navigation"
-import { NavigationBar } from "@/components/layout/navigation-bar"
+import { useParams, useSearchParams } from "next/navigation"
+import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { PromptSetTabs } from "@/components/prompt-sets/prompt-set-tabs"
 import { VariablesEditor } from "@/components/variables/variables-editor"
 import { PromptsArea } from "@/components/prompts/prompts-area"
@@ -22,10 +22,12 @@ import { dndAnnouncements } from "@/lib/dnd-announcements"
 
 export default function PromptSetsPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const projectId = params.projectId as string
+  const tabFromUrl = searchParams.get("tab")
 
   const projectsState = useProjects()
-  const { projects, isLoaded } = projectsState
+  const { projects, isLoaded, addProject, deleteProject, importProject } = projectsState
   const {
     currentProject,
     activePromptSet,
@@ -47,7 +49,7 @@ export default function PromptSetsPage() {
     updatePromptDescription,
     deletePrompt,
     reorderPrompts,
-  } = useActivePromptSet(projectId, projectsState)
+  } = useActivePromptSet(projectId, projectsState, tabFromUrl ?? undefined)
 
   const [isEditMode, setIsEditMode] = useState(false)
 
@@ -84,11 +86,18 @@ export default function PromptSetsPage() {
   const ready = isLoaded && Boolean(currentProject)
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-900 text-white overflow-hidden">
-      <NavigationBar projects={ready ? projects : []} currentProject={ready ? currentProject : undefined} />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="py-2 px-4 border-b border-zinc-700">
+    <DashboardLayout
+      projects={projects}
+      currentProject={ready ? currentProject : undefined}
+      currentPromptSetId={activePromptSetId}
+      isLoaded={isLoaded}
+      onAddProject={addProject}
+      onDeleteProject={deleteProject}
+      onImportProject={importProject}
+    >
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Tabs Bar */}
+        <div className="py-2 px-4 border-b border-border bg-card/50">
           <div className="flex items-center">
             <div className="flex-1 overflow-x-auto custom-scrollbar">
               {ready && currentProject && (
@@ -101,15 +110,15 @@ export default function PromptSetsPage() {
                 />
               )}
             </div>
-            <div className="flex space-x-2 ml-2">
+            <div className="flex items-center gap-2 ml-4">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={addPromptSet}
                 disabled={!ready}
-                className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
+                className="h-7 w-7 shrink-0"
               >
-                <PlusIcon className="h-3.5 w-3.5 text-zinc-300" />
+                <PlusIcon className="h-3.5 w-3.5" />
               </Button>
               <ViewToggle isCardView={cardView} onToggle={() => updateUiPreferences({ cardView: !cardView })} />
               <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
@@ -121,27 +130,26 @@ export default function PromptSetsPage() {
                       size="icon"
                       onClick={exportActivePromptSet}
                       disabled={!ready}
-                      className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
+                      className="h-7 w-7 shrink-0"
                     >
-                      <Download className="h-3.5 w-3.5 text-zinc-300" />
+                      <Download className="h-3.5 w-3.5" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Exportar Conjunto</p>
-                  </TooltipContent>
+                  <TooltipContent>Exportar conjunto</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
           </div>
         </div>
 
+        {/* Split Pane Content */}
         {ready && activePromptSet && (
           <SplitPane
             splitPosition={splitPosition}
             leftVisible={variablesPanelVisible}
             onChangeSplitPosition={(next) => updateUiPreferences({ splitPosition: next })}
             onSetLeftVisible={(visible) => updateUiPreferences({ variablesPanelVisible: visible })}
-            leftHeader={<h3 className="text-sm font-medium">Variables</h3>}
+            leftHeader={<h3 className="text-sm font-medium text-foreground">Variables</h3>}
             left={
               <ErrorBoundary fallbackLabel="No se pudo renderizar el panel de variables">
                 <DndContext
@@ -187,6 +195,6 @@ export default function PromptSetsPage() {
           />
         )}
       </div>
-    </div>
+    </DashboardLayout>
   )
 }

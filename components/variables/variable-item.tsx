@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 interface VariableItemProps {
   variable: PromptVariable
@@ -56,7 +57,7 @@ export function VariableItem({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={`space-y-1 ${isDragging ? "shadow-lg" : ""}`}>
+    <div ref={setNodeRef} style={style} className={cn("space-y-1", isDragging && "shadow-lg")}>
       <div className="flex items-center justify-between">
         <div className="flex-1 flex items-center">
           {isEditMode && (
@@ -67,7 +68,7 @@ export function VariableItem({
               {...attributes}
               {...listeners}
             >
-              <GripVertical aria-hidden="true" className="h-4 w-4 text-zinc-500" />
+              <GripVertical aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
             </button>
           )}
           {isEditing ? (
@@ -81,11 +82,11 @@ export function VariableItem({
                   onSaveVariableName(variable)
                 }
               }}
-              className="h-6 py-0 text-xs min-h-0 bg-zinc-700 border-zinc-600"
+              className="h-6 py-0 text-xs min-h-0"
               onFocus={onTextareaFocus}
             />
           ) : (
-            <div className="text-xs text-zinc-400 flex items-center">
+            <div className="text-xs text-muted-foreground flex items-center">
               <span>{variable.name}</span>
             </div>
           )}
@@ -93,22 +94,22 @@ export function VariableItem({
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-zinc-700 hover:text-zinc-300">
-                <MoreVertical className="h-3 w-3 text-zinc-400" />
+              <Button variant="ghost" size="icon" className="h-6 w-6">
+                <MoreVertical className="h-3 w-3 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white z-50">
+            <DropdownMenuContent align="end" className="z-50">
               <DropdownMenuItem onClick={() => onStartEditingName(variable)} className="cursor-pointer">
                 <Pencil className="mr-2 h-4 w-4" />
                 Editar nombre
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEditDescription(variable)} className="cursor-pointer">
                 <FileText className="mr-2 h-4 w-4" />
-                {variable.description ? "Editar descripción" : "Añadir descripción"}
+                {variable.description ? "Editar descripcion" : "Agregar descripcion"}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDeleteClick(variable.id)}
-                className="text-red-400 focus:text-red-400 cursor-pointer"
+                className="text-destructive focus:text-destructive cursor-pointer"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Eliminar
@@ -121,13 +122,13 @@ export function VariableItem({
         ref={textareaRef}
         value={variable.value}
         onChange={(e) => onUpdateVariable(variable.id, e.target.value)}
-        className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+        className="bg-secondary border-border custom-scrollbar"
         minRows={2}
         maxRows={10}
         onFocus={onTextareaFocus}
       />
       {variable.description && (
-        <p className="text-xs text-zinc-500 italic whitespace-pre-wrap">{variable.description}</p>
+        <p className="text-xs text-muted-foreground italic whitespace-pre-wrap">{variable.description}</p>
       )}
     </div>
   )

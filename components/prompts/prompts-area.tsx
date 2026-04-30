@@ -77,14 +77,14 @@ export function PromptsArea({
       </SortableContext>
 
       {!isEditMode && (
-        <div className="pt-4 flex justify-end sticky bottom-0 bg-zinc-900">
+        <div className="pt-4 flex justify-end sticky bottom-0 bg-background">
           <Button
             variant="outline"
             size="icon"
             onClick={onAddPrompt}
-            className="h-8 w-8 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
+            className="h-8 w-8"
           >
-            <PlusIcon className="h-4 w-4 text-zinc-300" />
+            <PlusIcon className="h-4 w-4" />
           </Button>
         </div>
       )}

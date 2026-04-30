@@ -44,10 +44,11 @@ export interface UseActivePromptSetResult {
 export function useActivePromptSet(
   projectId: string,
   projectsState: UseProjectsResult,
+  initialTabId?: string,
 ): UseActivePromptSetResult {
   const { projects, updateProject } = projectsState
   const searchParams = useSearchParams()
-  const setIdFromUrl = searchParams.get("set")
+  const setIdFromUrl = searchParams.get("set") || searchParams.get("tab") || initialTabId
 
   const currentProject = projects.find((p) => p.id === projectId) ?? projects[0]
 

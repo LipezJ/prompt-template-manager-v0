@@ -2,16 +2,13 @@
 
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { NavigationBar } from "@/components/layout/navigation-bar"
+import { DashboardLayout } from "@/components/layout/dashboard-layout"
+import { ProjectDetailContent } from "@/components/projects/project-detail-content"
 import { newId } from "@/lib/ids"
 import { useProjects } from "@/lib/hooks/use-projects"
 import type { PromptSet } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { ImportPromptSetDialog } from "@/components/dialogs/import-prompt-set-dialog"
-import { ProjectInfoCard } from "@/components/projects/project-info-card"
-import { ProjectHeader } from "@/components/projects/project-header"
-import { PromptSetGrid } from "@/components/prompt-sets/prompt-set-grid"
-import { ErrorBoundary } from "@/components/layout/error-boundary"
 import { copyToClipboard } from "@/lib/toast"
 
 export default function ProjectPage() {
@@ -19,7 +16,7 @@ export default function ProjectPage() {
   const router = useRouter()
   const projectId = params.projectId as string
 
-  const { projects, isLoaded, updateProject, deleteProject } = useProjects()
+  const { projects, isLoaded, addProject, updateProject, deleteProject, importProject } = useProjects()
   const currentProject = projects.find((p) => p.id === projectId) ?? projects[0]
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
@@ -95,47 +92,37 @@ export default function ProjectPage() {
   const ready = isLoaded && Boolean(currentProject)
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-900 text-white">
-      <NavigationBar projects={ready ? projects : []} currentProject={ready ? currentProject : undefined} />
-
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-5xl mx-auto">
-          {ready && currentProject && (
-            <>
-              <ProjectHeader
-                project={currentProject}
-                isEditMode={isEditMode}
-                canDelete={projects.length > 1}
-                onToggleEditMode={() => setIsEditMode((v) => !v)}
-                onRename={renameProject}
-                onExport={handleExportProject}
-                onDelete={() => setShowDeleteConfirmation(true)}
-              />
-
-              <ProjectInfoCard name={currentProject.name} promptSetsCount={currentProject.promptSets.length} />
-
-              <ErrorBoundary fallbackLabel="No se pudo renderizar la lista de conjuntos de prompts">
-                <PromptSetGrid
-                  project={currentProject}
-                  isEditMode={isEditMode}
-                  onAddPromptSet={addPromptSet}
-                  onDeletePromptSet={setPromptSetToDelete}
-                  onExportPromptSet={handleExportPromptSet}
-                  onReorderPromptSets={reorderPromptSets}
-                  onImportClick={() => setIsImportPromptSetDialogOpen(true)}
-                />
-              </ErrorBoundary>
-            </>
-          )}
-        </div>
-      </div>
+    <DashboardLayout
+      projects={projects}
+      currentProject={ready ? currentProject : undefined}
+      isLoaded={isLoaded}
+      onAddProject={addProject}
+      onDeleteProject={deleteProject}
+      onImportProject={importProject}
+    >
+      {ready && currentProject && (
+        <ProjectDetailContent
+          project={currentProject}
+          isEditMode={isEditMode}
+          canDelete={projects.length > 1}
+          onToggleEditMode={() => setIsEditMode((v) => !v)}
+          onRename={renameProject}
+          onExport={handleExportProject}
+          onDelete={() => setShowDeleteConfirmation(true)}
+          onAddPromptSet={addPromptSet}
+          onDeletePromptSet={setPromptSetToDelete}
+          onExportPromptSet={handleExportPromptSet}
+          onReorderPromptSets={reorderPromptSets}
+          onImportClick={() => setIsImportPromptSetDialogOpen(true)}
+        />
+      )}
 
       <ConfirmationDialog
         isOpen={showDeleteConfirmation}
         onClose={() => setShowDeleteConfirmation(false)}
         onConfirm={confirmDeleteProject}
         title="Eliminar proyecto"
-        description="¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer."
+        description="Esta accion eliminara el proyecto y no se puede deshacer."
       />
 
       <ConfirmationDialog
@@ -143,7 +130,7 @@ export default function ProjectPage() {
         onClose={() => setPromptSetToDelete(null)}
         onConfirm={() => promptSetToDelete && removePromptSet(promptSetToDelete)}
         title="Eliminar conjunto de prompts"
-        description="¿Estás seguro de que deseas eliminar este conjunto de prompts? Esta acción no se puede deshacer."
+        description="Esta accion eliminara el conjunto de prompts y no se puede deshacer."
       />
 
       <ImportPromptSetDialog
@@ -151,6 +138,6 @@ export default function ProjectPage() {
         onClose={() => setIsImportPromptSetDialogOpen(false)}
         onImport={handleImportPromptSet}
       />
-    </div>
+    </DashboardLayout>
   )
 }

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { MoveIcon } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 interface EditModeToggleProps {
   isEditMode: boolean
@@ -20,11 +21,10 @@ export function EditModeToggle({ isEditMode, onToggle }: EditModeToggleProps) {
             onClick={onToggle}
             aria-label={isEditMode ? "Finalizar reordenamiento" : "Reordenar elementos"}
             aria-pressed={isEditMode}
-            className={`h-7 w-7 ${
-              isEditMode
-                ? "bg-zinc-600 hover:bg-zinc-500 text-white"
-                : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-            }`}
+            className={cn(
+              "h-7 w-7",
+              isEditMode && "bg-primary text-primary-foreground hover:bg-primary/90"
+            )}
           >
             <MoveIcon aria-hidden="true" className="h-3.5 w-3.5" />
           </Button>

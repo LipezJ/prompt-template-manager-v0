@@ -69,7 +69,6 @@ export function PromptSetTabs({
   }
 
   const handleSelectPromptSet = (id: string) => {
-    // Prevent re-selecting the same set
     if (id !== activePromptSetId) {
       onSelectPromptSet(id)
     }
@@ -86,7 +85,7 @@ export function PromptSetTabs({
               onChange={(e) => setEditingName(e.target.value)}
               onBlur={handleSaveEditing}
               onKeyDown={handleKeyDown}
-              className="h-7 w-40 bg-zinc-800 border-zinc-700 text-white"
+              className="h-7 w-40"
             />
           ) : (
             <div className="flex items-center">
@@ -97,8 +96,8 @@ export function PromptSetTabs({
                 className={cn(
                   "h-7 rounded-r-none pr-2",
                   activePromptSetId === set.id
-                    ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground",
                 )}
               >
                 {set.name}
@@ -111,14 +110,14 @@ export function PromptSetTabs({
                     className={cn(
                       "h-7 w-6 rounded-l-none border-l-0",
                       activePromptSetId === set.id
-                        ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
-                        : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    <MoreVertical className="h-3 w-3 text-zinc-400" />
+                    <MoreVertical className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white">
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleStartEditing(set)} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Editar nombre
@@ -126,7 +125,7 @@ export function PromptSetTabs({
                   {promptSets.length > 1 && (
                     <DropdownMenuItem
                       onClick={() => handleDeleteClick(set.id)}
-                      className="text-red-400 focus:text-red-400 cursor-pointer"
+                      className="text-destructive focus:text-destructive cursor-pointer"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Eliminar
@@ -144,7 +143,7 @@ export function PromptSetTabs({
         onClose={() => setPromptSetToDelete(null)}
         onConfirm={handleConfirmDelete}
         title="Eliminar conjunto de prompts"
-        description="¿Estás seguro de que deseas eliminar este conjunto de prompts? Esta acción no se puede deshacer."
+        description="Esta accion eliminara el conjunto de prompts y no se puede deshacer."
       />
     </div>
   )

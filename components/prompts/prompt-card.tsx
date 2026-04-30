@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { GripVertical } from "lucide-react"
 import { replaceVariables } from "@/lib/prompt-utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 interface PromptCardProps {
   prompt: Prompt
@@ -53,8 +54,11 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
           <div
             ref={setNodeRef}
             style={style}
-            className={`bg-zinc-800 rounded-md p-4 cursor-pointer relative w-50 h-50 ${isDragging ? "shadow-lg" : ""
-              } hover:bg-zinc-750 transition-colors ${copied ? "bg-zinc-700" : ""}`}
+            className={cn(
+              "bg-card border border-border rounded-lg p-4 cursor-pointer relative w-50 h-50 hover:border-primary/50 transition-colors",
+              isDragging && "shadow-lg",
+              copied && "border-primary"
+            )}
             onClick={handleClick}
           >
             {isEditMode && (
@@ -65,20 +69,23 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
                 {...attributes}
                 {...listeners}
               >
-                <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+                <GripVertical aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
               </button>
             )}
-            <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar flex flex-col ${isEditMode ? "ml-6" : ""}`}>
-              <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden flex-1">{prompt.content}</pre>
+            <div className={cn(
+              "bg-secondary rounded-md p-2 h-full overflow-auto custom-scrollbar flex flex-col",
+              isEditMode && "ml-6"
+            )}>
+              <pre className="whitespace-pre-wrap text-xs text-foreground overflow-hidden flex-1">{prompt.content}</pre>
               {prompt.description && (
-                <p className="mt-1 pt-1 border-t border-zinc-800 text-[10px] text-zinc-500 italic line-clamp-2">
+                <p className="mt-1 pt-1 border-t border-border text-[10px] text-muted-foreground italic line-clamp-2">
                   {prompt.description}
                 </p>
               )}
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent side="top">¡Copiado!</TooltipContent>
+        <TooltipContent side="top">Copiado</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )
