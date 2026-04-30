@@ -15,9 +15,9 @@ export const PromptSchema = z.object({
 })
 
 export const UiPreferencesSchema = z.object({
-  splitPosition: z.number(),
-  variablesPanelVisible: z.boolean(),
-  cardView: z.boolean(),
+  splitPosition: z.number().default(50),
+  variablesPanelVisible: z.boolean().default(true),
+  cardView: z.boolean().default(false),
 })
 
 export const PromptSetSchema = z.object({
