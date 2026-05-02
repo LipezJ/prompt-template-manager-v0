@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, Eraser } from "lucide-react"
+import { ChevronLeft, PlusIcon, Eraser } from "lucide-react"
 import type { PromptVariable } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DescriptionDialog } from "@/components/dialogs/description-dialog"
@@ -20,6 +20,7 @@ interface VariablesEditorProps {
   onAddVariable: () => void
   onDeleteVariable: (id: string) => void
   onClearAllValues: () => void
+  onHidePanel?: () => void
   isEditMode?: boolean
 }
 
@@ -31,6 +32,7 @@ export function VariablesEditor({
   onAddVariable,
   onDeleteVariable,
   onClearAllValues,
+  onHidePanel,
   isEditMode = false,
 }: VariablesEditorProps) {
   const [editingVariable, setEditingVariable] = useState<string | null>(null)
@@ -77,30 +79,55 @@ export function VariablesEditor({
   }
 
   return (
-    <div className="bg-zinc-800 rounded-md p-4 h-full flex flex-col min-h-0">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium">Variables</h3>
-        {variables.length > 0 && (
-          <TooltipProvider>
+    <div className="app-card-subtle flex h-full min-h-0 flex-col p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-medium text-white">Variables</h3>
+          <p className="text-xs text-fog">{variables.length} en este set</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {onHidePanel && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onHidePanel}
+                    className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="sr-only">Ocultar panel de variables</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ocultar variables</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {variables.length > 0 && (
+            <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={handleClearAllClick}
-                  className="h-7 w-7 bg-zinc-700 hover:bg-zinc-600 border-zinc-600"
+                  className="h-8 w-8 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
                 >
-                  <Eraser className="h-3.5 w-3.5 text-zinc-300" />
+                  <Eraser className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Vaciar todos los valores</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-        )}
+            </TooltipProvider>
+          )}
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto pr-1 space-y-3 min-h-0 custom-scrollbar">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1 custom-scrollbar">
         <SortableContext items={variables.map((v) => v.id)} strategy={verticalListSortingStrategy}>
           {variables.map((variable) => (
             <VariableItem
@@ -124,14 +151,14 @@ export function VariablesEditor({
         </SortableContext>
       </div>
       {!isEditMode && (
-        <div className="pt-4 sticky bottom-0 bg-zinc-800">
+        <div className="sticky bottom-0 pt-3">
           <Button
             variant="outline"
             size="icon"
             onClick={onAddVariable}
-            className="w-full h-8 bg-zinc-700 hover:bg-zinc-600 border-zinc-600"
+            className="h-9 w-full rounded-2xl border-iron/70 bg-transparent text-fog hover:bg-graphite/40 hover:text-white"
           >
-            <PlusIcon className="h-4 w-4 text-zinc-300" />
+            <PlusIcon className="h-4 w-4" />
           </Button>
         </div>
       )}

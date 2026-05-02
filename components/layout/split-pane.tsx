@@ -3,14 +3,13 @@
 import type React from "react"
 import { useEffect, useState, type ReactNode } from "react"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 
 interface SplitPaneProps {
   splitPosition: number
   leftVisible: boolean
   onChangeSplitPosition: (next: number) => void
   onSetLeftVisible: (visible: boolean) => void
-  leftHeader: ReactNode
   left: ReactNode
   right: ReactNode
 }
@@ -20,7 +19,6 @@ export function SplitPane({
   leftVisible,
   onChangeSplitPosition,
   onSetLeftVisible,
-  leftHeader,
   left,
   right,
 }: SplitPaneProps) {
@@ -61,33 +59,22 @@ export function SplitPane({
 
   return (
     <div
-      className="flex-1 flex overflow-hidden h-0 min-h-0 p-4"
+      className="flex h-0 min-h-0 flex-1 overflow-hidden p-4"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
       {leftVisible && (
         <div className="flex flex-col min-h-0 h-full overflow-hidden" style={{ width: `${splitPosition}%` }}>
-          <div className="flex justify-between items-center mb-2">
-            {leftHeader}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onSetLeftVisible(false)}
-              className="h-6 w-6 hover:bg-zinc-700"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          </div>
           {left}
         </div>
       )}
 
       {leftVisible && (
         <div
-          className="w-2 h-full flex items-center justify-center cursor-col-resize mx-2 group"
+          className="group mx-3 flex h-full w-2 cursor-col-resize items-center justify-center"
           onMouseDown={handleMouseDown}
         >
-          <div className="w-0.5 h-full bg-zinc-700 group-hover:bg-zinc-500 group-active:bg-zinc-400"></div>
+          <div className="h-full w-px bg-iron group-hover:bg-violet-pulse group-active:bg-electric-blue"></div>
         </div>
       )}
 
@@ -97,7 +84,7 @@ export function SplitPane({
             variant="ghost"
             size="icon"
             onClick={() => onSetLeftVisible(true)}
-            className="h-6 w-6 hover:bg-zinc-700"
+            className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -50,15 +50,15 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-800 border-zinc-700 text-white max-w-3xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Editar Prompt</DialogTitle>
-          <DialogDescription className="text-zinc-400">Edita el contenido del prompt</DialogDescription>
+          <DialogDescription>Edita el contenido del prompt</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="prompt-content" className="text-sm font-medium mb-1 block">
+            <label htmlFor="prompt-content" className="mb-1 block text-sm font-medium text-white">
               Contenido
             </label>
             <AutoResizeTextarea
@@ -66,7 +66,7 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
               id="prompt-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+              className="custom-scrollbar"
               minRows={10}
               maxRows={20}
               onFocus={handleTextareaFocus}
@@ -74,27 +74,27 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
           </div>
 
           <div>
-            <label htmlFor="prompt-description" className="text-sm font-medium mb-1 block">
-              Descripción <span className="text-xs text-zinc-500 font-normal">(opcional)</span>
+            <label htmlFor="prompt-description" className="mb-1 block text-sm font-medium text-white">
+              Descripcion <span className="text-xs font-normal text-silver">(opcional)</span>
             </label>
             <AutoResizeTextarea
               id="prompt-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+              className="custom-scrollbar"
               minRows={2}
               maxRows={6}
-              placeholder="Describe el propósito o contexto de este prompt"
+              placeholder="Describe el proposito o contexto de este prompt"
             />
           </div>
 
-          <div className="bg-zinc-900 p-3 rounded-md">
-            <h4 className="text-sm font-medium mb-2">Variables disponibles:</h4>
+          <div className="rounded-2xl border border-iron/70 bg-black/40 p-3">
+            <h4 className="mb-2 text-sm font-medium text-white">Variables disponibles:</h4>
             <div className="flex flex-wrap gap-2">
               {variables.map((variable) => (
                 <span
                   key={variable.id}
-                  className="px-2 py-1 bg-zinc-700 rounded-md text-xs cursor-pointer hover:bg-zinc-600"
+                  className="cursor-pointer rounded-md bg-[rgba(107,87,255,0.4)] px-2 py-1 text-xs text-white hover:bg-[rgba(107,87,255,0.55)]"
                   onClick={() => {
                     if (textareaRef.current) {
                       const textarea = textareaRef.current
@@ -116,13 +116,11 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
           </div>
         </div>
 
-        <DialogFooter className="flex space-x-2 justify-end">
-          <Button variant="outline" onClick={onClose} className="bg-zinc-700 hover:bg-zinc-600 border-zinc-600">
+        <DialogFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button onClick={handleSave} className="bg-zinc-600 hover:bg-zinc-500 text-white">
-            Guardar
-          </Button>
+          <Button onClick={handleSave}>Guardar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

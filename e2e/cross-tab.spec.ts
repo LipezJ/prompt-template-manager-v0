@@ -39,8 +39,8 @@ test.describe("cross-tab sync", () => {
     await Promise.all([tabA.waitForLoadState("networkidle"), tabB.waitForLoadState("networkidle")])
 
     // Both tabs see the seeded project name initially.
-    await expect(tabA.getByText("Mi Primer Proyecto")).toBeVisible()
-    await expect(tabB.getByText("Mi Primer Proyecto")).toBeVisible()
+    await expect(tabA.getByText("Mi Primer Proyecto").first()).toBeVisible()
+    await expect(tabB.getByText("Mi Primer Proyecto").first()).toBeVisible()
 
     // Tab A writes new data directly to IndexedDB and broadcasts a "projects-updated" message.
     await tabA.evaluate(async () => {
@@ -76,7 +76,7 @@ test.describe("cross-tab sync", () => {
       channel.close()
     })
 
-    await expect(tabB.getByText("Renombrado desde A")).toBeVisible({ timeout: 3000 })
+    await expect(tabB.getByText("Renombrado desde A").first()).toBeVisible({ timeout: 3000 })
 
     expect(errorsA, errorsA.join("\n")).toHaveLength(0)
     expect(errorsB, errorsB.join("\n")).toHaveLength(0)

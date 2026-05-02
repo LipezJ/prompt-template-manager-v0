@@ -6,7 +6,7 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea"
 import type { Prompt, PromptVariable } from "@/types/prompt"
-import { CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical, FileText } from "lucide-react"
+import { Check, CopyIcon, EyeIcon, MoreVertical, Pencil, Trash2, GripVertical, FileText, X } from "lucide-react"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DescriptionDialog } from "@/components/dialogs/description-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -100,14 +100,14 @@ export function PromptPreview({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={`bg-zinc-800 rounded-md p-4 ${isDragging ? "shadow-lg" : ""}`}>
+    <div ref={setNodeRef} style={style} className="border-b border-iron/45 py-4 last:border-b-0">
       {isEditing ? (
         <div className="space-y-2">
           <AutoResizeTextarea
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+            className="rounded-xl border-iron/55 bg-black/20 text-white custom-scrollbar focus-visible:ring-violet-pulse"
             minRows={3}
             maxRows={20}
             onFocus={handleTextareaFocus}
@@ -117,37 +117,14 @@ export function PromptPreview({
               variant="outline"
               size="icon"
               onClick={handleCancel}
-              className="bg-zinc-700 hover:bg-zinc-600 border-zinc-600"
+              className="h-9 w-9 rounded-2xl border-iron bg-black/20 text-fog hover:bg-graphite hover:text-white"
             >
               <span className="sr-only">Cancelar</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-zinc-300"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+              <X className="h-4 w-4" />
             </Button>
-            <Button size="icon" onClick={handleSave} className="bg-zinc-600 hover:bg-zinc-500">
+            <Button size="icon" onClick={handleSave} className="h-9 w-9 rounded-2xl bg-white text-deep-charcoal hover:bg-fog">
               <span className="sr-only">Guardar</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-zinc-300"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <Check className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -158,15 +135,15 @@ export function PromptPreview({
               <button
                 type="button"
                 aria-label="Reordenar prompt"
-                className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
+                className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-8 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
                 {...attributes}
                 {...listeners}
               >
-                <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+                <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
               </button>
             )}
             <pre
-              className={`whitespace-pre-wrap text-sm p-2 bg-zinc-900 rounded min-h-25 max-h-75 overflow-y-auto cursor-pointer custom-scrollbar ${
+              className={`min-h-24 max-h-75 cursor-pointer overflow-y-auto whitespace-pre-wrap rounded-xl bg-black/25 p-3 pr-10 text-sm text-fog custom-scrollbar ${
                 isEditMode ? "pl-10" : ""
               }`}
               onClick={!isEditMode ? handleEdit : undefined}
@@ -176,11 +153,11 @@ export function PromptPreview({
             <div className="absolute top-1 right-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-zinc-800 hover:text-zinc-300">
-                    <MoreVertical className="h-3 w-3 text-zinc-400" />
+                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-xl text-silver hover:bg-graphite/70 hover:text-white">
+                    <MoreVertical className="h-3.5 w-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white z-50">
+                <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
                   <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Editar
@@ -203,7 +180,7 @@ export function PromptPreview({
           {(prompt.description || !isEditMode) && (
             <div className="flex items-start justify-between gap-2">
               {prompt.description ? (
-                <p className="text-xs text-zinc-500 italic whitespace-pre-wrap flex-1 min-w-0">
+                <p className="min-w-0 flex-1 whitespace-pre-wrap text-xs italic text-silver">
                   {prompt.description}
                 </p>
               ) : (
@@ -215,16 +192,16 @@ export function PromptPreview({
                     variant="outline"
                     size="icon"
                     onClick={togglePreview}
-                    className={`bg-zinc-700 hover:bg-zinc-600 border-zinc-600 ${isPreviewMode ? "ring-2 ring-zinc-500" : ""}`}
+                    className={`h-9 w-9 rounded-2xl border-iron bg-black/20 text-fog hover:bg-graphite hover:text-white ${isPreviewMode ? "ring-2 ring-violet-pulse" : ""}`}
                   >
-                    <EyeIcon className="h-4 w-4 text-zinc-300" />
+                    <EyeIcon className="h-4 w-4" />
                     <span className="sr-only">Preview</span>
                   </Button>
                   <TooltipProvider>
                     <Tooltip open={copied}>
                       <TooltipTrigger asChild>
-                        <Button size="icon" onClick={handleCopy} className="bg-zinc-600 hover:bg-zinc-500">
-                          <CopyIcon className="h-4 w-4 text-zinc-300" />
+                        <Button size="icon" onClick={handleCopy} className="h-9 w-9 rounded-2xl bg-deep-violet text-electric-blue hover:bg-violet-pulse hover:text-white">
+                          <CopyIcon className="h-4 w-4" />
                           <span className="sr-only">Copy</span>
                         </Button>
                       </TooltipTrigger>

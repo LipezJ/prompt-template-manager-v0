@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Link from "next/link"
-import { Download, FileTextIcon, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { Download, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import type { Project } from "@/types/prompt"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,14 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { getProjectIcon } from "@/lib/project-icons"
 
 interface ProjectHeaderProps {
   project: Project
-  isEditMode: boolean
   canDelete: boolean
-  onToggleEditMode: () => void
+  fallbackIconName?: string
   onRename: (name: string) => void
   onExport: () => void
   onDelete: () => void
@@ -27,9 +24,8 @@ interface ProjectHeaderProps {
 
 export function ProjectHeader({
   project,
-  isEditMode,
   canDelete,
-  onToggleEditMode,
+  fallbackIconName,
   onRename,
   onExport,
   onDelete,
@@ -52,6 +48,10 @@ export function ProjectHeader({
     setIsEditingName(true)
   }
 
+  const startEditingFromMenu = () => {
+    window.setTimeout(startEditing, 120)
+  }
+
   const saveName = () => {
     const trimmed = draftName.trim()
     if (trimmed !== "" && trimmed !== project.name) {
@@ -60,63 +60,59 @@ export function ProjectHeader({
     setIsEditingName(false)
   }
 
+  const ProjectIcon = getProjectIcon(project.icon ?? fallbackIconName)
+
   return (
-    <div className="flex justify-between items-center mb-6">
-      <div className="flex items-center">
-        {isEditingName ? (
-          <Input
-            ref={inputRef}
-            value={draftName}
-            onChange={(e) => setDraftName(e.target.value)}
-            onBlur={saveName}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") saveName()
-              if (e.key === "Escape") setIsEditingName(false)
-            }}
-            className="h-8 w-64 bg-zinc-800 border-zinc-700 text-white"
-          />
-        ) : (
-          <h1 className="text-xl font-bold group flex items-center">
-            <span>{project.name}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={startEditing}
-              className="h-6 w-6 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Pencil className="h-3.5 w-3.5 text-zinc-400" />
-            </Button>
-          </h1>
-        )}
+    <div className="flex min-w-0 flex-1 flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div className="flex min-w-0 items-start gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-magenta-glow/60 bg-[rgba(123,97,255,0.18)] text-electric-blue md:h-16 md:w-16">
+          <ProjectIcon aria-hidden="true" className="h-6 w-6 md:h-7 md:w-7" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-neon-pink">Proyecto</p>
+          {isEditingName ? (
+            <Input
+              ref={inputRef}
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onBlur={saveName}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveName()
+                if (e.key === "Escape") setIsEditingName(false)
+              }}
+              className="h-12 w-full max-w-xl rounded-2xl border-iron bg-deep-charcoal text-lg font-semibold text-white focus-visible:ring-violet-pulse md:text-2xl"
+            />
+          ) : (
+            <h1 className="group flex min-w-0 items-center text-3xl font-semibold leading-tight text-white md:text-5xl">
+              <span className="truncate">{project.name}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={startEditing}
+                className="ml-2 h-9 w-9 shrink-0 rounded-2xl text-silver opacity-100 transition hover:bg-graphite/70 hover:text-white md:opacity-0 md:group-hover:opacity-100"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </h1>
+          )}
+          <p className="max-w-2xl text-sm leading-6 text-fog">
+            Dashboard operativo para revisar y abrir los conjuntos de prompts de este proyecto.
+          </p>
+        </div>
       </div>
-      <div className="flex items-center space-x-2">
-        <EditModeToggle isEditMode={isEditMode} onToggle={onToggleEditMode} />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/projects/${project.id}/prompt-sets`}>
-                <Button size="icon" className="h-7 w-7 bg-zinc-800 hover:bg-zinc-700 text-zinc-300">
-                  <FileTextIcon className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Ver Prompt Sets</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="flex shrink-0 items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-zinc-800">
-              <MoreVertical className="h-4 w-4 text-zinc-400" />
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white">
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white z-50">
+          <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
             <DropdownMenuItem onClick={onExport} className="cursor-pointer">
               <Download className="mr-2 h-4 w-4" />
               Exportar
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={startEditing} className="cursor-pointer">
+            <DropdownMenuItem onClick={startEditingFromMenu} className="cursor-pointer">
               <Pencil className="mr-2 h-4 w-4" />
               Editar nombre
             </DropdownMenuItem>

@@ -34,26 +34,26 @@ export function DescriptionDialog({ isOpen, onClose, onSave, title, initialValue
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-800 border-zinc-700 text-white">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription className="text-zinc-400">
+          <DialogDescription>
             Texto opcional para describir el propósito o contexto.
           </DialogDescription>
         </DialogHeader>
         <AutoResizeTextarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+          className="custom-scrollbar"
           minRows={3}
           maxRows={10}
           placeholder="Descripción (opcional)"
         />
-        <DialogFooter className="flex space-x-2 justify-end">
-          <Button variant="outline" onClick={onClose} className="bg-zinc-700 hover:bg-zinc-600 border-zinc-600">
+        <DialogFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button onClick={handleSave} className="bg-zinc-600 hover:bg-zinc-500 text-white">
+          <Button onClick={handleSave}>
             Guardar
           </Button>
         </DialogFooter>

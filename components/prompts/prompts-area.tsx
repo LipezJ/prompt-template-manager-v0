@@ -42,15 +42,21 @@ export function PromptsArea({
   }
 
   return (
-    <>
+    <div className="app-card-subtle flex h-full min-h-0 flex-col p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-medium text-white">Prompts</h3>
+          <p className="text-xs text-fog">{prompts.length} en este set</p>
+        </div>
+      </div>
       <SortableContext
         items={prompts.map((prompt) => prompt.id)}
         strategy={isCardView ? rectSortingStrategy : verticalListSortingStrategy}
       >
         <div
-          className={`flex-1 overflow-y-auto pr-2 ${
-            isCardView ? "flex flex-wrap gap-4 content-start" : "space-y-4"
-          } min-h-0 custom-scrollbar`}
+          className={`min-h-0 flex-1 overflow-y-auto pr-2 custom-scrollbar ${
+            isCardView ? "grid grid-cols-1 content-start gap-4 sm:grid-cols-2 xl:grid-cols-3" : ""
+          }`}
         >
           {prompts.map((prompt) =>
             isCardView ? (
@@ -77,14 +83,14 @@ export function PromptsArea({
       </SortableContext>
 
       {!isEditMode && (
-        <div className="pt-4 flex justify-end sticky bottom-0 bg-zinc-900">
+        <div className="sticky bottom-0 flex justify-end pt-3">
           <Button
             variant="outline"
             size="icon"
             onClick={onAddPrompt}
-            className="h-8 w-8 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
+            className="h-9 w-9 rounded-2xl border-iron/70 bg-transparent text-fog hover:bg-graphite/40 hover:text-white"
           >
-            <PlusIcon className="h-4 w-4 text-zinc-300" />
+            <PlusIcon className="h-4 w-4" />
           </Button>
         </div>
       )}
@@ -98,6 +104,6 @@ export function PromptsArea({
           onSave={handleSaveEdit}
         />
       )}
-    </>
+    </div>
   )
 }

@@ -40,10 +40,10 @@ export function ImportPromptSetDialog({ isOpen, onClose, onImport }: ImportPromp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-800 border-zinc-700 text-white">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Importar Conjunto de Prompts</DialogTitle>
-          <DialogDescription className="text-zinc-400">
+          <DialogDescription>
             Pega el JSON del conjunto de prompts para importarlo
           </DialogDescription>
         </DialogHeader>
@@ -52,20 +52,16 @@ export function ImportPromptSetDialog({ isOpen, onClose, onImport }: ImportPromp
           value={jsonInput}
           onChange={(e) => setJsonInput(e.target.value)}
           placeholder='{"id": "set-id", "name": "Nombre del Conjunto", "variables": [...], "prompts": [...]}'
-          className="h-64 bg-zinc-700 border-zinc-600 text-white custom-scrollbar"
+          className="h-64 custom-scrollbar"
         />
 
-        {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+        {error && <p className="mt-2 text-sm text-danger-red">{error}</p>}
 
-        <DialogFooter className="flex space-x-2 justify-end">
-          <Button variant="outline" onClick={onClose} className="bg-zinc-700 hover:bg-zinc-600 border-zinc-600">
+        <DialogFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button
-            onClick={handleImport}
-            className="bg-zinc-600 hover:bg-zinc-500 text-white"
-            disabled={!jsonInput.trim()}
-          >
+          <Button onClick={handleImport} disabled={!jsonInput.trim()}>
             Importar
           </Button>
         </DialogFooter>

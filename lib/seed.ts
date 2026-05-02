@@ -5,6 +5,10 @@ export function createDefaultProjects(): Project[] {
     {
       id: "default",
       name: "Mi Primer Proyecto",
+      icon: "Sparkles",
+      uiPreferences: {
+        promptSetsSidebarVisible: false,
+      },
       promptSets: [
         {
           id: "set1",
@@ -44,3 +48,4 @@ export function createDefaultProjects(): Project[] {
     },
   ]
 }
+

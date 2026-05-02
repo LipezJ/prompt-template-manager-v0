@@ -15,12 +15,12 @@ test("home page renders the project grid", async ({ page }) => {
   expect(errors, errors.join("\n")).toHaveLength(0)
 })
 
-test("project page renders the seeded project", async ({ page }) => {
+test("project page renders the seeded project dashboard", async ({ page }) => {
   const errors = captureFatalErrors(page)
   await page.goto("/projects/default")
   await page.waitForLoadState("networkidle")
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
-  await expect(page.getByText("Información del Proyecto")).toBeVisible()
+  await expect(page.getByText("Prompt sets").first()).toBeVisible()
   await expect(page.getByText("Conjuntos de Prompts").first()).toBeVisible()
   expect(errors, errors.join("\n")).toHaveLength(0)
 })
@@ -30,6 +30,7 @@ test("prompt-sets page renders variables and prompts areas", async ({ page }) =>
   await page.goto("/projects/default/prompt-sets")
   await page.waitForLoadState("networkidle")
   await expect(page.getByRole("heading", { name: "Variables" }).first()).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Prompts" })).toBeVisible()
   expect(errors, errors.join("\n")).toHaveLength(0)
 })
 

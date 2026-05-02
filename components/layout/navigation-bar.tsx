@@ -9,8 +9,10 @@ interface NavigationBarProps {
 }
 
 export function NavigationBar({ projects, currentProject }: NavigationBarProps) {
+  void projects
+
   return (
-    <div className="border-b border-zinc-800 bg-zinc-900 text-white">
+    <div className="border-b border-iron/45 bg-deep-charcoal text-white">
       <div className="container mx-auto px-4">
         {/* Simplified navigation in a single row */}
         <div className="flex items-center h-12">
@@ -21,14 +23,14 @@ export function NavigationBar({ projects, currentProject }: NavigationBarProps) 
 
           {currentProject && (
             <>
-              <ChevronRight className="h-3 w-3 mx-2 text-zinc-500" />
+            <ChevronRight className="h-3 w-3 mx-2 text-silver" />
               {/* Project name links to project overview */}
               <Link
                 href={`/projects/${currentProject.id}`}
-                className="flex items-center text-zinc-300 hover:text-white transition-colors"
+                className="flex items-center text-fog hover:text-white transition-colors"
               >
                 <span className="text-sm font-medium">{`${currentProject.name}`}</span>
-                <span className="ml-2 px-1.5 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-300">Prompt</span>
+                <span className="ml-2 rounded-md bg-[rgba(107,87,255,0.48)] px-1.5 py-0.5 text-xs text-white">Prompt</span>
               </Link>
             </>
           )}

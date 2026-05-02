@@ -10,7 +10,7 @@ export function Toaster() {
       theme="dark"
       toastOptions={{
         classNames: {
-          toast: "bg-zinc-800 border border-zinc-700 text-white",
+          toast: "bg-deep-charcoal border border-iron text-white rounded-2xl",
         },
       }}
     />

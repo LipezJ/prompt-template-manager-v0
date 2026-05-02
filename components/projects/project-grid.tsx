@@ -2,13 +2,12 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, FolderIcon, Upload } from "lucide-react"
+import { PlusIcon, FolderKanban, Upload } from "lucide-react"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { ImportProjectDialog } from "@/components/dialogs/import-project-dialog"
 import type { Project } from "@/types/prompt"
-import { NavigationBar } from "@/components/layout/navigation-bar"
 import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
 import {
   DndContext,
@@ -19,15 +18,28 @@ import {
   useSensors,
   DragOverlay,
 } from "@dnd-kit/core"
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { SortableContext, arrayMove, sortableKeyboardCoordinates, rectSortingStrategy } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { useProjects } from "@/lib/hooks/use-projects"
 import { copyToClipboard } from "@/lib/toast"
 import { dndAnnouncements } from "@/lib/dnd-announcements"
 import { ProjectItem } from "./project-item"
+import { AppShell } from "@/components/layout/app-shell"
+import { useProjectsContext } from "@/lib/projects-provider"
 
 export function ProjectGrid() {
-  const { projects, isLoaded, addProject, deleteProject, importProject, reorderProjects } = useProjects()
+  const { projects, isLoaded, addProject, deleteProject, importProject, setProjects } = useProjectsContext()
+
+  const sortedProjects = useMemo(
+    () =>
+      projects
+        .map((project, index) => ({ project, index }))
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.project.pinned)) - Number(Boolean(a.project.pinned)) || a.index - b.index,
+        )
+        .map(({ project }) => project),
+    [projects],
+  )
 
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
@@ -70,22 +82,30 @@ export function ProjectGrid() {
   const handleDragEnd = (event: any) => {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      const oldIndex = projects.findIndex((p) => p.id === active.id)
-      const newIndex = projects.findIndex((p) => p.id === over.id)
-      if (oldIndex !== -1 && newIndex !== -1) reorderProjects(oldIndex, newIndex)
+      const oldIndex = sortedProjects.findIndex((p) => p.id === active.id)
+      const newIndex = sortedProjects.findIndex((p) => p.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setProjects(arrayMove(sortedProjects, oldIndex, newIndex))
+      }
     }
     setActiveId(null)
   }
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-900 text-white">
-      <NavigationBar projects={isLoaded ? projects : []} />
-
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold">Mis Proyectos</h1>
-            <div className="flex space-x-2">
+    <AppShell
+      projects={isLoaded ? projects : []}
+      title="Proyectos"
+      eyebrow="Biblioteca"
+      hideHeader
+    >
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 py-6 lg:px-8">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-semibold leading-tight text-white">Proyectos</h2>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-silver">
+              {projects.length} {projects.length === 1 ? "proyecto" : "proyectos"}
+            </p>
+            <div className="flex items-center gap-2">
               <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
               <TooltipProvider>
                 <Tooltip>
@@ -94,9 +114,9 @@ export function ProjectGrid() {
                       variant="outline"
                       size="icon"
                       onClick={() => setIsImportDialogOpen(true)}
-                      className="h-7 w-7 bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
+                      className="h-9 w-9 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
                     >
-                      <Upload className="h-3.5 w-3.5" />
+                      <Upload className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -106,53 +126,57 @@ export function ProjectGrid() {
               </TooltipProvider>
             </div>
           </div>
-
-          {isLoaded && (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-              accessibility={{ announcements: dndAnnouncements }}
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <SortableContext items={projects.map((p) => p.id)} strategy={verticalListSortingStrategy}>
-                  {projects.map((project) => (
-                    <ProjectItem
-                      key={project.id}
-                      project={project}
-                      isEditMode={isEditMode}
-                      onDeleteClick={handleDeleteClick}
-                      onExportProject={handleExportProject}
-                      handleProjectOptions={handleProjectOptions}
-                    />
-                  ))}
-                </SortableContext>
-
-                {!isEditMode && (
-                  <button
-                    onClick={() => addProject()}
-                    className="bg-zinc-800 rounded-lg border border-zinc-700 border-dashed hover:border-zinc-500 hover:bg-zinc-750 transition-colors flex flex-col items-center justify-center p-5 h-full"
-                  >
-                    <PlusIcon className="h-6 w-6 text-zinc-500 mb-2" />
-                    <span className="text-sm text-zinc-400">Nuevo Proyecto</span>
-                  </button>
-                )}
-              </div>
-
-              <DragOverlay>
-                {activeId ? (
-                  <div className="bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700 shadow-xl p-4 opacity-80">
-                    <div className="flex items-center mb-2">
-                      <FolderIcon className="h-5 w-5 text-zinc-400 mr-2" />
-                      <h2 className="text-base font-medium truncate">{projects.find((p) => p.id === activeId)?.name}</h2>
-                    </div>
-                  </div>
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-          )}
         </div>
+
+        {isLoaded && (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            accessibility={{ announcements: dndAnnouncements }}
+          >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <SortableContext items={sortedProjects.map((p) => p.id)} strategy={rectSortingStrategy}>
+                {sortedProjects.map((project) => (
+                  <ProjectItem
+                    key={project.id}
+                    project={project}
+                    index={projects.findIndex((p) => p.id === project.id)}
+                    isEditMode={isEditMode}
+                    onDeleteClick={handleDeleteClick}
+                    onExportProject={handleExportProject}
+                    handleProjectOptions={handleProjectOptions}
+                  />
+                ))}
+              </SortableContext>
+
+              {!isEditMode && (
+                <button
+                  onClick={() => addProject()}
+                  className="app-focus app-card-subtle flex min-h-44 flex-col items-center justify-center border-dashed p-6 text-center transition hover:border-violet-pulse hover:bg-[rgba(90,31,208,0.18)]"
+                >
+                  <PlusIcon className="mb-3 h-6 w-6 text-electric-blue" />
+                  <span className="text-sm font-medium text-white">Nuevo Proyecto</span>
+                  <span className="mt-1 text-xs text-fog">Crear un espacio de prompts</span>
+                </button>
+              )}
+            </div>
+
+            <DragOverlay>
+              {activeId ? (
+                <div className="app-card-subtle p-4 opacity-90">
+                  <div className="flex items-center gap-3">
+                    <FolderKanban className="h-5 w-5 text-amethyst" />
+                    <h2 className="truncate text-base font-medium text-white">
+                      {projects.find((p) => p.id === activeId)?.name}
+                    </h2>
+                  </div>
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        )}
       </div>
 
       <ConfirmationDialog
@@ -168,6 +192,6 @@ export function ProjectGrid() {
         onClose={() => setIsImportDialogOpen(false)}
         onImport={importProject}
       />
-    </div>
+    </AppShell>
   )
 }

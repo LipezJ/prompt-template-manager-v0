@@ -31,13 +31,13 @@ export function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-800 border-zinc-700 text-white">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription className="text-zinc-400">{description}</DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <DialogFooter className="flex space-x-2 justify-end">
-          <Button variant="outline" onClick={onClose} className="bg-zinc-700 hover:bg-zinc-600 border-zinc-600">
+        <DialogFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
             {cancelText}
           </Button>
           <Button
@@ -46,7 +46,6 @@ export function ConfirmationDialog({
               onConfirm()
               onClose()
             }}
-            className="bg-red-600 hover:bg-red-700 text-white"
           >
             {confirmText}
           </Button>

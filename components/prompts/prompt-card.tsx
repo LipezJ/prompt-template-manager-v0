@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { GripVertical } from "lucide-react"
 import { replaceVariables } from "@/lib/prompt-utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 interface PromptCardProps {
   prompt: Prompt
@@ -53,25 +54,28 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
           <div
             ref={setNodeRef}
             style={style}
-            className={`bg-zinc-800 rounded-md p-4 cursor-pointer relative w-50 h-50 ${isDragging ? "shadow-lg" : ""
-              } hover:bg-zinc-750 transition-colors ${copied ? "bg-zinc-700" : ""}`}
+            className={cn(
+              "relative h-52 cursor-pointer rounded-2xl border border-iron/60 bg-black/20 p-4 transition hover:border-violet-pulse/80 hover:bg-[rgba(90,31,208,0.14)]",
+              isDragging && "opacity-70",
+              copied && "border-electric-blue bg-[rgba(24,163,250,0.12)]",
+            )}
             onClick={handleClick}
           >
             {isEditMode && (
               <button
                 type="button"
                 aria-label="Reordenar prompt"
-                className="absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
+                className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-8 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
                 {...attributes}
                 {...listeners}
               >
-                <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+                <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
               </button>
             )}
-            <div className={`bg-zinc-900 rounded-md p-2 h-full overflow-auto custom-scrollbar flex flex-col ${isEditMode ? "ml-6" : ""}`}>
-              <pre className="whitespace-pre-wrap text-xs text-zinc-300 overflow-hidden flex-1">{prompt.content}</pre>
+            <div className={`flex h-full flex-col overflow-auto p-1 custom-scrollbar ${isEditMode ? "ml-6" : ""}`}>
+              <pre className="flex-1 overflow-hidden whitespace-pre-wrap text-xs text-fog">{prompt.content}</pre>
               {prompt.description && (
-                <p className="mt-1 pt-1 border-t border-zinc-800 text-[10px] text-zinc-500 italic line-clamp-2">
+                <p className="mt-2 line-clamp-2 border-t border-iron/50 pt-2 text-[10px] italic text-silver">
                   {prompt.description}
                 </p>
               )}

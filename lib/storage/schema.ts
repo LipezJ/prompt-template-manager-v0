@@ -28,9 +28,16 @@ export const PromptSetSchema = z.object({
   uiPreferences: UiPreferencesSchema.optional(),
 })
 
+export const ProjectUiPreferencesSchema = z.object({
+  promptSetsSidebarVisible: z.boolean().default(false),
+})
+
 export const ProjectSchema = z.object({
   id: z.string(),
   name: z.string(),
+  icon: z.string().optional(),
+  pinned: z.boolean().optional(),
+  uiPreferences: ProjectUiPreferencesSchema.optional(),
   promptSets: z.array(PromptSetSchema),
 })
 

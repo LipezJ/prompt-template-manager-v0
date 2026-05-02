@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 interface PromptSetItemProps {
   promptSetId: string
@@ -51,44 +52,54 @@ export function PromptSetItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-zinc-800 rounded-lg p-3 border border-zinc-700 hover:border-zinc-600 transition-colors relative ${
-        isDragging ? "shadow-lg" : ""
-      }`}
+      className={cn(
+        "app-card-subtle group relative min-h-40 p-5 transition hover:border-violet-pulse/80 hover:bg-[rgba(90,31,208,0.16)]",
+        isDragging && "opacity-70",
+      )}
     >
       {isEditMode && (
         <button
           type="button"
           aria-label={`Reordenar conjunto: ${name}`}
-          className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 bg-transparent border-0"
+          className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-10 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
           {...attributes}
           {...listeners}
         >
-          <GripVertical aria-hidden="true" className="h-5 w-5 text-zinc-500" />
+          <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
         </button>
       )}
       <Link
         href={`/projects/${projectId}/prompt-sets?set=${promptSetId}`}
-        className={`block ${isEditMode ? "pointer-events-none pl-8" : ""}`}
+        className={`app-focus block ${isEditMode ? "pointer-events-none pl-8" : ""}`}
       >
-        <div className="flex items-start">
-          <FileTextIcon className="h-4 w-4 text-zinc-400 mr-2 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-sm">{name}</h3>
-            <p className="text-xs text-zinc-400">
-              {promptsCount} prompt{promptsCount !== 1 ? "s" : ""}, {variablesCount} variable
-              {variablesCount !== 1 ? "s" : ""}
-            </p>
+        <div className="mb-8 flex items-start gap-3 pr-8">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[rgba(24,163,250,0.14)]">
+            <FileTextIcon className="h-4 w-4 text-electric-blue" />
           </div>
+        </div>
+        <h3 className="truncate text-base font-semibold text-white">{name}</h3>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-fog">
+          <span className="rounded-md bg-[rgba(107,87,255,0.48)] px-2 py-1 text-white">
+            {promptsCount} prompt{promptsCount !== 1 ? "s" : ""}
+          </span>
+          <span>
+            {variablesCount} variable{variablesCount !== 1 ? "s" : ""}
+          </span>
         </div>
       </Link>
       <div className="absolute top-2 right-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-zinc-700" onClick={onOptionsClick}>
-              <MoreVertical className="h-3.5 w-3.5 text-zinc-400" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
+              onClick={onOptionsClick}
+            >
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white z-50">
+          <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
             <DropdownMenuItem onClick={() => onExportPromptSet(promptSetId)} className="cursor-pointer">
               <Download className="mr-2 h-4 w-4" />
               Exportar

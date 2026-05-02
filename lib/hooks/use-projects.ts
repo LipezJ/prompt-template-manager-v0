@@ -61,6 +61,10 @@ export function useProjects(): UseProjectsResult {
     const created: Project = {
       id: newId("project"),
       name: "",
+      icon: "FileText",
+      uiPreferences: {
+        promptSetsSidebarVisible: false,
+      },
       promptSets: [
         {
           id: newId("set"),

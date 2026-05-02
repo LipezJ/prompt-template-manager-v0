@@ -2,13 +2,12 @@
 
 import { useState } from "react"
 import { useParams } from "next/navigation"
-import { NavigationBar } from "@/components/layout/navigation-bar"
 import { PromptSetTabs } from "@/components/prompt-sets/prompt-set-tabs"
 import { VariablesEditor } from "@/components/variables/variables-editor"
 import { PromptsArea } from "@/components/prompts/prompts-area"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, Download } from "lucide-react"
-import { useProjects } from "@/lib/hooks/use-projects"
+import { useProjectsContext } from "@/lib/projects-provider"
 import { useActivePromptSet } from "@/lib/hooks/use-active-prompt-set"
 import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
 import { ViewToggle } from "@/components/layout/view-toggle"
@@ -19,12 +18,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { copyToClipboard } from "@/lib/toast"
 import { ErrorBoundary } from "@/components/layout/error-boundary"
 import { dndAnnouncements } from "@/lib/dnd-announcements"
+import { AppShell } from "@/components/layout/app-shell"
 
 export default function PromptSetsPage() {
   const params = useParams()
   const projectId = params.projectId as string
 
-  const projectsState = useProjects()
+  const projectsState = useProjectsContext()
   const { projects, isLoaded } = projectsState
   const {
     currentProject,
@@ -84,54 +84,59 @@ export default function PromptSetsPage() {
   const ready = isLoaded && Boolean(currentProject)
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-900 text-white overflow-hidden">
-      <NavigationBar projects={ready ? projects : []} currentProject={ready ? currentProject : undefined} />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="py-2 px-4 border-b border-zinc-700">
-          <div className="flex items-center">
-            <div className="flex-1 overflow-x-auto custom-scrollbar">
-              {ready && currentProject && (
-                <PromptSetTabs
-                  promptSets={currentProject.promptSets}
-                  activePromptSetId={activePromptSetId}
-                  onSelectPromptSet={selectPromptSet}
-                  onUpdateName={renameActivePromptSet}
-                  onDeletePromptSet={deletePromptSet}
-                />
-              )}
-            </div>
-            <div className="flex space-x-2 ml-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={addPromptSet}
-                disabled={!ready}
-                className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
-              >
-                <PlusIcon className="h-3.5 w-3.5 text-zinc-300" />
-              </Button>
-              <ViewToggle isCardView={cardView} onToggle={() => updateUiPreferences({ cardView: !cardView })} />
-              <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={exportActivePromptSet}
-                      disabled={!ready}
-                      className="h-7 w-7 shrink-0 bg-zinc-800 hover:bg-zinc-700 border-zinc-700"
-                    >
-                      <Download className="h-3.5 w-3.5 text-zinc-300" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Exportar Conjunto</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+    <AppShell
+      projects={ready ? projects : []}
+      currentProject={ready ? currentProject : undefined}
+      activePromptSetId={activePromptSetId}
+      title={activePromptSet?.name ?? "Prompt sets"}
+      eyebrow={currentProject?.name ?? "Editor"}
+      topActions={
+        <>
+          <ViewToggle isCardView={cardView} onToggle={() => updateUiPreferences({ cardView: !cardView })} />
+          <EditModeToggle isEditMode={isEditMode} onToggle={() => setIsEditMode((v) => !v)} />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={exportActivePromptSet}
+                  disabled={!ready}
+                  className="h-8 w-8 shrink-0 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Exportar Conjunto</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </>
+      }
+    >
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="shrink-0 border-b border-iron/45 bg-black/25 px-4 py-3">
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar">
+            {ready && currentProject && (
+              <PromptSetTabs
+                promptSets={currentProject.promptSets}
+                activePromptSetId={activePromptSetId}
+                onSelectPromptSet={selectPromptSet}
+                onUpdateName={renameActivePromptSet}
+                onDeletePromptSet={deletePromptSet}
+              />
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={addPromptSet}
+              disabled={!ready}
+              className="h-9 w-9 shrink-0 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
+            >
+              <PlusIcon className="h-4 w-4" />
+              <span className="sr-only">Nuevo Conjunto</span>
+            </Button>
           </div>
         </div>
 
@@ -141,11 +146,10 @@ export default function PromptSetsPage() {
             leftVisible={variablesPanelVisible}
             onChangeSplitPosition={(next) => updateUiPreferences({ splitPosition: next })}
             onSetLeftVisible={(visible) => updateUiPreferences({ variablesPanelVisible: visible })}
-            leftHeader={<h3 className="text-sm font-medium">Variables</h3>}
             left={
               <ErrorBoundary fallbackLabel="No se pudo renderizar el panel de variables">
                 <DndContext
-                  sensors={isEditMode ? sensors : []}
+                  sensors={sensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handleVariableDragEnd}
                   accessibility={{ announcements: dndAnnouncements }}
@@ -158,6 +162,7 @@ export default function PromptSetsPage() {
                     onAddVariable={addVariable}
                     onDeleteVariable={deleteVariable}
                     onClearAllValues={clearAllVariableValues}
+                    onHidePanel={() => updateUiPreferences({ variablesPanelVisible: false })}
                     isEditMode={isEditMode}
                   />
                 </DndContext>
@@ -166,7 +171,7 @@ export default function PromptSetsPage() {
             right={
               <ErrorBoundary fallbackLabel="No se pudo renderizar el panel de prompts">
                 <DndContext
-                  sensors={isEditMode ? sensors : []}
+                  sensors={sensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handlePromptDragEnd}
                   accessibility={{ announcements: dndAnnouncements }}
@@ -187,6 +192,6 @@ export default function PromptSetsPage() {
           />
         )}
       </div>
-    </div>
+    </AppShell>
   )
 }

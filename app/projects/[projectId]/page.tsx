@@ -1,25 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { NavigationBar } from "@/components/layout/navigation-bar"
 import { newId } from "@/lib/ids"
-import { useProjects } from "@/lib/hooks/use-projects"
+import { useProjectsContext } from "@/lib/projects-provider"
 import type { PromptSet } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { ImportPromptSetDialog } from "@/components/dialogs/import-prompt-set-dialog"
-import { ProjectInfoCard } from "@/components/projects/project-info-card"
 import { ProjectHeader } from "@/components/projects/project-header"
 import { PromptSetGrid } from "@/components/prompt-sets/prompt-set-grid"
 import { ErrorBoundary } from "@/components/layout/error-boundary"
 import { copyToClipboard } from "@/lib/toast"
+import { AppShell } from "@/components/layout/app-shell"
+import { getProjectIconByIndex } from "@/lib/project-icons"
 
 export default function ProjectPage() {
   const params = useParams()
   const router = useRouter()
   const projectId = params.projectId as string
 
-  const { projects, isLoaded, updateProject, deleteProject } = useProjects()
+  const { projects, isLoaded, updateProject, deleteProject } = useProjectsContext()
   const currentProject = projects.find((p) => p.id === projectId) ?? projects[0]
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
@@ -93,41 +93,46 @@ export default function ProjectPage() {
   }
 
   const ready = isLoaded && Boolean(currentProject)
+  const projectIndex = currentProject ? Math.max(0, projects.findIndex((p) => p.id === currentProject.id)) : 0
+  const fallbackIconName = getProjectIconByIndex(projectIndex).name
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-900 text-white">
-      <NavigationBar projects={ready ? projects : []} currentProject={ready ? currentProject : undefined} />
+    <AppShell
+      projects={ready ? projects : []}
+      currentProject={ready ? currentProject : undefined}
+      title={ready && currentProject ? currentProject.name : "Proyecto"}
+      eyebrow="Dashboard"
+    >
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 py-6 lg:px-8">
+        {ready && currentProject && (
+          <>
+            <section className="relative overflow-hidden rounded-3xl border border-magenta-glow/70 bg-[linear-gradient(130deg,rgba(90,31,208,0.34)_10%,rgba(46,16,106,0)_70%)] p-4 md:p-6">
+              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                <ProjectHeader
+                  project={currentProject}
+                  canDelete={projects.length > 1}
+                  fallbackIconName={fallbackIconName}
+                  onRename={renameProject}
+                  onExport={handleExportProject}
+                  onDelete={() => setShowDeleteConfirmation(true)}
+                />
+              </div>
+            </section>
 
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-5xl mx-auto">
-          {ready && currentProject && (
-            <>
-              <ProjectHeader
+            <ErrorBoundary fallbackLabel="No se pudo renderizar la lista de conjuntos de prompts">
+              <PromptSetGrid
                 project={currentProject}
                 isEditMode={isEditMode}
-                canDelete={projects.length > 1}
+                onAddPromptSet={addPromptSet}
+                onDeletePromptSet={setPromptSetToDelete}
+                onExportPromptSet={handleExportPromptSet}
+                onReorderPromptSets={reorderPromptSets}
+                onImportClick={() => setIsImportPromptSetDialogOpen(true)}
                 onToggleEditMode={() => setIsEditMode((v) => !v)}
-                onRename={renameProject}
-                onExport={handleExportProject}
-                onDelete={() => setShowDeleteConfirmation(true)}
               />
-
-              <ProjectInfoCard name={currentProject.name} promptSetsCount={currentProject.promptSets.length} />
-
-              <ErrorBoundary fallbackLabel="No se pudo renderizar la lista de conjuntos de prompts">
-                <PromptSetGrid
-                  project={currentProject}
-                  isEditMode={isEditMode}
-                  onAddPromptSet={addPromptSet}
-                  onDeletePromptSet={setPromptSetToDelete}
-                  onExportPromptSet={handleExportPromptSet}
-                  onReorderPromptSets={reorderPromptSets}
-                  onImportClick={() => setIsImportPromptSetDialogOpen(true)}
-                />
-              </ErrorBoundary>
-            </>
-          )}
-        </div>
+            </ErrorBoundary>
+          </>
+        )}
       </div>
 
       <ConfirmationDialog
@@ -151,6 +156,20 @@ export default function ProjectPage() {
         onClose={() => setIsImportPromptSetDialogOpen(false)}
         onImport={handleImportPromptSet}
       />
+    </AppShell>
+  )
+}
+
+function SummaryTile({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
+  return (
+    <div className="app-card-subtle flex items-center gap-4 p-5">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[rgba(107,87,255,0.24)] text-electric-blue">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm text-fog">{label}</p>
+        <p className="text-2xl font-semibold leading-tight text-white">{value}</p>
+      </div>
     </div>
   )
 }

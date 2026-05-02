@@ -76,7 +76,7 @@ export function PromptSetTabs({
   }
 
   return (
-    <div className="flex space-x-2 overflow-x-auto pb-2">
+    <div className="flex gap-2 overflow-x-auto pb-1">
       {promptSets.map((set) => (
         <div key={set.id} className="shrink-0">
           {editingId === set.id ? (
@@ -86,7 +86,7 @@ export function PromptSetTabs({
               onChange={(e) => setEditingName(e.target.value)}
               onBlur={handleSaveEditing}
               onKeyDown={handleKeyDown}
-              className="h-7 w-40 bg-zinc-800 border-zinc-700 text-white"
+              className="h-9 w-44 rounded-2xl border-iron bg-deep-charcoal text-white focus-visible:ring-violet-pulse"
             />
           ) : (
             <div className="flex items-center">
@@ -95,10 +95,10 @@ export function PromptSetTabs({
                 size="sm"
                 onClick={() => handleSelectPromptSet(set.id)}
                 className={cn(
-                  "h-7 rounded-r-none pr-2",
+                  "h-9 rounded-l-2xl rounded-r-none border-r-0 px-4 pr-3",
                   activePromptSetId === set.id
-                    ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+                    ? "border-violet-pulse bg-[rgba(107,87,255,0.28)] text-white hover:bg-[rgba(107,87,255,0.34)]"
+                    : "border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white",
                 )}
               >
                 {set.name}
@@ -109,16 +109,16 @@ export function PromptSetTabs({
                     variant={activePromptSetId === set.id ? "default" : "outline"}
                     size="icon"
                     className={cn(
-                      "h-7 w-6 rounded-l-none border-l-0",
+                      "h-9 w-8 rounded-l-none rounded-r-2xl",
                       activePromptSetId === set.id
-                        ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-100"
-                        : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700",
+                        ? "border-violet-pulse bg-[rgba(107,87,255,0.28)] text-white hover:bg-[rgba(107,87,255,0.34)]"
+                        : "border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white",
                     )}
                   >
-                    <MoreVertical className="h-3 w-3 text-zinc-400" />
+                    <MoreVertical className="h-3.5 w-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-zinc-800 border-zinc-700 text-white">
+                <DropdownMenuContent align="end" className="border-iron bg-deep-charcoal text-white">
                   <DropdownMenuItem onClick={() => handleStartEditing(set)} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Editar nombre

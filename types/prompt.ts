@@ -26,5 +26,10 @@ export interface PromptSet {
 export interface Project {
   id: string
   name: string
+  icon?: string
+  pinned?: boolean
+  uiPreferences?: {
+    promptSetsSidebarVisible: boolean
+  }
   promptSets: PromptSet[]
 }

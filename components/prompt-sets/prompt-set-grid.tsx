@@ -17,6 +17,7 @@ import type { Project } from "@/types/prompt"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { dndAnnouncements } from "@/lib/dnd-announcements"
+import { EditModeToggle } from "@/components/layout/edit-mode-toggle"
 import { PromptSetItem } from "./prompt-set-item"
 
 interface PromptSetGridProps {
@@ -27,6 +28,7 @@ interface PromptSetGridProps {
   onExportPromptSet: (id: string) => void
   onReorderPromptSets: (oldIndex: number, newIndex: number) => void
   onImportClick: () => void
+  onToggleEditMode: () => void
 }
 
 export function PromptSetGrid({
@@ -37,6 +39,7 @@ export function PromptSetGrid({
   onExportPromptSet,
   onReorderPromptSets,
   onImportClick,
+  onToggleEditMode,
 }: PromptSetGridProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -65,47 +68,53 @@ export function PromptSetGrid({
   }
 
   return (
-    <div className="mb-6">
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-lg font-semibold">Conjuntos de Prompts</h2>
-        {!isEditMode && (
-          <div className="flex space-x-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={onImportClick}
-                    className="h-7 w-7 bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-                  >
-                    <Upload className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Importar Conjunto</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={onAddPromptSet}
-                    className="h-7 w-7 bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-                  >
-                    <PlusIcon className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Nuevo Conjunto</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        )}
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-medium text-neon-pink">Coleccion</p>
+          <h2 className="text-2xl font-semibold text-white">Conjuntos de Prompts</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <EditModeToggle isEditMode={isEditMode} onToggle={onToggleEditMode} />
+          {!isEditMode && (
+            <>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={onImportClick}
+                      className="h-9 w-9 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Importar Conjunto</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={onAddPromptSet}
+                      className="h-9 w-9 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Nuevo Conjunto</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
+          )}
+        </div>
       </div>
 
       <DndContext
@@ -115,7 +124,7 @@ export function PromptSetGrid({
         onDragEnd={handleDragEnd}
         accessibility={{ announcements: dndAnnouncements }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <SortableContext items={project.promptSets.map((s) => s.id)} strategy={rectSortingStrategy}>
             {project.promptSets.map((promptSet) => (
               <PromptSetItem
@@ -136,21 +145,21 @@ export function PromptSetGrid({
           {!isEditMode && (
             <button
               onClick={onAddPromptSet}
-              className="bg-zinc-800 rounded-lg border border-zinc-700 border-dashed hover:border-zinc-500 hover:bg-zinc-750 transition-colors flex flex-col items-center justify-center p-3 h-full"
+              className="app-focus app-card-subtle flex min-h-40 flex-col items-center justify-center border-dashed p-5 text-center transition hover:border-violet-pulse hover:bg-[rgba(90,31,208,0.18)]"
             >
-              <PlusIcon className="h-5 w-5 text-zinc-500 mb-1" />
-              <span className="text-xs text-zinc-400">Nuevo Conjunto</span>
+              <PlusIcon className="mb-2 h-5 w-5 text-electric-blue" />
+              <span className="text-sm font-medium text-white">Nuevo Conjunto</span>
             </button>
           )}
         </div>
 
         <DragOverlay>
           {activeId ? (
-            <div className="bg-zinc-800 rounded-lg p-3 border border-zinc-700 shadow-xl opacity-80">
-              <div className="flex items-start">
-                <FileTextIcon className="h-4 w-4 text-zinc-400 mr-2 mt-0.5" />
+            <div className="app-card-subtle p-4 opacity-90">
+              <div className="flex items-start gap-3">
+                <FileTextIcon className="mt-0.5 h-4 w-4 text-electric-blue" />
                 <div>
-                  <h3 className="font-medium text-sm">
+                  <h3 className="text-sm font-medium text-white">
                     {project.promptSets.find((s) => s.id === activeId)?.name}
                   </h3>
                 </div>
@@ -159,6 +168,6 @@ export function PromptSetGrid({
           ) : null}
         </DragOverlay>
       </DndContext>
-    </div>
+    </section>
   )
 }
