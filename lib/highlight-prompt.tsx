@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react"
 
 const PATTERN =
-  /(\{\{\s*(?:#if\s+[A-Za-z_][A-Za-z0-9_]*|else|\/if)\s*\}\})|(\{{1,2})\s*([A-Za-z_][A-Za-z0-9_]*)\s*(\}{1,2})/g
+  /(\{\{\s*(?:#if\s+[A-Za-z_][A-Za-z0-9_]*|#else|\/if)\s*\}\})|(\{{1,2})\s*([A-Za-z_][A-Za-z0-9_]*)\s*(\}{1,2})/g
 
 export function highlightPromptContent(content: string): ReactNode {
   const nodes: ReactNode[] = []

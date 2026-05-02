@@ -34,6 +34,10 @@ describe("renderPrompt — variables", () => {
   it("keeps unknown refs literal", () => {
     expect(renderPrompt("Hi {desconocida}", [v("a", "1")])).toBe("Hi {desconocida}")
   })
+
+  it("treats {{else}} and {{if}} as plain refs (only #else / #if name are control tags)", () => {
+    expect(renderPrompt("{{else}} {{if}}", [v("else", "X"), v("if", "Y")])).toBe("X Y")
+  })
 })
 
 describe("renderPrompt — conditionals", () => {
@@ -46,13 +50,13 @@ describe("renderPrompt — conditionals", () => {
   })
 
   it("renders alternative on else when guard is falsy", () => {
-    expect(renderPrompt("{{#if a}}A{{else}}B{{/if}}", [v("a", "")])).toBe("B")
+    expect(renderPrompt("{{#if a}}A{{#else}}B{{/if}}", [v("a", "")])).toBe("B")
   })
 
   it("uses boolean truthiness for boolean variables", () => {
     const flag = (val: string) => v("flag", val, { type: "boolean" })
-    expect(renderPrompt("{{#if flag}}on{{else}}off{{/if}}", [flag("true")])).toBe("on")
-    expect(renderPrompt("{{#if flag}}on{{else}}off{{/if}}", [flag("false")])).toBe("off")
+    expect(renderPrompt("{{#if flag}}on{{#else}}off{{/if}}", [flag("true")])).toBe("on")
+    expect(renderPrompt("{{#if flag}}on{{#else}}off{{/if}}", [flag("false")])).toBe("off")
   })
 
   it("supports nested conditionals", () => {
@@ -82,7 +86,7 @@ describe("renderPrompt — whitespace control", () => {
 
 describe("getActiveVariableRefs", () => {
   it("collects refs in rendered branches only", () => {
-    const tpl = "{{#if a}}{b}{{else}}{c}{{/if}}"
+    const tpl = "{{#if a}}{b}{{#else}}{c}{{/if}}"
     expect(getActiveVariableRefs(tpl, [v("a", "x"), v("b", ""), v("c", "")])).toEqual(new Set(["b"]))
     expect(getActiveVariableRefs(tpl, [v("a", ""), v("b", ""), v("c", "")])).toEqual(new Set(["c"]))
   })

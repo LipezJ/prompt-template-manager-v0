@@ -28,7 +28,7 @@ type Token =
   | { kind: "ref"; name: string; raw: string }
 
 const TOKEN_PATTERN =
-  /\{\{\s*(?:(#if)\s+([A-Za-z_][A-Za-z0-9_]*)|(else)|(\/if))\s*\}\}|(\{{1,2})\s*([A-Za-z_][A-Za-z0-9_]*)\s*(\}{1,2})/g
+  /\{\{\s*(?:(#if)\s+([A-Za-z_][A-Za-z0-9_]*)|(#else)|(\/if))\s*\}\}|(\{{1,2})\s*([A-Za-z_][A-Za-z0-9_]*)\s*(\}{1,2})/g
 
 function tokenize(input: string): Token[] {
   const tokens: Token[] = []
