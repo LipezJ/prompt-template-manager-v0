@@ -119,7 +119,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 <CommandItem
                   key={project.id}
                   value={`proyecto ${project.name} ${project.id}`}
-                  onSelect={() => runCommand(() => router.push(`/projects/${project.id}`))}
+                  onSelect={() =>
+                    runCommand(() => {
+                      const firstSet = project.promptSets[0]
+                      router.push(
+                        firstSet
+                          ? `/projects/${project.id}/prompt-sets?set=${firstSet.id}`
+                          : `/projects/${project.id}`,
+                      )
+                    })
+                  }
                 >
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-amethyst">
                     <Icon aria-hidden="true" className="h-4 w-4" />
