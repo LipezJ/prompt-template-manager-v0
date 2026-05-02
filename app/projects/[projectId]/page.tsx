@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type ReactNode } from "react"
+import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { newId } from "@/lib/ids"
 import { useProjectsContext } from "@/lib/projects-provider"
@@ -61,6 +61,15 @@ export default function ProjectPage() {
       promptSets: project.promptSets.filter((s) => s.id !== promptSetId),
     }))
     setPromptSetToDelete(null)
+  }
+
+  const renamePromptSet = (promptSetId: string, name: string) => {
+    if (!currentProject) return
+    if (name.trim() === "") return
+    updateProject(currentProject.id, (project) => ({
+      ...project,
+      promptSets: project.promptSets.map((s) => (s.id === promptSetId ? { ...s, name } : s)),
+    }))
   }
 
   const reorderPromptSets = (oldIndex: number, newIndex: number) => {
@@ -126,6 +135,7 @@ export default function ProjectPage() {
                 onAddPromptSet={addPromptSet}
                 onDeletePromptSet={setPromptSetToDelete}
                 onExportPromptSet={handleExportPromptSet}
+                onRenamePromptSet={renamePromptSet}
                 onReorderPromptSets={reorderPromptSets}
                 onImportClick={() => setIsImportPromptSetDialogOpen(true)}
                 onToggleEditMode={() => setIsEditMode((v) => !v)}

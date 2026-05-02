@@ -23,7 +23,8 @@ export interface UseActivePromptSetResult {
 
   addPromptSet: () => void
   deletePromptSet: (id: string) => void
-  renameActivePromptSet: (name: string) => void
+  renamePromptSet: (id: string, name: string) => void
+  reorderPromptSets: (oldIndex: number, newIndex: number) => void
   updateUiPreferences: (updates: Partial<UiPreferences>) => void
 
   addVariable: () => void
@@ -117,12 +118,27 @@ export function useActivePromptSet(
     [currentProject, activePromptSetId, updateProject],
   )
 
-  const renameActivePromptSet = useCallback(
-    (name: string) => {
+  const renamePromptSet = useCallback(
+    (id: string, name: string) => {
+      if (!currentProject) return
       if (name.trim() === "") return
-      patchActiveSet((set) => ({ ...set, name }))
+      updateProject(currentProject.id, (project) => ({
+        ...project,
+        promptSets: project.promptSets.map((set) => (set.id === id ? { ...set, name } : set)),
+      }))
     },
-    [patchActiveSet],
+    [currentProject, updateProject],
+  )
+
+  const reorderPromptSets = useCallback(
+    (oldIndex: number, newIndex: number) => {
+      if (!currentProject) return
+      updateProject(currentProject.id, (project) => ({
+        ...project,
+        promptSets: arrayMove(project.promptSets, oldIndex, newIndex),
+      }))
+    },
+    [currentProject, updateProject],
   )
 
   const updateUiPreferences = useCallback(
@@ -238,7 +254,8 @@ export function useActivePromptSet(
     selectPromptSet,
     addPromptSet,
     deletePromptSet,
-    renameActivePromptSet,
+    renamePromptSet,
+    reorderPromptSets,
     updateUiPreferences,
     addVariable,
     updateVariable,

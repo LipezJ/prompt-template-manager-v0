@@ -26,6 +26,7 @@ interface PromptSetGridProps {
   onAddPromptSet: () => void
   onDeletePromptSet: (id: string) => void
   onExportPromptSet: (id: string) => void
+  onRenamePromptSet: (id: string, name: string) => void
   onReorderPromptSets: (oldIndex: number, newIndex: number) => void
   onImportClick: () => void
   onToggleEditMode: () => void
@@ -37,6 +38,7 @@ export function PromptSetGrid({
   onAddPromptSet,
   onDeletePromptSet,
   onExportPromptSet,
+  onRenamePromptSet,
   onReorderPromptSets,
   onImportClick,
   onToggleEditMode,
@@ -127,6 +129,7 @@ export function PromptSetGrid({
                 isEditMode={isEditMode}
                 onDeleteClick={onDeletePromptSet}
                 onExportPromptSet={onExportPromptSet}
+                onRenamePromptSet={onRenamePromptSet}
                 onOptionsClick={handlePromptSetOptions}
               />
             ))}

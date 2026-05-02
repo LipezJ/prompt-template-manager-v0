@@ -124,12 +124,36 @@ describe("useActivePromptSet", () => {
     expect(result.current.active.currentProject!.promptSets.length).toBeGreaterThanOrEqual(1)
   })
 
-  it("renameActivePromptSet ignores empty names", async () => {
+  it("renamePromptSet ignores empty names", async () => {
     const result = await renderReady()
+    const id = result.current.active.activePromptSet!.id
     const original = result.current.active.activePromptSet!.name
     act(() => {
-      result.current.active.renameActivePromptSet("   ")
+      result.current.active.renamePromptSet(id, "   ")
     })
     expect(result.current.active.activePromptSet!.name).toBe(original)
+  })
+
+  it("renamePromptSet renames the targeted set even when not active", async () => {
+    const result = await renderReady()
+
+    act(() => {
+      result.current.active.addPromptSet()
+    })
+    await waitFor(() => {
+      expect(result.current.active.currentProject!.promptSets.length).toBeGreaterThanOrEqual(2)
+    })
+
+    const activeId = result.current.active.activePromptSet!.id
+    const otherSet = result.current.active.currentProject!.promptSets.find((s) => s.id !== activeId)!
+
+    act(() => {
+      result.current.active.renamePromptSet(otherSet.id, "Renombrado")
+    })
+
+    expect(
+      result.current.active.currentProject!.promptSets.find((s) => s.id === otherSet.id)?.name,
+    ).toBe("Renombrado")
+    expect(result.current.active.activePromptSet!.id).toBe(activeId)
   })
 })

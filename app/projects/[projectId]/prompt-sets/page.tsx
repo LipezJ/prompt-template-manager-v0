@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { copyToClipboard } from "@/lib/toast"
 import { ErrorBoundary } from "@/components/layout/error-boundary"
 import { dndAnnouncements } from "@/lib/dnd-announcements"
+import { restrictToParentElement, restrictToVerticalAxis } from "@/lib/dnd-modifiers"
 import { AppShell } from "@/components/layout/app-shell"
 
 export default function PromptSetsPage() {
@@ -33,7 +34,8 @@ export default function PromptSetsPage() {
     selectPromptSet,
     addPromptSet,
     deletePromptSet,
-    renameActivePromptSet,
+    renamePromptSet,
+    reorderPromptSets,
     updateUiPreferences,
     addVariable,
     updateVariable,
@@ -116,9 +118,11 @@ export default function PromptSetsPage() {
               <PromptSetTabs
                 promptSets={currentProject.promptSets}
                 activePromptSetId={activePromptSetId}
+                isEditMode={isEditMode}
                 onSelectPromptSet={selectPromptSet}
-                onUpdateName={renameActivePromptSet}
+                onUpdateName={renamePromptSet}
                 onDeletePromptSet={deletePromptSet}
+                onReorderPromptSets={reorderPromptSets}
               />
             )}
             <Button variant="ghost" size="icon" onClick={addPromptSet} disabled={!ready} className="h-8 w-8 shrink-0">
@@ -139,6 +143,7 @@ export default function PromptSetsPage() {
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
+                  modifiers={[restrictToVerticalAxis, restrictToParentElement]}
                   onDragEnd={handleVariableDragEnd}
                   accessibility={{ announcements: dndAnnouncements }}
                 >
@@ -161,6 +166,7 @@ export default function PromptSetsPage() {
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
+                  modifiers={cardView ? [restrictToParentElement] : [restrictToVerticalAxis, restrictToParentElement]}
                   onDragEnd={handlePromptDragEnd}
                   accessibility={{ announcements: dndAnnouncements }}
                 >

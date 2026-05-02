@@ -2,10 +2,12 @@
 
 import type React from "react"
 import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { BracesIcon, Download, FileTextIcon, GripVertical, MoreVertical, Trash2 } from "lucide-react"
+import { BracesIcon, Download, FileTextIcon, GripVertical, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +25,7 @@ interface PromptSetItemProps {
   isEditMode: boolean
   onDeleteClick: (id: string) => void
   onExportPromptSet: (id: string) => void
+  onRenamePromptSet: (id: string, name: string) => void
   onOptionsClick: (e: React.MouseEvent) => void
 }
 
@@ -35,11 +38,44 @@ export function PromptSetItem({
   isEditMode,
   onDeleteClick,
   onExportPromptSet,
+  onRenamePromptSet,
   onOptionsClick,
 }: PromptSetItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: promptSetId,
   })
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [draftName, setDraftName] = useState(name)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isEditingName) {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }
+  }, [isEditingName])
+
+  const startEditing = () => {
+    setDraftName(name)
+    setIsEditingName(true)
+  }
+
+  const commitEditing = () => {
+    if (draftName.trim() !== "" && draftName !== name) {
+      onRenamePromptSet(promptSetId, draftName.trim())
+    }
+    setIsEditingName(false)
+  }
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      commitEditing()
+    } else if (e.key === "Escape") {
+      e.preventDefault()
+      setIsEditingName(false)
+    }
+  }
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -47,6 +83,8 @@ export function PromptSetItem({
     zIndex: isDragging ? 10 : 1,
     opacity: isDragging ? 0.5 : 1,
   }
+
+  const linkDisabled = isEditMode || isEditingName
 
   return (
     <div
@@ -70,10 +108,27 @@ export function PromptSetItem({
       )}
       <Link
         href={`/projects/${projectId}/prompt-sets?set=${promptSetId}`}
-        className={cn("app-focus flex flex-col items-start gap-0.5", isEditMode && "pointer-events-none pl-5")}
+        className={cn(
+          "app-focus flex flex-col items-start gap-0.5",
+          linkDisabled && "pointer-events-none",
+          isEditMode && "pl-5",
+        )}
+        tabIndex={linkDisabled ? -1 : undefined}
       >
         <div className="flex w-full items-center justify-between gap-2 pr-5">
-          <p className="truncate text-left text-sm text-white group-hover:text-amethyst">{name}</p>
+          {isEditingName ? (
+            <Input
+              ref={inputRef}
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onBlur={commitEditing}
+              onKeyDown={handleNameKeyDown}
+              onClick={(e) => e.preventDefault()}
+              className="pointer-events-auto h-7 px-1.5 py-1 text-sm"
+            />
+          ) : (
+            <p className="truncate text-left text-sm text-white group-hover:text-amethyst">{name}</p>
+          )}
           <p className="flex shrink-0 items-center gap-1.5 text-xs text-silver">
             <FileTextIcon aria-hidden="true" className="size-3" />
             {promptsCount}
@@ -103,6 +158,10 @@ export function PromptSetItem({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
+            <DropdownMenuItem onClick={startEditing} className="cursor-pointer">
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar nombre
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onExportPromptSet(promptSetId)} className="cursor-pointer">
               <Download className="mr-2 h-4 w-4" />
               Exportar
