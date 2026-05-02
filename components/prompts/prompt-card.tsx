@@ -55,9 +55,9 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
             ref={setNodeRef}
             style={style}
             className={cn(
-              "relative h-52 cursor-pointer rounded-sm border border-iron bg-deep-charcoal p-3 transition hover:border-electric-blue/50 hover:bg-graphite",
+              "hover-clone group relative h-52 cursor-pointer select-none rounded-sm border border-iron bg-deep-charcoal p-3 transition hover:border-amethyst/50",
               isDragging && "opacity-70",
-              copied && "border-electric-blue bg-graphite",
+              copied && "border-electric-blue",
             )}
             onClick={handleClick}
           >

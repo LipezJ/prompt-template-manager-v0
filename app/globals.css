@@ -4,6 +4,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Registered so that `--hc-offset` can be smoothly interpolated as a <length>.
+   Without @property, CSS treats custom properties as strings and they snap. */
+@property --hc-offset {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 :root {
   /* Zed-inspired neutrals on a dark canvas. Names are kept stable for backwards compatibility. */
   --color-obsidian-ground: #0d0f13;
@@ -299,7 +307,9 @@ body {
      element on hover, like a duplicate stamp offset to the bottom-right.
      We use `clip-path` (not z-index) to mask the overlap with the parent so only the
      L-shape sticking out is visible. This sidesteps stacking-context pitfalls: the
-     clone may paint above the parent, but the part covering it is clipped away. */
+     clone may paint above the parent, but the part covering it is clipped away.
+     The visible offset is driven by --hc-offset so transform AND clip-path animate
+     together — otherwise mid-animation the L-shape would briefly overlap the card. */
   .hover-clone {
     position: relative;
   }
@@ -317,26 +327,36 @@ body {
       transparent 6px
     );
     border-radius: inherit;
-    /* Keep only the bottom-right L-shape (right 6px strip + bottom 6px strip). The
-       rest of the clone — the part that would sit on top of the parent — is clipped. */
+    --hc-offset: 0px;
+    transform: translate(var(--hc-offset), var(--hc-offset));
     clip-path: polygon(
-      calc(100% - 6px) 0,
+      calc(100% - var(--hc-offset)) 0,
       100% 0,
       100% 100%,
       0 100%,
-      0 calc(100% - 6px),
-      calc(100% - 6px) calc(100% - 6px)
+      0 calc(100% - var(--hc-offset)),
+      calc(100% - var(--hc-offset)) calc(100% - var(--hc-offset))
     );
-    transform: translate(0, 0);
     opacity: 0;
     transition:
-      transform 160ms ease,
+      --hc-offset 160ms ease,
       opacity 160ms ease;
     pointer-events: none;
   }
 
-  .hover-clone:hover::before {
+  .hover-clone:hover::before,
+  .hover-clone:active::before {
     opacity: 1;
-    transform: translate(6px, 6px);
+  }
+
+  .hover-clone:hover::before {
+    --hc-offset: 6px;
+  }
+
+  /* Press feedback — the clone retracts toward the card, like the card is being
+     pushed down onto its stamp. Faster than the hover transition for snappy feel. */
+  .hover-clone:active::before {
+    --hc-offset: 1px;
+    transition-duration: 90ms;
   }
 }
