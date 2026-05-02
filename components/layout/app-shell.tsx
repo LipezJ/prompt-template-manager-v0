@@ -72,7 +72,7 @@ export function AppShell({
 
   return (
     <div className="relative flex h-screen overflow-hidden bg-obsidian-ground text-pure-white">
-      <aside className="relative z-10 flex w-14 shrink-0 flex-col items-center border-r border-iron/60 bg-deep-charcoal">
+      <aside className="relative z-10 flex w-13 shrink-0 flex-col items-center border-r border-iron/60 bg-deep-charcoal">
         <Link
           href="/"
           className="app-focus mt-3 flex h-9 w-9 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-electric-blue transition hover:border-electric-blue/70 hover:text-white"

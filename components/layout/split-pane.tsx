@@ -71,7 +71,7 @@ export function SplitPane({
 
       {leftVisible && (
         <div
-          className="group mx-3 flex h-full w-2 cursor-col-resize items-center justify-center"
+          className="group mx-2 flex h-full w-2 cursor-col-resize items-center justify-center"
           onMouseDown={handleMouseDown}
         >
           <div className="h-full w-px bg-iron group-hover:bg-electric-blue/60 group-active:bg-electric-blue"></div>
