@@ -181,7 +181,6 @@ export function AppShell({
                 </button>
               )}
               <Breadcrumbs
-                projects={projects}
                 currentProject={currentProject}
                 activePromptSetId={activePromptSetId}
                 fallbackTitle={title}
@@ -211,12 +210,10 @@ export function AppShell({
 }
 
 function Breadcrumbs({
-  projects,
   currentProject,
   activePromptSetId,
   fallbackTitle,
 }: {
-  projects: Project[]
   currentProject?: Project
   activePromptSetId?: string
   fallbackTitle: string
@@ -240,32 +237,15 @@ function Breadcrumbs({
       </Link>
       <ChevronRight aria-hidden="true" className="hidden h-3 w-3 shrink-0 text-ash sm:block" />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              "app-focus flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 hover:bg-graphite",
-              activePromptSet ? "text-silver hover:text-white" : "text-white",
-            )}
-          >
-            <span className="truncate">{currentProject.name}</span>
-            <ChevronDown aria-hidden="true" className="h-3 w-3 shrink-0 text-ash" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-64">
-          <DropdownMenuItem asChild>
-            <Link href="/">Todos los proyectos</Link>
-          </DropdownMenuItem>
-          <div className="max-h-72 overflow-y-auto border-t border-iron/60 p-1 custom-scrollbar">
-            {projects.map((project) => (
-              <DropdownMenuItem key={project.id} asChild>
-                <Link href={`/projects/${project.id}`}>{project.name}</Link>
-              </DropdownMenuItem>
-            ))}
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Link
+        href={`/projects/${currentProject.id}`}
+        className={cn(
+          "app-focus min-w-0 truncate rounded-sm px-1.5 py-1 hover:bg-graphite",
+          activePromptSet ? "text-silver hover:text-white" : "text-white",
+        )}
+      >
+        {currentProject.name}
+      </Link>
 
       {activePromptSet && (
         <>
