@@ -1,24 +1,40 @@
 import { Fragment, type ReactNode } from "react"
 
-const REF_PATTERN = /(\{{1,2})\s*([A-Za-z_][A-Za-z0-9_]*)\s*(\}{1,2})/g
+const PATTERN =
+  /(\{\{\s*(?:#if\s+[A-Za-z_][A-Za-z0-9_]*|else|\/if)\s*\}\})|(\{{1,2})\s*([A-Za-z_][A-Za-z0-9_]*)\s*(\}{1,2})/g
 
 export function highlightPromptContent(content: string): ReactNode {
   const nodes: ReactNode[] = []
   let lastIndex = 0
   let key = 0
 
-  for (const match of content.matchAll(REF_PATTERN)) {
-    const [raw, open, , close] = match
+  for (const match of content.matchAll(PATTERN)) {
+    const raw = match[0]
+    const control = match[1]
+    const refOpen = match[2]
+    const refClose = match[4]
     const start = match.index ?? 0
-    if (open.length !== close.length) continue
+
     if (start > lastIndex) {
       nodes.push(<Fragment key={key++}>{content.slice(lastIndex, start)}</Fragment>)
     }
-    nodes.push(
-      <span key={key++} className="text-electric-blue">
-        {raw}
-      </span>,
-    )
+
+    if (control) {
+      nodes.push(
+        <span key={key++} className="text-amethyst">
+          {raw}
+        </span>,
+      )
+    } else if (refOpen && refClose && refOpen.length === refClose.length) {
+      nodes.push(
+        <span key={key++} className="text-electric-blue">
+          {raw}
+        </span>,
+      )
+    } else {
+      nodes.push(<Fragment key={key++}>{raw}</Fragment>)
+    }
+
     lastIndex = start + raw.length
   }
 
