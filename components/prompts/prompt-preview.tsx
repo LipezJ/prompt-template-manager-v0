@@ -13,7 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { replaceVariables } from "@/lib/prompt-utils"
+import { getMissingRequiredVariables, replaceVariables } from "@/lib/prompt-utils"
 import { cn } from "@/lib/utils"
 
 interface PromptPreviewProps {
@@ -23,6 +23,7 @@ interface PromptPreviewProps {
   onUpdateDescription: (description: string) => void
   onDeletePrompt: () => void
   isEditMode?: boolean
+  onMissingVariables?: (ids: string[]) => void
 }
 
 export function PromptPreview({
@@ -32,6 +33,7 @@ export function PromptPreview({
   onUpdateDescription,
   onDeletePrompt,
   isEditMode = false,
+  onMissingVariables,
 }: PromptPreviewProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [content, setContent] = useState(prompt.content)
@@ -39,6 +41,7 @@ export function PromptPreview({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
   const [showDescriptionDialog, setShowDescriptionDialog] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [missingNames, setMissingNames] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -54,8 +57,16 @@ export function PromptPreview({
   }
 
   const handleCopy = () => {
+    const missing = getMissingRequiredVariables(prompt.content, variables)
+    if (missing.length > 0) {
+      setMissingNames(missing.map((v) => v.name))
+      onMissingVariables?.(missing.map((v) => v.id))
+      setTimeout(() => setMissingNames([]), 2200)
+      return
+    }
     const processedText = replaceVariables(prompt.content, variables)
     void navigator.clipboard.writeText(processedText)
+    onMissingVariables?.([])
     setCopied(true)
     setTimeout(() => setCopied(false), 600)
   }
@@ -194,14 +205,28 @@ export function PromptPreview({
                     <span className="sr-only">Preview</span>
                   </Button>
                   <TooltipProvider>
-                    <Tooltip open={copied}>
+                    <Tooltip open={copied || missingNames.length > 0}>
                       <TooltipTrigger asChild>
-                        <Button size="icon" onClick={handleCopy} className="h-8 w-8">
+                        <Button
+                          size="icon"
+                          onClick={handleCopy}
+                          className={cn(
+                            "h-8 w-8",
+                            missingNames.length > 0 && "border-danger-red bg-danger-red text-white hover:bg-danger-red",
+                          )}
+                        >
                           <CopyIcon className="h-3.5 w-3.5" />
                           <span className="sr-only">Copy</span>
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="top">¡Copiado!</TooltipContent>
+                      <TooltipContent
+                        side="top"
+                        className={cn(missingNames.length > 0 && "border-danger-red bg-danger-red text-white")}
+                      >
+                        {missingNames.length > 0
+                          ? `Faltan variables: ${missingNames.join(", ")}`
+                          : "¡Copiado!"}
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>

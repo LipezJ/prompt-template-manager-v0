@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import { PromptSetTabs } from "@/components/prompt-sets/prompt-set-tabs"
 import { VariablesEditor } from "@/components/variables/variables-editor"
@@ -41,6 +41,9 @@ export default function PromptSetsPage() {
     updateVariable,
     updateVariableName,
     updateVariableDescription,
+    updateVariableType,
+    updateVariableOptional,
+    updateVariableOptions,
     deleteVariable,
     clearAllVariableValues,
     reorderVariables,
@@ -52,6 +55,15 @@ export default function PromptSetsPage() {
   } = useActivePromptSet(projectId, projectsState)
 
   const [isEditMode, setIsEditMode] = useState(false)
+  const [missingVariableIds, setMissingVariableIds] = useState<string[]>([])
+
+  const effectiveMissingVariableIds = useMemo(() => {
+    if (missingVariableIds.length === 0 || !activePromptSet) return []
+    return missingVariableIds.filter((id) => {
+      const variable = activePromptSet.variables.find((v) => v.id === id)
+      return variable !== undefined && variable.value === ""
+    })
+  }, [missingVariableIds, activePromptSet])
 
   const splitPosition = activePromptSet?.uiPreferences?.splitPosition ?? 50
   const variablesPanelVisible = activePromptSet?.uiPreferences?.variablesPanelVisible ?? true
@@ -152,11 +164,15 @@ export default function PromptSetsPage() {
                     onUpdateVariable={updateVariable}
                     onUpdateVariableName={updateVariableName}
                     onUpdateVariableDescription={updateVariableDescription}
+                    onUpdateVariableType={updateVariableType}
+                    onUpdateVariableOptional={updateVariableOptional}
+                    onUpdateVariableOptions={updateVariableOptions}
                     onAddVariable={addVariable}
                     onDeleteVariable={deleteVariable}
                     onClearAllValues={clearAllVariableValues}
                     onHidePanel={() => updateUiPreferences({ variablesPanelVisible: false })}
                     isEditMode={isEditMode}
+                    missingVariableIds={effectiveMissingVariableIds}
                   />
                 </DndContext>
               </ErrorBoundary>
@@ -179,6 +195,7 @@ export default function PromptSetsPage() {
                     onUpdatePromptDescription={updatePromptDescription}
                     onDeletePrompt={deletePrompt}
                     onAddPrompt={addPrompt}
+                    onMissingVariables={setMissingVariableIds}
                   />
                 </DndContext>
               </ErrorBoundary>

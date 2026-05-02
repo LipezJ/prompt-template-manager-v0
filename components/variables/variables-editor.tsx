@@ -5,9 +5,10 @@ import type React from "react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, PlusIcon, Eraser } from "lucide-react"
-import type { PromptVariable } from "@/types/prompt"
+import type { PromptVariable, SelectOption, VariableType } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DescriptionDialog } from "@/components/dialogs/description-dialog"
+import { SelectOptionsDialog } from "@/components/dialogs/select-options-dialog"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { VariableItem } from "./variable-item"
@@ -17,11 +18,15 @@ interface VariablesEditorProps {
   onUpdateVariable: (id: string, value: string) => void
   onUpdateVariableName: (id: string, name: string) => void
   onUpdateVariableDescription: (id: string, description: string) => void
+  onUpdateVariableType: (id: string, type: VariableType) => void
+  onUpdateVariableOptional: (id: string, optional: boolean) => void
+  onUpdateVariableOptions: (id: string, options: SelectOption[]) => void
   onAddVariable: () => void
   onDeleteVariable: (id: string) => void
   onClearAllValues: () => void
   onHidePanel?: () => void
   isEditMode?: boolean
+  missingVariableIds?: string[]
 }
 
 export function VariablesEditor({
@@ -29,17 +34,23 @@ export function VariablesEditor({
   onUpdateVariable,
   onUpdateVariableName,
   onUpdateVariableDescription,
+  onUpdateVariableType,
+  onUpdateVariableOptional,
+  onUpdateVariableOptions,
   onAddVariable,
   onDeleteVariable,
   onClearAllValues,
   onHidePanel,
   isEditMode = false,
+  missingVariableIds,
 }: VariablesEditorProps) {
+  const missingSet = missingVariableIds ? new Set(missingVariableIds) : undefined
   const [editingVariable, setEditingVariable] = useState<string | null>(null)
   const [editingName, setEditingName] = useState("")
   const [variableToDelete, setVariableToDelete] = useState<string | null>(null)
   const [showClearConfirmation, setShowClearConfirmation] = useState(false)
   const [descriptionTarget, setDescriptionTarget] = useState<PromptVariable | null>(null)
+  const [optionsTarget, setOptionsTarget] = useState<PromptVariable | null>(null)
   const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({})
 
   const handleStartEditingName = (variable: PromptVariable) => {
@@ -126,11 +137,15 @@ export function VariablesEditor({
               isEditMode={isEditMode}
               isEditing={editingVariable === variable.id}
               editingName={editingName}
+              isMissing={missingSet?.has(variable.id) ?? false}
               onStartEditingName={handleStartEditingName}
               onSaveVariableName={handleSaveVariableName}
               onEditDescription={setDescriptionTarget}
+              onEditOptions={setOptionsTarget}
               onDeleteClick={handleDeleteClick}
               onUpdateVariable={onUpdateVariable}
+              onUpdateVariableType={onUpdateVariableType}
+              onUpdateVariableOptional={onUpdateVariableOptional}
               onEditingNameChange={setEditingName}
               onTextareaFocus={handleTextareaFocus}
               textareaRef={(el) => {
@@ -172,6 +187,16 @@ export function VariablesEditor({
         }}
         title={`Descripción de ${descriptionTarget?.name ?? "variable"}`}
         initialValue={descriptionTarget?.description ?? ""}
+      />
+
+      <SelectOptionsDialog
+        isOpen={!!optionsTarget}
+        onClose={() => setOptionsTarget(null)}
+        onSave={(options) => {
+          if (optionsTarget) onUpdateVariableOptions(optionsTarget.id, options)
+        }}
+        variableName={optionsTarget?.name ?? "variable"}
+        initialOptions={optionsTarget?.options ?? []}
       />
     </div>
   )

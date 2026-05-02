@@ -1,8 +1,19 @@
+export type VariableType = "string" | "multiline" | "boolean" | "select"
+
+export interface SelectOption {
+  id: string
+  label: string
+  value: string
+}
+
 export interface PromptVariable {
   id: string
   name: string
   value: string
   description?: string
+  type?: VariableType
+  optional?: boolean
+  options?: SelectOption[]
 }
 
 export interface Prompt {

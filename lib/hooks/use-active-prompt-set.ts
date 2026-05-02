@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { arrayMove } from "@dnd-kit/sortable"
-import type { Prompt, Project, PromptSet, PromptVariable } from "@/types/prompt"
+import type { Prompt, Project, PromptSet, PromptVariable, SelectOption, VariableType } from "@/types/prompt"
 import { newId } from "@/lib/ids"
 import type { UseProjectsResult } from "./use-projects"
 
@@ -31,6 +31,9 @@ export interface UseActivePromptSetResult {
   updateVariable: (id: string, value: string) => void
   updateVariableName: (id: string, name: string) => void
   updateVariableDescription: (id: string, description: string) => void
+  updateVariableType: (id: string, type: VariableType) => void
+  updateVariableOptional: (id: string, optional: boolean) => void
+  updateVariableOptions: (id: string, options: SelectOption[]) => void
   deleteVariable: (id: string) => void
   clearAllVariableValues: () => void
   reorderVariables: (oldIndex: number, newIndex: number) => void
@@ -188,6 +191,60 @@ export function useActivePromptSet(
     [patchActiveSet],
   )
 
+  const updateVariableType = useCallback(
+    (id: string, type: VariableType) => {
+      patchActiveSet((set) => ({
+        ...set,
+        variables: set.variables.map((v) => {
+          if (v.id !== id) return v
+          const next: PromptVariable = { ...v, type }
+          if (type === "boolean") {
+            next.value = v.value === "true" ? "true" : "false"
+            delete next.options
+          } else if (type === "select") {
+            const opts = v.options ?? []
+            next.options = opts
+            const isStillValid = opts.some((o) => o.value === v.value)
+            if (!isStillValid) next.value = opts[0]?.value ?? ""
+          } else {
+            delete next.options
+            if (v.type === "boolean") next.value = ""
+          }
+          return next
+        }),
+      }))
+    },
+    [patchActiveSet],
+  )
+
+  const updateVariableOptional = useCallback(
+    (id: string, optional: boolean) => {
+      patchActiveSet((set) => ({
+        ...set,
+        variables: set.variables.map((v) => (v.id === id ? { ...v, optional: optional || undefined } : v)),
+      }))
+    },
+    [patchActiveSet],
+  )
+
+  const updateVariableOptions = useCallback(
+    (id: string, options: SelectOption[]) => {
+      patchActiveSet((set) => ({
+        ...set,
+        variables: set.variables.map((v) => {
+          if (v.id !== id) return v
+          const isStillValid = options.some((o) => o.value === v.value)
+          return {
+            ...v,
+            options,
+            value: isStillValid ? v.value : options[0]?.value ?? "",
+          }
+        }),
+      }))
+    },
+    [patchActiveSet],
+  )
+
   const deleteVariable = useCallback(
     (id: string) => {
       patchActiveSet((set) => ({ ...set, variables: set.variables.filter((v) => v.id !== id) }))
@@ -261,6 +318,9 @@ export function useActivePromptSet(
     updateVariable,
     updateVariableName,
     updateVariableDescription,
+    updateVariableType,
+    updateVariableOptional,
+    updateVariableOptions,
     deleteVariable,
     clearAllVariableValues,
     reorderVariables,

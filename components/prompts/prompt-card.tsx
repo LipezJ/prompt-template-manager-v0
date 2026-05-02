@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useState, useEffect } from "react"
 import { GripVertical } from "lucide-react"
-import { replaceVariables } from "@/lib/prompt-utils"
+import { getMissingRequiredVariables, replaceVariables } from "@/lib/prompt-utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
@@ -13,10 +13,18 @@ interface PromptCardProps {
   variables: PromptVariable[]
   isEditMode?: boolean
   onOpenModal?: (prompt: Prompt) => void
+  onMissingVariables?: (ids: string[]) => void
 }
 
-export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal }: PromptCardProps) {
+export function PromptCard({
+  prompt,
+  variables,
+  isEditMode = false,
+  onOpenModal,
+  onMissingVariables,
+}: PromptCardProps) {
   const [copied, setCopied] = useState(false)
+  const [missingNames, setMissingNames] = useState<string[]>([])
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: prompt.id,
@@ -36,8 +44,17 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
       return
     }
 
+    const missing = getMissingRequiredVariables(prompt.content, variables)
+    if (missing.length > 0) {
+      setMissingNames(missing.map((v) => v.name))
+      onMissingVariables?.(missing.map((v) => v.id))
+      setTimeout(() => setMissingNames([]), 2200)
+      return
+    }
+
     const processedText = replaceVariables(prompt.content, variables)
     void navigator.clipboard.writeText(processedText)
+    onMissingVariables?.([])
 
     setCopied(true)
     setTimeout(() => setCopied(false), 600)
@@ -45,11 +62,15 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
 
   useEffect(() => {
     setCopied(false)
+    setMissingNames([])
   }, [prompt.id])
+
+  const showError = missingNames.length > 0 && !isEditMode
+  const showCopied = copied && !isEditMode
 
   return (
     <TooltipProvider>
-      <Tooltip open={copied && !isEditMode}>
+      <Tooltip open={showError || showCopied}>
         <TooltipTrigger asChild>
           <div
             ref={setNodeRef}
@@ -58,6 +79,7 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
               "hover-clone group relative h-52 cursor-pointer select-none rounded-sm border border-iron bg-deep-charcoal p-3 transition hover:border-amethyst/50",
               isDragging && "opacity-70",
               copied && "border-electric-blue",
+              showError && "border-danger-red hover:border-danger-red",
             )}
             onClick={handleClick}
           >
@@ -82,7 +104,9 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent side="top">¡Copiado!</TooltipContent>
+        <TooltipContent side="top" className={cn(showError && "border-danger-red bg-danger-red text-white")}>
+          {showError ? `Faltan variables: ${missingNames.join(", ")}` : "¡Copiado!"}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )

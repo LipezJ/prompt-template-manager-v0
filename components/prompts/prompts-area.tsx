@@ -17,6 +17,7 @@ interface PromptsAreaProps {
   onUpdatePromptDescription: (promptId: string, description: string) => void
   onDeletePrompt: (promptId: string) => void
   onAddPrompt: () => void
+  onMissingVariables?: (ids: string[]) => void
 }
 
 export function PromptsArea({
@@ -28,6 +29,7 @@ export function PromptsArea({
   onUpdatePromptDescription,
   onDeletePrompt,
   onAddPrompt,
+  onMissingVariables,
 }: PromptsAreaProps) {
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null)
 
@@ -66,6 +68,7 @@ export function PromptsArea({
                 variables={variables}
                 isEditMode={isEditMode}
                 onOpenModal={handleEdit}
+                onMissingVariables={onMissingVariables}
               />
             ) : (
               <PromptPreview
@@ -76,6 +79,7 @@ export function PromptsArea({
                 onUpdateDescription={(description) => onUpdatePromptDescription(prompt.id, description)}
                 onDeletePrompt={() => onDeletePrompt(prompt.id)}
                 isEditMode={isEditMode}
+                onMissingVariables={onMissingVariables}
               />
             ),
           )}
