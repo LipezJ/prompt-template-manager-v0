@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, PlusIcon, Eraser } from "lucide-react"
+import { ChevronLeft, Globe, PlusIcon, Eraser } from "lucide-react"
 import type { PromptVariable, SelectOption, VariableType } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DescriptionDialog } from "@/components/dialogs/description-dialog"
@@ -15,12 +15,15 @@ import { VariableItem } from "./variable-item"
 
 interface VariablesEditorProps {
   variables: PromptVariable[]
+  globalVariables: PromptVariable[]
   onUpdateVariable: (id: string, value: string) => void
   onUpdateVariableName: (id: string, name: string) => void
   onUpdateVariableDescription: (id: string, description: string) => void
   onUpdateVariableType: (id: string, type: VariableType) => void
   onUpdateVariableOptional: (id: string, optional: boolean) => void
   onUpdateVariableOptions: (id: string, options: SelectOption[]) => void
+  onPromoteToGlobal: (id: string) => void
+  onDemoteToLocal: (id: string) => void
   onAddVariable: () => void
   onDeleteVariable: (id: string) => void
   onClearAllValues: () => void
@@ -31,12 +34,15 @@ interface VariablesEditorProps {
 
 export function VariablesEditor({
   variables,
+  globalVariables,
   onUpdateVariable,
   onUpdateVariableName,
   onUpdateVariableDescription,
   onUpdateVariableType,
   onUpdateVariableOptional,
   onUpdateVariableOptions,
+  onPromoteToGlobal,
+  onDemoteToLocal,
   onAddVariable,
   onDeleteVariable,
   onClearAllValues,
@@ -52,6 +58,8 @@ export function VariablesEditor({
   const [descriptionTarget, setDescriptionTarget] = useState<PromptVariable | null>(null)
   const [optionsTarget, setOptionsTarget] = useState<PromptVariable | null>(null)
   const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({})
+
+  const totalCount = globalVariables.length + variables.length
 
   const handleStartEditingName = (variable: PromptVariable) => {
     setEditingVariable(variable.id)
@@ -89,6 +97,35 @@ export function VariablesEditor({
     setShowClearConfirmation(false)
   }
 
+  const renderItem = (variable: PromptVariable, isGlobal: boolean) => (
+    <VariableItem
+      key={variable.id}
+      variable={variable}
+      isEditMode={isEditMode}
+      isEditing={editingVariable === variable.id}
+      editingName={editingName}
+      isMissing={missingSet?.has(variable.id) ?? false}
+      isGlobal={isGlobal}
+      onStartEditingName={handleStartEditingName}
+      onSaveVariableName={handleSaveVariableName}
+      onEditDescription={setDescriptionTarget}
+      onEditOptions={setOptionsTarget}
+      onDeleteClick={handleDeleteClick}
+      onUpdateVariable={onUpdateVariable}
+      onUpdateVariableType={onUpdateVariableType}
+      onUpdateVariableOptional={onUpdateVariableOptional}
+      onPromoteToGlobal={onPromoteToGlobal}
+      onDemoteToLocal={onDemoteToLocal}
+      onEditingNameChange={setEditingName}
+      onTextareaFocus={handleTextareaFocus}
+      textareaRef={(el) => {
+        textareaRefs.current[variable.id] = el
+      }}
+    />
+  )
+
+  const allItemIds = [...globalVariables.map((v) => v.id), ...variables.map((v) => v.id)]
+
   return (
     <div className="flex h-full min-h-0 flex-col rounded-sm border border-iron bg-deep-charcoal px-4 py-4">
       <div className="flex items-center justify-between border-b border-iron/60 pb-3">
@@ -96,7 +133,7 @@ export function VariablesEditor({
           <span className="text-eyebrow">Variables</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="font-mono-tight text-[11px] text-ash">{variables.length}</span>
+          <span className="font-mono-tight text-[11px] text-ash">{totalCount}</span>
           {onHidePanel && (
             <TooltipProvider>
               <Tooltip>
@@ -112,7 +149,7 @@ export function VariablesEditor({
               </Tooltip>
             </TooltipProvider>
           )}
-          {variables.length > 0 && (
+          {totalCount > 0 && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -129,30 +166,17 @@ export function VariablesEditor({
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto pr-1 custom-scrollbar">
-        <SortableContext items={variables.map((v) => v.id)} strategy={verticalListSortingStrategy}>
-          {variables.map((variable) => (
-            <VariableItem
-              key={variable.id}
-              variable={variable}
-              isEditMode={isEditMode}
-              isEditing={editingVariable === variable.id}
-              editingName={editingName}
-              isMissing={missingSet?.has(variable.id) ?? false}
-              onStartEditingName={handleStartEditingName}
-              onSaveVariableName={handleSaveVariableName}
-              onEditDescription={setDescriptionTarget}
-              onEditOptions={setOptionsTarget}
-              onDeleteClick={handleDeleteClick}
-              onUpdateVariable={onUpdateVariable}
-              onUpdateVariableType={onUpdateVariableType}
-              onUpdateVariableOptional={onUpdateVariableOptional}
-              onEditingNameChange={setEditingName}
-              onTextareaFocus={handleTextareaFocus}
-              textareaRef={(el) => {
-                textareaRefs.current[variable.id] = el
-              }}
-            />
-          ))}
+        <SortableContext items={allItemIds} strategy={verticalListSortingStrategy}>
+          {globalVariables.length > 0 && (
+            <div className="border-b border-iron/40 pb-1">
+              <div className="flex items-center gap-1.5 pt-3 pb-1 text-eyebrow text-amethyst">
+                <Globe aria-hidden="true" className="h-3 w-3" />
+                <span>Globales</span>
+              </div>
+              {globalVariables.map((variable) => renderItem(variable, true))}
+            </div>
+          )}
+          {variables.map((variable) => renderItem(variable, false))}
         </SortableContext>
       </div>
       {!isEditMode && (

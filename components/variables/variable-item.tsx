@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities"
 import {
   Check,
   FileText,
+  Globe,
   GripVertical,
   ListChecks,
   MoreVertical,
@@ -33,6 +34,7 @@ interface VariableItemProps {
   isEditing: boolean
   editingName: string
   isMissing?: boolean
+  isGlobal?: boolean
   onStartEditingName: (variable: PromptVariable) => void
   onSaveVariableName: (variable: PromptVariable) => void
   onEditDescription: (variable: PromptVariable) => void
@@ -41,6 +43,8 @@ interface VariableItemProps {
   onUpdateVariable: (id: string, value: string) => void
   onUpdateVariableType: (id: string, type: VariableType) => void
   onUpdateVariableOptional: (id: string, optional: boolean) => void
+  onPromoteToGlobal: (id: string) => void
+  onDemoteToLocal: (id: string) => void
   onEditingNameChange: (value: string) => void
   onTextareaFocus: (e: React.FocusEvent<HTMLTextAreaElement>) => void
   textareaRef: React.Ref<HTMLTextAreaElement>
@@ -60,6 +64,7 @@ export function VariableItem({
   isEditing,
   editingName,
   isMissing = false,
+  isGlobal = false,
   onStartEditingName,
   onSaveVariableName,
   onEditDescription,
@@ -68,6 +73,8 @@ export function VariableItem({
   onUpdateVariable,
   onUpdateVariableType,
   onUpdateVariableOptional,
+  onPromoteToGlobal,
+  onDemoteToLocal,
   onEditingNameChange,
   onTextareaFocus,
   textareaRef,
@@ -122,6 +129,7 @@ export function VariableItem({
             />
           ) : (
             <span className="flex min-w-0 items-center gap-1.5">
+              {isGlobal && <Globe aria-hidden="true" className="h-3 w-3 shrink-0 text-amethyst" />}
               <span className="font-mono-tight truncate text-xs text-electric-blue">
                 {variable.name}
                 {isMissing && (
@@ -169,6 +177,15 @@ export function VariableItem({
             >
               <Check className={cn("mr-2 h-4 w-4", isOptional ? "text-electric-blue" : "opacity-0")} />
               Opcional
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                isGlobal ? onDemoteToLocal(variable.id) : onPromoteToGlobal(variable.id)
+              }
+              className="cursor-pointer"
+            >
+              <Check className={cn("mr-2 h-4 w-4", isGlobal ? "text-electric-blue" : "opacity-0")} />
+              Global
             </DropdownMenuItem>
             {type === "select" && (
               <DropdownMenuItem onClick={() => onEditOptions(variable)} className="cursor-pointer">

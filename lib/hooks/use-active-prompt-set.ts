@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { arrayMove } from "@dnd-kit/sortable"
 import type { Prompt, Project, PromptSet, PromptVariable, SelectOption, VariableType } from "@/types/prompt"
@@ -27,6 +27,9 @@ export interface UseActivePromptSetResult {
   reorderPromptSets: (oldIndex: number, newIndex: number) => void
   updateUiPreferences: (updates: Partial<UiPreferences>) => void
 
+  globalVariables: PromptVariable[]
+  isGlobalVariable: (id: string) => boolean
+
   addVariable: () => void
   updateVariable: (id: string, value: string) => void
   updateVariableName: (id: string, name: string) => void
@@ -37,6 +40,10 @@ export interface UseActivePromptSetResult {
   deleteVariable: (id: string) => void
   clearAllVariableValues: () => void
   reorderVariables: (oldIndex: number, newIndex: number) => void
+  reorderGlobalVariables: (oldIndex: number, newIndex: number) => void
+
+  promoteVariableToGlobal: (id: string) => void
+  demoteVariableToLocal: (id: string) => void
 
   addPrompt: () => void
   updatePrompt: (id: string, content: string) => void
@@ -70,6 +77,16 @@ export function useActivePromptSet(
 
   const activePromptSet = currentProject?.promptSets.find((s) => s.id === activePromptSetId)
 
+  const globalVariables = useMemo(
+    () => currentProject?.globalVariables ?? [],
+    [currentProject?.globalVariables],
+  )
+
+  const isGlobalVariable = useCallback(
+    (id: string) => globalVariables.some((v) => v.id === id),
+    [globalVariables],
+  )
+
   const selectPromptSet = useCallback((id: string) => {
     setActivePromptSetId(id)
     const url = new URL(window.location.href)
@@ -87,6 +104,24 @@ export function useActivePromptSet(
       }))
     },
     [currentProject, activePromptSet, updateProject],
+  )
+
+  const patchVariableById = useCallback(
+    (id: string, transform: (variable: PromptVariable) => PromptVariable) => {
+      if (!currentProject) return
+      if (isGlobalVariable(id)) {
+        updateProject(currentProject.id, (project) => ({
+          ...project,
+          globalVariables: (project.globalVariables ?? []).map((v) => (v.id === id ? transform(v) : v)),
+        }))
+        return
+      }
+      patchActiveSet((set) => ({
+        ...set,
+        variables: set.variables.map((v) => (v.id === id ? transform(v) : v)),
+      }))
+    },
+    [currentProject, isGlobalVariable, updateProject, patchActiveSet],
   )
 
   const addPromptSet = useCallback(() => {
@@ -161,106 +196,165 @@ export function useActivePromptSet(
 
   const updateVariable = useCallback(
     (id: string, value: string) => {
-      patchActiveSet((set) => ({
-        ...set,
-        variables: set.variables.map((v) => (v.id === id ? { ...v, value } : v)),
-      }))
+      patchVariableById(id, (v) => ({ ...v, value }))
     },
-    [patchActiveSet],
+    [patchVariableById],
   )
 
   const updateVariableName = useCallback(
     (id: string, name: string) => {
-      patchActiveSet((set) => ({
-        ...set,
-        variables: set.variables.map((v) => (v.id === id ? { ...v, name } : v)),
-      }))
+      patchVariableById(id, (v) => ({ ...v, name }))
     },
-    [patchActiveSet],
+    [patchVariableById],
   )
 
   const updateVariableDescription = useCallback(
     (id: string, description: string) => {
-      patchActiveSet((set) => ({
-        ...set,
-        variables: set.variables.map((v) =>
-          v.id === id ? { ...v, description: description.trim() === "" ? undefined : description } : v,
-        ),
+      patchVariableById(id, (v) => ({
+        ...v,
+        description: description.trim() === "" ? undefined : description,
       }))
     },
-    [patchActiveSet],
+    [patchVariableById],
   )
 
   const updateVariableType = useCallback(
     (id: string, type: VariableType) => {
-      patchActiveSet((set) => ({
-        ...set,
-        variables: set.variables.map((v) => {
-          if (v.id !== id) return v
-          const next: PromptVariable = { ...v, type }
-          if (type === "boolean") {
-            next.value = v.value === "true" ? "true" : "false"
-            delete next.options
-          } else if (type === "select") {
-            const opts = v.options ?? []
-            next.options = opts
-            const isStillValid = opts.some((o) => o.value === v.value)
-            if (!isStillValid) next.value = opts[0]?.value ?? ""
-          } else {
-            delete next.options
-            if (v.type === "boolean") next.value = ""
-          }
-          return next
-        }),
-      }))
+      patchVariableById(id, (v) => {
+        const next: PromptVariable = { ...v, type }
+        if (type === "boolean") {
+          next.value = v.value === "true" ? "true" : "false"
+          delete next.options
+        } else if (type === "select") {
+          const opts = v.options ?? []
+          next.options = opts
+          const isStillValid = opts.some((o) => o.value === v.value)
+          if (!isStillValid) next.value = opts[0]?.value ?? ""
+        } else {
+          delete next.options
+          if (v.type === "boolean") next.value = ""
+        }
+        return next
+      })
     },
-    [patchActiveSet],
+    [patchVariableById],
   )
 
   const updateVariableOptional = useCallback(
     (id: string, optional: boolean) => {
-      patchActiveSet((set) => ({
-        ...set,
-        variables: set.variables.map((v) => (v.id === id ? { ...v, optional: optional || undefined } : v)),
-      }))
+      patchVariableById(id, (v) => ({ ...v, optional: optional || undefined }))
     },
-    [patchActiveSet],
+    [patchVariableById],
   )
 
   const updateVariableOptions = useCallback(
     (id: string, options: SelectOption[]) => {
-      patchActiveSet((set) => ({
-        ...set,
-        variables: set.variables.map((v) => {
-          if (v.id !== id) return v
-          const isStillValid = options.some((o) => o.value === v.value)
-          return {
-            ...v,
-            options,
-            value: isStillValid ? v.value : options[0]?.value ?? "",
-          }
-        }),
-      }))
+      patchVariableById(id, (v) => {
+        const isStillValid = options.some((o) => o.value === v.value)
+        return {
+          ...v,
+          options,
+          value: isStillValid ? v.value : options[0]?.value ?? "",
+        }
+      })
     },
-    [patchActiveSet],
+    [patchVariableById],
   )
 
   const deleteVariable = useCallback(
     (id: string) => {
+      if (!currentProject) return
+      if (isGlobalVariable(id)) {
+        updateProject(currentProject.id, (project) => ({
+          ...project,
+          globalVariables: (project.globalVariables ?? []).filter((v) => v.id !== id),
+        }))
+        return
+      }
       patchActiveSet((set) => ({ ...set, variables: set.variables.filter((v) => v.id !== id) }))
     },
-    [patchActiveSet],
+    [currentProject, isGlobalVariable, updateProject, patchActiveSet],
   )
 
   const clearAllVariableValues = useCallback(() => {
-    patchActiveSet((set) => ({ ...set, variables: set.variables.map((v) => ({ ...v, value: "" })) }))
-  }, [patchActiveSet])
+    if (!currentProject) return
+    const setId = activePromptSet?.id
+    updateProject(currentProject.id, (project) => ({
+      ...project,
+      globalVariables: (project.globalVariables ?? []).map((v) => ({ ...v, value: "" })),
+      promptSets: project.promptSets.map((set) =>
+        set.id === setId ? { ...set, variables: set.variables.map((v) => ({ ...v, value: "" })) } : set,
+      ),
+    }))
+  }, [currentProject, activePromptSet?.id, updateProject])
 
   const reorderVariables = useCallback(
     (oldIndex: number, newIndex: number) => {
       patchActiveSet((set) => ({ ...set, variables: arrayMove(set.variables, oldIndex, newIndex) }))
     },
     [patchActiveSet],
+  )
+
+  const reorderGlobalVariables = useCallback(
+    (oldIndex: number, newIndex: number) => {
+      if (!currentProject) return
+      updateProject(currentProject.id, (project) => ({
+        ...project,
+        globalVariables: arrayMove(project.globalVariables ?? [], oldIndex, newIndex),
+      }))
+    },
+    [currentProject, updateProject],
+  )
+
+  const promoteVariableToGlobal = useCallback(
+    (id: string) => {
+      if (!currentProject) return
+      updateProject(currentProject.id, (project) => {
+        let variable: PromptVariable | undefined
+        for (const set of project.promptSets) {
+          const found = set.variables.find((v) => v.id === id)
+          if (found) {
+            variable = found
+            break
+          }
+        }
+        if (!variable) return project
+        const promoted = variable
+        return {
+          ...project,
+          promptSets: project.promptSets.map((set) => ({
+            ...set,
+            variables: set.variables.filter(
+              (v) => v.id !== promoted.id && v.name !== promoted.name,
+            ),
+          })),
+          globalVariables: [
+            ...(project.globalVariables ?? []).filter((v) => v.name !== promoted.name),
+            { ...promoted },
+          ],
+        }
+      })
+    },
+    [currentProject, updateProject],
+  )
+
+  const demoteVariableToLocal = useCallback(
+    (id: string) => {
+      if (!currentProject || !activePromptSet) return
+      const setId = activePromptSet.id
+      updateProject(currentProject.id, (project) => {
+        const variable = (project.globalVariables ?? []).find((v) => v.id === id)
+        if (!variable) return project
+        return {
+          ...project,
+          globalVariables: (project.globalVariables ?? []).filter((v) => v.id !== id),
+          promptSets: project.promptSets.map((set) =>
+            set.id === setId ? { ...set, variables: [...set.variables, { ...variable }] } : set,
+          ),
+        }
+      })
+    },
+    [currentProject, activePromptSet, updateProject],
   )
 
   const addPrompt = useCallback(() => {
@@ -314,6 +408,8 @@ export function useActivePromptSet(
     renamePromptSet,
     reorderPromptSets,
     updateUiPreferences,
+    globalVariables,
+    isGlobalVariable,
     addVariable,
     updateVariable,
     updateVariableName,
@@ -324,6 +420,9 @@ export function useActivePromptSet(
     deleteVariable,
     clearAllVariableValues,
     reorderVariables,
+    reorderGlobalVariables,
+    promoteVariableToGlobal,
+    demoteVariableToLocal,
     addPrompt,
     updatePrompt,
     updatePromptDescription,

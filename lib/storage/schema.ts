@@ -50,6 +50,7 @@ export const ProjectSchema = z.object({
   pinned: z.boolean().optional(),
   uiPreferences: ProjectUiPreferencesSchema.optional(),
   promptSets: z.array(PromptSetSchema),
+  globalVariables: z.array(PromptVariableSchema).optional(),
 })
 
 export const ProjectsSchema = z.array(ProjectSchema)

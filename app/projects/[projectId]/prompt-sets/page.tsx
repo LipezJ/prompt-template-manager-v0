@@ -37,6 +37,7 @@ export default function PromptSetsPage() {
     renamePromptSet,
     reorderPromptSets,
     updateUiPreferences,
+    globalVariables,
     addVariable,
     updateVariable,
     updateVariableName,
@@ -47,6 +48,9 @@ export default function PromptSetsPage() {
     deleteVariable,
     clearAllVariableValues,
     reorderVariables,
+    reorderGlobalVariables,
+    promoteVariableToGlobal,
+    demoteVariableToLocal,
     addPrompt,
     updatePrompt,
     updatePromptDescription,
@@ -57,13 +61,18 @@ export default function PromptSetsPage() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [missingVariableIds, setMissingVariableIds] = useState<string[]>([])
 
+  const effectiveVariables = useMemo(
+    () => [...globalVariables, ...(activePromptSet?.variables ?? [])],
+    [globalVariables, activePromptSet?.variables],
+  )
+
   const effectiveMissingVariableIds = useMemo(() => {
-    if (missingVariableIds.length === 0 || !activePromptSet) return []
+    if (missingVariableIds.length === 0) return []
     return missingVariableIds.filter((id) => {
-      const variable = activePromptSet.variables.find((v) => v.id === id)
+      const variable = effectiveVariables.find((v) => v.id === id)
       return variable !== undefined && variable.value === ""
     })
-  }, [missingVariableIds, activePromptSet])
+  }, [missingVariableIds, effectiveVariables])
 
   const splitPosition = activePromptSet?.uiPreferences?.splitPosition ?? 50
   const variablesPanelVisible = activePromptSet?.uiPreferences?.variablesPanelVisible ?? true
@@ -82,9 +91,19 @@ export default function PromptSetsPage() {
   const handleVariableDragEnd = (event: any) => {
     const { active, over } = event
     if (!over || active.id === over.id || !activePromptSet) return
-    const oldIndex = activePromptSet.variables.findIndex((v) => v.id === active.id)
-    const newIndex = activePromptSet.variables.findIndex((v) => v.id === over.id)
-    if (oldIndex !== -1 && newIndex !== -1) reorderVariables(oldIndex, newIndex)
+    const activeIsGlobal = globalVariables.some((v) => v.id === active.id)
+    const overIsGlobal = globalVariables.some((v) => v.id === over.id)
+    if (activeIsGlobal && overIsGlobal) {
+      const oldIndex = globalVariables.findIndex((v) => v.id === active.id)
+      const newIndex = globalVariables.findIndex((v) => v.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) reorderGlobalVariables(oldIndex, newIndex)
+      return
+    }
+    if (!activeIsGlobal && !overIsGlobal) {
+      const oldIndex = activePromptSet.variables.findIndex((v) => v.id === active.id)
+      const newIndex = activePromptSet.variables.findIndex((v) => v.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) reorderVariables(oldIndex, newIndex)
+    }
   }
 
   const handlePromptDragEnd = (event: any) => {
@@ -161,12 +180,15 @@ export default function PromptSetsPage() {
                 >
                   <VariablesEditor
                     variables={activePromptSet.variables}
+                    globalVariables={globalVariables}
                     onUpdateVariable={updateVariable}
                     onUpdateVariableName={updateVariableName}
                     onUpdateVariableDescription={updateVariableDescription}
                     onUpdateVariableType={updateVariableType}
                     onUpdateVariableOptional={updateVariableOptional}
                     onUpdateVariableOptions={updateVariableOptions}
+                    onPromoteToGlobal={promoteVariableToGlobal}
+                    onDemoteToLocal={demoteVariableToLocal}
                     onAddVariable={addVariable}
                     onDeleteVariable={deleteVariable}
                     onClearAllValues={clearAllVariableValues}
@@ -188,7 +210,7 @@ export default function PromptSetsPage() {
                 >
                   <PromptsArea
                     prompts={activePromptSet.prompts}
-                    variables={activePromptSet.variables}
+                    variables={effectiveVariables}
                     isCardView={cardView}
                     isEditMode={isEditMode}
                     onUpdatePrompt={updatePrompt}

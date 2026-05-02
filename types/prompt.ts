@@ -43,4 +43,5 @@ export interface Project {
     promptSetsSidebarVisible: boolean
   }
   promptSets: PromptSet[]
+  globalVariables?: PromptVariable[]
 }
