@@ -12,6 +12,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Search,
   Sparkles,
 } from "lucide-react"
 import type { Project } from "@/types/prompt"
@@ -26,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ProjectIconPicker, ProjectPinToggle } from "@/components/projects/project-options"
+import { useCommandPalette } from "@/components/command-palette-provider"
 
 interface AppShellProps {
   projects: Project[]
@@ -48,6 +50,7 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const { updateProject } = useProjectsContext()
+  const { open: openCommandPalette } = useCommandPalette()
   const promptSetsSidebarVisible = currentProject?.uiPreferences?.promptSetsSidebarVisible ?? false
   const railProjects = useMemo(
     () =>
@@ -75,6 +78,21 @@ export function AppShell({
           <Sparkles aria-hidden="true" className="h-4 w-4 text-white" />
           <span className="sr-only">Inicio</span>
         </Link>
+        <TooltipProvider delayDuration={180}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={openCommandPalette}
+                aria-label="Abrir paleta de comandos"
+                className="app-focus mt-3 flex h-9 w-9 items-center justify-center rounded-2xl border border-iron/70 bg-black/40 text-silver transition hover:border-violet-pulse/70 hover:text-white"
+              >
+                <Search aria-hidden="true" className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Buscar (⌘K)</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <nav aria-label="Proyectos" className="mt-6 flex min-h-0 flex-1 flex-col items-center gap-3 overflow-y-auto px-2 pb-4 custom-scrollbar">
           {railProjects.map(({ project, index }) => (
             <ProjectRailItem
@@ -167,7 +185,21 @@ export function AppShell({
                 fallbackTitle={title}
               />
             </div>
-            {topActions && <div className="flex shrink-0 items-center gap-2">{topActions}</div>}
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={openCommandPalette}
+                aria-label="Abrir paleta de comandos"
+                className="app-focus hidden h-8 items-center gap-2 rounded-2xl border border-iron/70 bg-black/40 px-3 text-xs text-silver transition hover:border-violet-pulse/70 hover:text-white md:inline-flex"
+              >
+                <Search aria-hidden="true" className="h-3.5 w-3.5" />
+                <span>Buscar…</span>
+                <span className="ml-2 rounded-md border border-iron/70 bg-black/60 px-1.5 py-0.5 text-[10px] font-medium tracking-wider text-silver">
+                  ⌘K
+                </span>
+              </button>
+              {topActions}
+            </div>
           </header>
         )}
         <div className="min-h-0 flex-1 overflow-y-auto custom-scrollbar">{children}</div>

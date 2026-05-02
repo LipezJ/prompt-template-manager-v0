@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { Toaster } from "@/components/ui/sonner"
 import { ErrorBoundary } from "@/components/layout/error-boundary"
 import { ProjectsProvider } from "@/lib/projects-provider"
+import { CommandPaletteProvider } from "@/components/command-palette-provider"
 
 export const metadata: Metadata = {
   title: "Prompt Manager",
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="es">
       <body className="bg-obsidian-ground text-pure-white antialiased">
         <ErrorBoundary fallbackLabel="La aplicacion encontro un error inesperado">
-          <ProjectsProvider>{children}</ProjectsProvider>
+          <ProjectsProvider>
+            <CommandPaletteProvider>{children}</CommandPaletteProvider>
+          </ProjectsProvider>
         </ErrorBoundary>
         <Toaster />
       </body>
