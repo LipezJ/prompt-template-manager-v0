@@ -74,19 +74,14 @@ export function SplitPane({
           className="group mx-3 flex h-full w-2 cursor-col-resize items-center justify-center"
           onMouseDown={handleMouseDown}
         >
-          <div className="h-full w-px bg-iron group-hover:bg-violet-pulse group-active:bg-electric-blue"></div>
+          <div className="h-full w-px bg-iron group-hover:bg-electric-blue/60 group-active:bg-electric-blue"></div>
         </div>
       )}
 
       {!leftVisible && (
         <div className="mb-2 ml-1 mr-3 flex items-start">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onSetLeftVisible(true)}
-            className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
-          >
-            <ChevronRight className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={() => onSetLeftVisible(true)} className="h-8 w-8">
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </div>
       )}

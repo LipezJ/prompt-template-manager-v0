@@ -60,10 +60,10 @@ export function VariableItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={cn("border-b border-iron/45 py-4 last:border-b-0", isDragging && "opacity-70")}
+      className={cn("border-b border-iron/60 py-3 last:border-b-0", isDragging && "opacity-70")}
     >
       <div className="flex items-center justify-between">
-        <div className="flex-1 flex items-center">
+        <div className="flex flex-1 items-center">
           {isEditMode && (
             <button
               type="button"
@@ -72,7 +72,7 @@ export function VariableItem({
               {...attributes}
               {...listeners}
             >
-              <GripVertical aria-hidden="true" className="h-4 w-4 text-silver" />
+              <GripVertical aria-hidden="true" className="h-3.5 w-3.5 text-ash" />
             </button>
           )}
           {isEditing ? (
@@ -86,53 +86,49 @@ export function VariableItem({
                   onSaveVariableName(variable)
                 }
               }}
-              className="min-h-0 h-7 rounded-xl border-iron/60 bg-black/20 py-1 text-xs text-white focus-visible:ring-violet-pulse"
+              className="font-mono-tight h-7 min-h-0 py-1 text-xs"
               onFocus={onTextareaFocus}
             />
           ) : (
-            <div className="flex items-center text-xs font-medium text-fog">
-              <span>{variable.name}</span>
-            </div>
+            <span className="font-mono-tight text-xs text-electric-blue">{variable.name}</span>
           )}
         </div>
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-xl text-silver hover:bg-graphite/70 hover:text-white">
-                <MoreVertical className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
-              <DropdownMenuItem onClick={() => onStartEditingName(variable)} className="cursor-pointer">
-                <Pencil className="mr-2 h-4 w-4" />
-                Editar nombre
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEditDescription(variable)} className="cursor-pointer">
-                <FileText className="mr-2 h-4 w-4" />
-                {variable.description ? "Editar descripción" : "Añadir descripción"}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onDeleteClick(variable.id)}
-                className="text-red-400 focus:text-red-400 cursor-pointer"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-6 w-6 rounded-sm text-silver hover:bg-graphite hover:text-white">
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
+            <DropdownMenuItem onClick={() => onStartEditingName(variable)} className="cursor-pointer">
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar nombre
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEditDescription(variable)} className="cursor-pointer">
+              <FileText className="mr-2 h-4 w-4" />
+              {variable.description ? "Editar descripción" : "Añadir descripción"}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDeleteClick(variable.id)}
+              className="cursor-pointer text-danger-red focus:text-danger-red"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <AutoResizeTextarea
         ref={textareaRef}
         value={variable.value}
         onChange={(e) => onUpdateVariable(variable.id, e.target.value)}
-        className="mt-2 rounded-xl border-iron/55 bg-black/20 text-white custom-scrollbar focus-visible:ring-violet-pulse"
+        className="font-mono-tight mt-2 custom-scrollbar"
         minRows={2}
         maxRows={10}
         onFocus={onTextareaFocus}
       />
       {variable.description && (
-        <p className="mt-2 whitespace-pre-wrap text-xs italic text-silver">{variable.description}</p>
+        <p className="mt-2 whitespace-pre-wrap text-xs text-ash">{variable.description}</p>
       )}
     </div>
   )

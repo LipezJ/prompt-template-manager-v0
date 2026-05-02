@@ -76,7 +76,7 @@ export function PromptSetTabs({
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="flex items-center gap-px overflow-x-auto border-b border-iron/60 pb-px">
       {promptSets.map((set) => (
         <div key={set.id} className="shrink-0">
           {editingId === set.id ? (
@@ -86,37 +86,38 @@ export function PromptSetTabs({
               onChange={(e) => setEditingName(e.target.value)}
               onBlur={handleSaveEditing}
               onKeyDown={handleKeyDown}
-              className="h-9 w-44 rounded-2xl border-iron bg-deep-charcoal text-white focus-visible:ring-violet-pulse"
+              className="h-8 w-44"
             />
           ) : (
             <div className="flex items-center">
-              <Button
-                variant={activePromptSetId === set.id ? "default" : "outline"}
-                size="sm"
+              <button
+                type="button"
                 onClick={() => handleSelectPromptSet(set.id)}
                 className={cn(
-                  "h-9 rounded-l-2xl rounded-r-none border-r-0 px-4 pr-3",
+                  "app-focus relative h-9 px-3 text-sm transition",
                   activePromptSetId === set.id
-                    ? "border-violet-pulse bg-[rgba(107,87,255,0.28)] text-white hover:bg-[rgba(107,87,255,0.34)]"
-                    : "border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white",
+                    ? "text-white"
+                    : "text-silver hover:text-white",
                 )}
               >
                 {set.name}
-              </Button>
+                {activePromptSetId === set.id && (
+                  <span className="absolute bottom-0 left-0 right-0 h-px bg-electric-blue" />
+                )}
+              </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant={activePromptSetId === set.id ? "default" : "outline"}
-                    size="icon"
+                  <button
+                    type="button"
                     className={cn(
-                      "h-9 w-8 rounded-l-none rounded-r-2xl",
+                      "app-focus flex h-9 w-6 items-center justify-center transition",
                       activePromptSetId === set.id
-                        ? "border-violet-pulse bg-[rgba(107,87,255,0.28)] text-white hover:bg-[rgba(107,87,255,0.34)]"
-                        : "border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white",
+                        ? "text-silver hover:text-white"
+                        : "text-ash hover:text-white",
                     )}
                   >
                     <MoreVertical className="h-3.5 w-3.5" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="border-iron bg-deep-charcoal text-white">
                   <DropdownMenuItem onClick={() => handleStartEditing(set)} className="cursor-pointer">
@@ -126,7 +127,7 @@ export function PromptSetTabs({
                   {promptSets.length > 1 && (
                     <DropdownMenuItem
                       onClick={() => handleDeleteClick(set.id)}
-                      className="text-red-400 focus:text-red-400 cursor-pointer"
+                      className="cursor-pointer text-danger-red focus:text-danger-red"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Eliminar

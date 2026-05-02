@@ -28,9 +28,9 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.error) return this.props.children
     return (
-      <div className="rounded-2xl border border-danger-red/70 bg-danger-red/10 p-4 text-sm text-white">
-        <p className="font-medium mb-2">{this.props.fallbackLabel ?? "Algo falló al renderizar este panel"}</p>
-        <p className="mb-3 break-all font-mono text-xs text-fog">{this.state.error.message}</p>
+      <div className="rounded-sm border border-danger-red/70 bg-danger-red/10 p-4 text-sm text-white">
+        <p className="mb-2 font-medium">{this.props.fallbackLabel ?? "Algo falló al renderizar este panel"}</p>
+        <p className="font-mono-tight mb-3 break-all text-xs text-fog">{this.state.error.message}</p>
         <Button size="sm" variant="outline" onClick={this.reset}>
           Reintentar
         </Button>

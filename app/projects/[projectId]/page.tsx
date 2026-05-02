@@ -106,7 +106,7 @@ export default function ProjectPage() {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 py-6 lg:px-8">
         {ready && currentProject && (
           <>
-            <section className="relative overflow-hidden rounded-3xl border border-magenta-glow/70 bg-[linear-gradient(130deg,rgba(90,31,208,0.34)_10%,rgba(46,16,106,0)_70%)] p-4 md:p-6">
+            <section className="relative overflow-hidden border-b border-iron/60 pb-6">
               <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
                 <ProjectHeader
                   project={currentProject}
@@ -157,19 +157,5 @@ export default function ProjectPage() {
         onImport={handleImportPromptSet}
       />
     </AppShell>
-  )
-}
-
-function SummaryTile({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
-  return (
-    <div className="app-card-subtle flex items-center gap-4 p-5">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[rgba(107,87,255,0.24)] text-electric-blue">
-        {icon}
-      </div>
-      <div>
-        <p className="text-sm text-fog">{label}</p>
-        <p className="text-2xl font-semibold leading-tight text-white">{value}</p>
-      </div>
-    </div>
   )
 }

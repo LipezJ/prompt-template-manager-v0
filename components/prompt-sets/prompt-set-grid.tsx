@@ -69,10 +69,10 @@ export function PromptSetGrid({
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-neon-pink">Coleccion</p>
-          <h2 className="text-2xl font-semibold text-white">Conjuntos de Prompts</h2>
+      <div className="flex flex-col gap-3 border-b border-iron/60 pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <span className="text-eyebrow">Coleccion</span>
+          <h2 className="font-serif-display text-xl leading-tight text-electric-blue">Conjuntos de Prompts</h2>
         </div>
         <div className="flex items-center gap-2">
           <EditModeToggle isEditMode={isEditMode} onToggle={onToggleEditMode} />
@@ -81,13 +81,8 @@ export function PromptSetGrid({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={onImportClick}
-                      className="h-9 w-9 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
-                    >
-                      <Upload className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={onImportClick} className="h-8 w-8">
+                      <Upload className="h-3.5 w-3.5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -98,13 +93,8 @@ export function PromptSetGrid({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={onAddPromptSet}
-                      className="h-9 w-9 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
-                    >
-                      <PlusIcon className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={onAddPromptSet} className="h-8 w-8">
+                      <PlusIcon className="h-3.5 w-3.5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -124,7 +114,7 @@ export function PromptSetGrid({
         onDragEnd={handleDragEnd}
         accessibility={{ announcements: dndAnnouncements }}
       >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           <SortableContext items={project.promptSets.map((s) => s.id)} strategy={rectSortingStrategy}>
             {project.promptSets.map((promptSet) => (
               <PromptSetItem
@@ -144,25 +134,25 @@ export function PromptSetGrid({
 
           {!isEditMode && (
             <button
+              type="button"
               onClick={onAddPromptSet}
-              className="app-focus app-card-subtle flex min-h-40 flex-col items-center justify-center border-dashed p-5 text-center transition hover:border-violet-pulse hover:bg-[rgba(90,31,208,0.18)]"
+              className="app-focus group flex flex-col items-start gap-0.5 rounded-sm border border-dashed border-iron bg-deep-charcoal/40 p-2.5 text-left transition hover:border-electric-blue/50 hover:bg-graphite/60"
             >
-              <PlusIcon className="mb-2 h-5 w-5 text-electric-blue" />
-              <span className="text-sm font-medium text-white">Nuevo Conjunto</span>
+              <p className="truncate text-sm text-white group-hover:text-amethyst">+ Nuevo conjunto</p>
+              <p className="w-[95%] truncate text-[.75rem] text-silver">Crear un nuevo set de prompts.</p>
+              <p className="min-h-4.5 truncate text-[.75rem] text-ash">Local</p>
             </button>
           )}
         </div>
 
         <DragOverlay>
           {activeId ? (
-            <div className="app-card-subtle p-4 opacity-90">
-              <div className="flex items-start gap-3">
-                <FileTextIcon className="mt-0.5 h-4 w-4 text-electric-blue" />
-                <div>
-                  <h3 className="text-sm font-medium text-white">
-                    {project.promptSets.find((s) => s.id === activeId)?.name}
-                  </h3>
-                </div>
+            <div className="app-card p-4 opacity-95">
+              <div className="flex items-center gap-2.5">
+                <FileTextIcon className="h-4 w-4 text-electric-blue" />
+                <h3 className="truncate text-sm font-medium text-white">
+                  {project.promptSets.find((s) => s.id === activeId)?.name}
+                </h3>
               </div>
             </div>
           ) : null}

@@ -4,7 +4,7 @@ import type React from "react"
 import Link from "next/link"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Download, GripVertical, MoreVertical, Pin, Trash2 } from "lucide-react"
+import { Download, FileTextIcon, GripVertical, MoreVertical, Pin, Trash2 } from "lucide-react"
 import type { Project } from "@/types/prompt"
 import { Button } from "@/components/ui/button"
 import {
@@ -58,7 +58,7 @@ export function ProjectItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "app-card-subtle group relative min-h-44 overflow-hidden p-5 transition hover:border-violet-pulse/80 hover:bg-[rgba(90,31,208,0.16)]",
+        "hover-clone group relative cursor-pointer rounded-sm border border-iron/60 bg-deep-charcoal p-2.5 transition [box-shadow:hsl(218,_13%,_70%,_0.08)_0_-2px_0_0_inset] hover:border-amethyst/50",
         isDragging && "opacity-70",
       )}
     >
@@ -66,32 +66,36 @@ export function ProjectItem({
         <button
           type="button"
           aria-label={`Reordenar proyecto: ${project.name}`}
-          className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-10 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
+          className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-6 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
           {...attributes}
           {...listeners}
         >
-          <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
+          <GripVertical aria-hidden="true" className="h-3.5 w-3.5 text-ash" />
         </button>
       )}
-      {project.pinned && (
-        <span className="pointer-events-none absolute left-3 top-3 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-violet-pulse text-white">
-          <Pin aria-hidden="true" className="h-3 w-3" />
-        </span>
-      )}
-      <Link href={`/projects/${project.id}`} className={`app-focus block ${isEditMode ? "pointer-events-none pl-8" : ""}`}>
-        <div className="mb-8 flex items-start gap-3 pr-8">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[rgba(107,87,255,0.22)]">
-            <ProjectIcon aria-hidden="true" className="h-5 w-5 text-amethyst" />
-          </div>
+      <Link
+        href={`/projects/${project.id}`}
+        className={cn("app-focus flex flex-col items-start gap-0.5", isEditMode && "pointer-events-none pl-5")}
+      >
+        <div className="flex w-full items-center justify-between gap-2 pr-5">
+          <p className="truncate text-left text-sm text-white group-hover:text-amethyst">
+            {project.name}
+          </p>
+          <p className="flex shrink-0 items-center gap-1.5 text-xs text-silver mr-2">
+            <FileTextIcon aria-hidden="true" className="size-3" />
+            {project.promptSets.reduce((sum, set) => sum + set.prompts.length, 0)}
+          </p>
         </div>
-        <h2 className="truncate text-lg font-semibold text-white">{project.name}</h2>
-        <div className="mt-3 flex items-center gap-2 text-xs text-fog">
-          <span className="rounded-md bg-[rgba(107,87,255,0.48)] px-2 py-1 text-white">
-            {project.promptSets.length} set{project.promptSets.length !== 1 ? "s" : ""}
-          </span>
-          <span>
-            {project.promptSets.reduce((sum, set) => sum + set.prompts.length, 0)} prompts
-          </span>
+        <p className="w-[95%] truncate text-left text-[.75rem] text-silver">
+          {project.promptSets.length} conjunto{project.promptSets.length !== 1 ? "s" : ""} de prompts
+        </p>
+        <div className="flex min-h-4.5 max-w-full items-center gap-1 text-[.75rem] text-ash">
+          {project.pinned ? (
+            <Pin aria-hidden="true" className="size-3 text-electric-blue" />
+          ) : (
+            <ProjectIcon aria-hidden="true" className="size-3 text-silver" />
+          )}
+          <p className="truncate">{project.pinned ? "Fijado" : "Local"}</p>
         </div>
       </Link>
       <div className="absolute top-2 right-2">
@@ -100,10 +104,10 @@ export function ProjectItem({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
+              className="h-6 w-6 rounded-sm text-silver hover:bg-graphite hover:text-white"
               onClick={handleProjectOptions}
             >
-              <MoreVertical className="h-4 w-4" />
+              <MoreVertical className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="z-50 w-64 border-iron bg-deep-charcoal text-white">
@@ -114,7 +118,7 @@ export function ProjectItem({
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={(e) => onDeleteClick(e, project.id)}
-              className="text-red-400 focus:text-red-400 cursor-pointer"
+              className="cursor-pointer text-danger-red focus:text-danger-red"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Eliminar proyecto

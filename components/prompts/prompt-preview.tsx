@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { replaceVariables } from "@/lib/prompt-utils"
+import { cn } from "@/lib/utils"
 
 interface PromptPreviewProps {
   prompt: Prompt
@@ -100,31 +101,26 @@ export function PromptPreview({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="border-b border-iron/45 py-4 last:border-b-0">
+    <div ref={setNodeRef} style={style} className="border-b border-iron/60 py-4 last:border-b-0">
       {isEditing ? (
         <div className="space-y-2">
           <AutoResizeTextarea
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="rounded-xl border-iron/55 bg-black/20 text-white custom-scrollbar focus-visible:ring-violet-pulse"
+            className="font-mono-tight custom-scrollbar"
             minRows={3}
             maxRows={20}
             onFocus={handleTextareaFocus}
           />
           <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCancel}
-              className="h-9 w-9 rounded-2xl border-iron bg-black/20 text-fog hover:bg-graphite hover:text-white"
-            >
+            <Button variant="outline" size="icon" onClick={handleCancel} className="h-8 w-8">
               <span className="sr-only">Cancelar</span>
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </Button>
-            <Button size="icon" onClick={handleSave} className="h-9 w-9 rounded-2xl bg-white text-deep-charcoal hover:bg-fog">
+            <Button size="icon" onClick={handleSave} className="h-8 w-8">
               <span className="sr-only">Guardar</span>
-              <Check className="h-4 w-4" />
+              <Check className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
@@ -135,16 +131,16 @@ export function PromptPreview({
               <button
                 type="button"
                 aria-label="Reordenar prompt"
-                className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-8 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
+                className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-7 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
                 {...attributes}
                 {...listeners}
               >
-                <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
+                <GripVertical aria-hidden="true" className="h-4 w-4 text-ash" />
               </button>
             )}
             <pre
-              className={`min-h-24 max-h-75 cursor-pointer overflow-y-auto whitespace-pre-wrap rounded-xl bg-black/25 p-3 pr-10 text-sm text-fog custom-scrollbar ${
-                isEditMode ? "pl-10" : ""
+              className={`font-mono-tight min-h-24 max-h-75 cursor-pointer overflow-y-auto whitespace-pre-wrap rounded-sm border border-iron bg-graphite p-2.5 pr-9 text-xs text-fog transition hover:border-electric-blue/50 custom-scrollbar ${
+                isEditMode ? "pl-9" : ""
               }`}
               onClick={!isEditMode ? handleEdit : undefined}
             >
@@ -153,7 +149,7 @@ export function PromptPreview({
             <div className="absolute top-1 right-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-xl text-silver hover:bg-graphite/70 hover:text-white">
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-sm text-silver hover:bg-graphite hover:text-white">
                     <MoreVertical className="h-3.5 w-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -168,7 +164,7 @@ export function PromptPreview({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
-                    className="text-red-400 focus:text-red-400 cursor-pointer"
+                    className="cursor-pointer text-danger-red focus:text-danger-red"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Eliminar
@@ -180,7 +176,7 @@ export function PromptPreview({
           {(prompt.description || !isEditMode) && (
             <div className="flex items-start justify-between gap-2">
               {prompt.description ? (
-                <p className="min-w-0 flex-1 whitespace-pre-wrap text-xs italic text-silver">
+                <p className="min-w-0 flex-1 whitespace-pre-wrap text-xs text-ash">
                   {prompt.description}
                 </p>
               ) : (
@@ -192,16 +188,16 @@ export function PromptPreview({
                     variant="outline"
                     size="icon"
                     onClick={togglePreview}
-                    className={`h-9 w-9 rounded-2xl border-iron bg-black/20 text-fog hover:bg-graphite hover:text-white ${isPreviewMode ? "ring-2 ring-violet-pulse" : ""}`}
+                    className={cn("h-8 w-8", isPreviewMode && "border-electric-blue text-white")}
                   >
-                    <EyeIcon className="h-4 w-4" />
+                    <EyeIcon className="h-3.5 w-3.5" />
                     <span className="sr-only">Preview</span>
                   </Button>
                   <TooltipProvider>
                     <Tooltip open={copied}>
                       <TooltipTrigger asChild>
-                        <Button size="icon" onClick={handleCopy} className="h-9 w-9 rounded-2xl bg-deep-violet text-electric-blue hover:bg-violet-pulse hover:text-white">
-                          <CopyIcon className="h-4 w-4" />
+                        <Button size="icon" onClick={handleCopy} className="h-8 w-8">
+                          <CopyIcon className="h-3.5 w-3.5" />
                           <span className="sr-only">Copy</span>
                         </Button>
                       </TooltipTrigger>

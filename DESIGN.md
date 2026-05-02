@@ -1,242 +1,214 @@
-# JetBrains — Style Reference
-> Neon nebula on obsidian — a black-ground page where violet-blue gradients bloom upward like deep-space imagery, punctuated by hot-pink neon and per-product chromatic icon light.
+# Zed — Style Reference
+> precision-engineered dark mode text editor
 
-**Theme:** dark
+**Theme:** light
 
-JetBrains' site feels like the interior of a deep-space control room — pure black (#000000) ground plane with electric violet-to-blue gradients erupting from the darkness like bioluminescent nebulae. The defining moves are the chromatic product icon ecosystem (each IDE gets a vivid multicolor badge) floating against near-black surfaces, and the blue radial glow (rgba(0,71,253,0.8) at 75% opacity) diffused behind hero content like a spotlight on a dark stage. Headlines at 72-79px use JetBrains Sans weight 600 with tight letter-spacing, while the hot-pink accent (#f31199, CSS var --main-page-pink) fires only on category labels and brand moments — a neon sign in a dark corridor. Cards use 24px radius with translucent violet or pink fills (rgba(90,31,208,0.3), rgba(243,17,180,0.2)) that glow rather than separate.
+Zed's visual design evokes the quiet confidence of precision engineering, much like a well-crafted mechanical keyboard. A primary palette of cool blues and grays, accented by vibrant UI indicators, creates a focused, high-performance atmosphere. The interplay of crisp, small typography and generous negative space ensures clarity, allowing the powerful functionality of the editor to take center stage.
 
 ## Tokens — Colors
 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
-| Obsidian Ground | `#000000` | `--color-obsidian-ground` | Page background — the absolute black base all gradients and glows emerge from |
-| Deep Charcoal | `#19191c` | `--color-deep-charcoal` | Nav bar background, footer, elevated surface one step above absolute black |
-| Graphite | `#343434` | `--color-graphite` | Most-used color on site; borders, dividers, muted icon strokes, body text secondary contexts |
-| Iron | `#474749` | `--color-iron` | Subtle borders, inactive state outlines |
-| Ash | `#757577` | `--color-ash` | Card borders, inactive dividers |
-| Slate | `#8c8c8` | `--color-slate` | Secondary body text, muted icon fills |
-| Silver | `#a3a3a4` | `--color-silver` | Tertiary icons, ghost button labels, disabled states |
-| Fog | `#bababb` | `--color-fog` | Body text on dark backgrounds, list items, secondary link labels |
-| Pure White | `#ffffff` | `--color-pure-white` | Primary headings, button labels on dark, high-emphasis body text |
-| Electric Blue | `#18a3fa` | `--color-electric-blue` | Primary link color, info badges, active state highlights — the most-used chromatic color site-wide, giving the dark UI its cool electric temperature |
-| Violet Pulse | `#7b61ff` | `--color-violet-pulse` | Button borders, badge backgrounds, primary CTA outlines — the core violet brand hue from the JetBrains logo |
-| Iris | `#6b57ff` | `--color-iris` | Badge fills, body accent — slightly darker violet variant for surfaces needing more saturation |
-| Amethyst | `#8473ff` | `--color-amethyst` | Heading accent color, primary dark-theme color token (--rs-color-primary-dark-theme) |
-| Deep Violet | `#2e106a` | `--color-deep-violet` | CTA button background — deep space purple that pairs with Electric Blue (#18a3fa) text for a neon-on-void feel |
-| Neon Pink | `#f31199` | `--color-neon-pink` | Category labels ('For businesses', 'For developers'), brand highlight moments — the signature hot-pink neon that fires sparingly against black like a neon sign (--main-page-pink) |
-| Magenta Glow | `#5a1fd0` | `--color-magenta-glow` | Gradient start color for violet nebula gradient, card border accents |
-| Nebula Violet | `linear-gradient(130deg, rgb(90, 31, 208) 10%, rgba(46, 16, 106, 0) 70%)` | `--color-nebula-violet` | Hero gradient bloom origin |
-| Aurora Teal | `linear-gradient(90deg, rgb(8, 222, 170) -12.99%, rgb(0, 170, 250) 176.77%)` | `--color-aurora-teal` | Section accent headings, icon fills, gradient stop — teal-to-blue gradient used on feature callouts |
-| Hero Blue Glow | `radial-gradient(87.36% 97.44% at 54.14% 23.32%, rgba(0, 71, 253, 0.8) 0px, rgba(0, 71, 253, 0.8) 15%, rgba(0, 0, 0, 0) 75%)` | `--color-hero-blue-glow` | Radial glow behind hero content — the deep blue spotlight effect that dominates the first viewport |
-| Danger Red | `#f45c4a` | `--color-danger-red` | Error states, destructive actions (--rs-color-danger) |
-| Success Green | `#4dbb5f` | `--color-success-green` | Success states (--rs-color-success) |
-| Warning Amber | `#f3c033` | `--color-warning-amber` | Warning states (--rs-color-warning) |
+| Midnight Blue | `#1348dc` | `--color-midnight-blue` | Primary brand color for prominent headings, active links, and key interactive elements. Conveys a sense of depth and authority. |
+| Sky Blue | `#2b7fff` | `--color-sky-blue` | Illustrative fill and stroke color, often seen in abstract graphics or larger UI elements. Provides a brighter contrast to Midnight Blue. |
+| Deep Harbor | `#464b57` | `--color-deep-harbor` | Dark primary text, button text on lighter backgrounds, and subtle borders. Forms the backbone of the typographic hierarchy. |
+| Iceberg Blue | `#8ec5ff` | `--color-iceberg-blue` | Button states, secondary accents, and illustrative fills. Provides a lighter, more interactive shade of blue. |
+| Pale Arctic | `#bedbff` | `--color-pale-arctic` | Subtle borders and background tints for UI elements, offering a very light blue accent. |
+| Cerulean Haze | `#74ade8` | `--color-cerulean-haze` | Secondary text in body, icons, and less prominent interactive states. A mid-tone blue that supports the primary brand colors. |
+| Carbon Gray | `#5d636f` | `--color-carbon-gray` | Subtle text, navigation items, and icon strokes. A darker gray for less prominent semantic information. |
+| Pine Green | `#a1c181` | `--color-pine-green` | Semantic positive indicators and specific body text highlights. Infrequent use provides impact. |
+| Rosewood Red | `#d07277` | `--color-rosewood-red` | Semantic warning or error indicators, and selected body text elements. Offers a warm contrast. |
+| Golden Ochre | `#dec184` | `--color-golden-ochre` | Amber accents for specific body text, icons, warning states, and occasional backgrounds. Reserved for highlights. |
+| Page Background | `#e5e7eb` | `--color-page-background` | Default page background. A very light, almost achromatic off-white providing a clean canvas. |
+| Off-Black Text | `#3a3d43` | `--color-off-black-text` | Primary body text color throughout the site. Provides clear contrast against lighter backgrounds. |
+| Medium Gray | `#b2b5bb` | `--color-medium-gray` | Secondary text, subtle borders, and less prominent buttons. A mid-tone gray for supporting information. |
+| Light Gray Border | `#cccfd3` | `--color-light-gray-border` | Subtle borders, dividers, and background tints for UI elements. Creates clear separation without harsh lines. |
+| White Surface | `#ffffff` | `--color-white-surface` | Card backgrounds, elevated UI surfaces, and some button fills. Provides maximum contrast and a clean modern feel. |
+| Dark Editor Surface | `#282c33` | `--color-dark-editor-surface` | Dark mode background for the embedded code editor. A very dark, almost black surface. |
+| Input Background | `#f4f4f2` | `--color-input-background` | Subtle background for input fields, providing slight differentiation from the page background. |
+| Dark Modal Background | `#2f343` | `--color-dark-modal-background` | Darker background for prominent interactive elements, like a modal or specific button states. |
+| Accent Blue Shadow | `#053794` | `--color-accent-blue-shadow` | Shadow color for subtle elevation, indicating interactive elements like navigation items. A darker, desaturated blue. |
 
 ## Tokens — Typography
 
-### JetBrains Sans — The single typeface for the entire site at all sizes and weights. 600 at 72-79px for hero headlines — unusual that even at this weight the custom letterSpacing tightening (-0.005em to -0.001em) keeps the large type dense and technical rather than editorial. Weight 300 appears at mid-sizes giving subheadings a lighter counterpoint to bold display text. JetBrains Sans is custom-designed — it carries optical metrics tuned for code-adjacent contexts, slightly wider than Inter at body sizes, with liga/calt features active that echo the IDE typographic environment. · `--font-jetbrains-sans`
-- **Substitute:** Inter, Plus Jakarta Sans
-- **Weights:** 300, 400, 500, 600
-- **Sizes:** 13px, 16px, 20px, 29px, 35px, 43px, 72px, 79px
-- **Line height:** 0.90–1.54 (tighter at larger sizes: 0.90 at display, 1.50–1.54 at body)
-- **Letter spacing:** -0.40px at large sizes (72-79px, -0.005em), -0.08px at mid sizes (29-43px, -0.001em), +0.032px at small sizes (16px, +0.002em), +0.065px at 13px (+0.005em)
-- **OpenType features:** `"calt", "kern", "liga"`
-- **Role:** The single typeface for the entire site at all sizes and weights. 600 at 72-79px for hero headlines — unusual that even at this weight the custom letterSpacing tightening (-0.005em to -0.001em) keeps the large type dense and technical rather than editorial. Weight 300 appears at mid-sizes giving subheadings a lighter counterpoint to bold display text. JetBrains Sans is custom-designed — it carries optical metrics tuned for code-adjacent contexts, slightly wider than Inter at body sizes, with liga/calt features active that echo the IDE typographic environment.
+### Writer — The primary font for body text, button labels, and general UI elements. Its relatively tight letter-spacing at all sizes enhances readability for dense code-editor-like content. · `--font-writer`
+- **Substitute:** Inter
+- **Weights:** 400
+- **Sizes:** 10px, 11px, 12px, 13px, 14px, 16px
+- **Line height:** 1.10, 1.33, 1.43, 1.50, 1.71
+- **Letter spacing:** -0.0250em
+- **Role:** The primary font for body text, button labels, and general UI elements. Its relatively tight letter-spacing at all sizes enhances readability for dense code-editor-like content.
+
+### Zed Mono — A monospaced font used for code blocks, input fields, and specific technical UI elements. Its wider letter-spacing provides clear distinction from the main body text, mimicking a terminal or editor environment. · `--font-zed-mono`
+- **Substitute:** IBM Plex Mono
+- **Weights:** 400
+- **Sizes:** 10px, 11px, 12px, 24px
+- **Line height:** 1.33, 1.50, 1.67, 2.00
+- **Letter spacing:** 0.0500em
+- **Role:** A monospaced font used for code blocks, input fields, and specific technical UI elements. Its wider letter-spacing provides clear distinction from the main body text, mimicking a terminal or editor environment.
+
+### Plex Serif — Primarily used for page headings and subheadings. The delicate weight 340 for larger sizes provides an elegant, approachable feel contrasting with the functional monospaced and sans-serif fonts, softening the overall technical aesthetic. · `--font-plex-serif`
+- **Substitute:** IBM Plex Serif
+- **Weights:** 340, 400
+- **Sizes:** 13px, 14px, 15px, 17px, 26px, 48px
+- **Line height:** 1.10, 1.20, 1.25, 1.43, 1.50
+- **Letter spacing:** -0.0200em
+- **Role:** Primarily used for page headings and subheadings. The delicate weight 340 for larger sizes provides an elegant, approachable feel contrasting with the functional monospaced and sans-serif fonts, softening the overall technical aesthetic.
+
+### ui-monospace — System monospaced font used for specific navigation or technical context where compact, crisp text is required. Its very tight letter-spacing prioritizes information density. · `--font-ui-monospace`
+- **Substitute:** Menlo
+- **Weights:** 400, 700
+- **Sizes:** 11px, 12px
+- **Line height:** 1.00, 1.33, 1.43
+- **Letter spacing:** -0.0320em
+- **Role:** System monospaced font used for specific navigation or technical context where compact, crisp text is required. Its very tight letter-spacing prioritizes information density.
 
 ### Type Scale
 
 | Role | Size | Line Height | Letter Spacing | Token |
 |------|------|-------------|----------------|-------|
-| caption | 13px | 1.2 | 0.065px | `--text-caption` |
-| body-sm | 16px | 1.5 | 0.032px | `--text-body-sm` |
-| body | 20px | 1.4 | — | `--text-body` |
-| subheading | 29px | 1.34 | -0.029px | `--text-subheading` |
-| heading-sm | 35px | 1.2 | -0.035px | `--text-heading-sm` |
-| heading | 43px | 1.14 | -0.043px | `--text-heading` |
-| heading-lg | 72px | 1 | -0.36px | `--text-heading-lg` |
-| display | 79px | 0.9 | -0.395px | `--text-display` |
+| caption | 10px | 1.1 | -0.25px | `--text-caption` |
+| heading | 26px | 1.25 | -0.52px | `--text-heading` |
+| display | 48px | 1.1 | -0.96px | `--text-display` |
 
 ## Tokens — Spacing & Shapes
 
-**Base unit:** 8px
-
-**Density:** comfortable
+**Density:** compact
 
 ### Spacing Scale
 
 | Name | Value | Token |
 |------|-------|-------|
+| 4 | 4px | `--spacing-4` |
+| 6 | 6px | `--spacing-6` |
 | 8 | 8px | `--spacing-8` |
+| 10 | 10px | `--spacing-10` |
+| 12 | 12px | `--spacing-12` |
+| 14 | 14px | `--spacing-14` |
 | 16 | 16px | `--spacing-16` |
+| 20 | 20px | `--spacing-20` |
 | 24 | 24px | `--spacing-24` |
 | 32 | 32px | `--spacing-32` |
+| 36 | 36px | `--spacing-36` |
+| 40 | 40px | `--spacing-40` |
 | 48 | 48px | `--spacing-48` |
-| 64 | 64px | `--spacing-64` |
-| 96 | 96px | `--spacing-96` |
-| 144 | 144px | `--spacing-144` |
-| 200 | 200px | `--spacing-200` |
+| 224 | 224px | `--spacing-224` |
 
 ### Border Radius
 
 | Element | Value |
 |---------|-------|
-| cards | 24px |
-| badges | 4-6px |
-| images | 16px |
-| modals | 24px |
-| buttons | 20-26px |
+| cards | 2px |
+| buttons | 2px |
+| default | 2px |
+
+### Shadows
+
+| Name | Value | Token |
+|------|-------|-------|
+| subtle | `rgba(111, 123, 144, 0.1) 0px -2px 0px 0px inset` | `--shadow-subtle` |
+| subtle-2 | `rgba(111, 123, 144, 0.05) 0px -2px 0px 0px inset` | `--shadow-subtle-2` |
+| subtle-3 | `rgb(5, 55, 148) 0px -2px 0px 0px inset, rgb(230, 239, 254...` | `--shadow-subtle-3` |
+| subtle-4 | `rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0p...` | `--shadow-subtle-4` |
+| md | `rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1)...` | `--shadow-md` |
 
 ### Layout
 
-- **Page max-width:** 1280px
-- **Section gap:** 80-120px
-- **Card padding:** 24px
-- **Element gap:** 8-16px
+- **Section gap:** 64px
 
 ## Components
 
-### Hero CTA Button — Primary Dark
-**Role:** Main call-to-action on hero sections
+### Primary Navigation Link
+**Role:** Interactive element in the main header.
 
-White fill (#ffffff), #19191c text, 26px border-radius (pill), 12px top/bottom padding, 32px left/right padding. JetBrains Sans 16px weight 500. Used for 'Choose Your IDE' — solid white stands out starkly against the dark gradient hero.
+Text in Writer font, weight 400, color Off-Black Text (#3a3d43). On hover, it shows a subtle bottom border or background change, occasionally with a box-shadow of rgb(5, 55, 148) 0px -2px 0px 0px inset, rgb(230, 239, 254) 0px 1px 3px 0px for active states.
 
-### CTA Button — Violet Deep
-**Role:** Secondary prominent CTA on feature cards
+### Secondary Ghost Button
+**Role:** Subtle call to action or supplementary action.
 
-Background #2e106a (Deep Violet), text #18a3fa (Electric Blue), border #7b61ff (Violet Pulse) 1px, 16px border-radius, 24px padding all sides. The neon-blue text on deep-violet background creates an illuminated button that reads like an active screen element inside the IDE itself.
+Text color rgb(0, 0, 0), no background, no border, with 4px border-radius. Padding of 0px top/bottom, 8px right, 10px left. Very subtle, almost link-like.
 
-### Ghost Button — White Outlined
-**Role:** Navigation links, secondary actions with text context
+### Brand Secondary Button (Light)
+**Role:** Prominent but not primary action.
 
-Background transparent, #ffffff text, 1px #ffffff border, 20px border-radius, 8px padding all sides. Used in nav contexts and as paired secondary to primary CTAs.
+Background color oklab(0.999994 0.0000455677 0.0000200868 / 0.6) (essentially a very light, desaturated blue), text color oklch(0.359228 0.010478 262.86) (a deep indigo-gray). 4px border-radius, 10px padding all around. Has a subtle oklch(0.852786 0.00594737 262.86) (light indigo-gray) top border.
 
-### Ghost Link Button — Borderless
-**Role:** Nav bar top-level items, inline text actions
+### Dark Code Block Button
+**Role:** Interactive elements within the dark-themed code editor preview.
 
-Background transparent, #ffffff text, no border (0px radius, 0px top/bottom padding, 10px left/right padding). Pure text with horizontal padding only — becomes a tab-style navigation element.
+Background color rgb(46, 52, 62) (a dark slate), text color rgb(220, 224, 229) (a light gray). 2px border-radius, no padding defined, indicating tight internal spacing or inherited context. Has a rgb(70, 75, 87) border.
 
-### Feature Announcement Card
-**Role:** Hero carousel cards for product announcements like 'JetBrains IDEs 2026.1'
+### Navigation Context Button (Dark Text)
+**Role:** Navigation or contextual actions within a darker UI section.
 
-Background transparent with 1px border #5a1fd0 (Magenta Glow / vivid violet), 24px radius, internal padding 24-64px. Contains product name at 29-35px weight 600, body at 16px #bababb, IDE icon grid at 32px, and a 3D/abstract gradient visual asset on the right half. The violet border glows against black.
+No background, text color rgb(220, 224, 229) (light gray). No border or padding, often takes on the appearance of a focused textual element within an interactive zone with a oklch(0.928 0.006 264.531) (pale indigo-gray) border.
 
-### Business Feature Card
-**Role:** Gradient content card for audience-segmented sections
+### Code Input Field
+**Role:** Used for user input in code-related contexts.
 
-Background linear-gradient(130deg, rgb(90,31,208) 10%, rgba(46,16,106,0) 70%) overlaid with organic blob shapes in deep red/purple, 24px radius, 64px padding. White headlines at 35-43px weight 600, #bababb body at 16px, white ghost pill button (26px radius, 32px horizontal padding). The gradient gives the impression of colored light bleeding from within.
+Transparent background, text color rgb(220, 224, 229) (light gray), no border. 0px border-radius, and 4px padding on all sides. Uses Zed Mono font for input.
 
-### Pink Tinted Feature Card
-**Role:** Highlight cards for specific product moments
+### Feature Card
+**Role:** Showcasing individual product features.
 
-Background rgba(243,17,180,0.2) (20% opacity Neon Pink), 24px radius, 23px padding. The translucent magenta tint reads as a glowing selection highlight against the dark ground.
+Card background is White Surface (#ffffff), with text in Off-Black Text (#3a3d43). Padding of 16px to 24px and a 2px border-radius. Features a subtle inset shadow rgba(111, 123, 144, 0.05) 0px -2px 0px 0px for visual depth. The content within has tight spacing, typically 6px row gap.
 
-### Violet Badge — Filled
-**Role:** Status labels like 'Now Live', 'Featured', 'Free for non-commercial use'
+### Code Editor Frame
+**Role:** Visual container for the embedded code editor preview.
 
-Background #6b57ff (Iris), #ffffff text, 4px radius, 1px top/bottom padding, 7px left/right padding, JetBrains Sans 13px weight 500. Sharp-cornered relative to other components — badges are the most rectangular element in the system.
-
-### Violet Badge — Tab Style
-**Role:** Contextual tab labels attached to card tops
-
-Background rgba(107,87,255,0.5) (50% opacity Violet Pulse), #ffffff text, border-radius 6px 6px 0px 0px (top-rounded only), 5px top/bottom padding, 11px left/right padding. The flat bottom connects visually to the card it labels.
-
-### IDE Product Icon Badge
-**Role:** Per-product identity marks in product grids and navigation
-
-32px square icons with each IDE's distinct multicolor gradient fill (no single token — each product has unique chromatic identity: IntelliJ IDEA uses orange/red/purple, PyCharm uses green/yellow, DataGrip uses teal/dark). Displayed on 16px radius containers. These are the primary chromatic diversity element of the system — the only place vivid orange (#ff8100), vivid green (#00d886), vivid yellow (#f0eb18) appear.
-
-### Navigation Bar
-**Role:** Top-level site navigation, always visible
-
-Full-width, 72px height, background #19191c (Deep Charcoal). JetBrains logo mark (multicolor cube icon) + 'JETBRAINS' wordmark in #ffffff weight 500 at 16px, left-aligned. Nav items (#ffffff, no border, 10px horizontal padding) centered. Utility icons (search, account, cart, language) right-aligned in #a3a3a4 at 20px. No border-bottom — the header floats above the hero gradient.
-
-### Carousel Pagination Control
-**Role:** Slide navigation for announcement cards
-
-Left/right arrow buttons with transparent background, 1px #474749 border, 20px radius, 8px padding. Counter text '1 / 2' in #bababb at 16px between arrows. Sits below card carousels, horizontally centered.
-
-### Audience Segmentation Tab Row
-**Role:** Segment switcher for 'For developers / For teams / For businesses'
-
-Horizontal pill-group container with transparent background, each segment as a ghost button (20px radius). Active segment uses 1px #7b61ff border, #ffffff text. Inactive segments have no border, #bababb text. The group appears as a floating pill selector centered in the content area.
+Background color Dark Editor Surface (#282c33). Features box-shadow rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px for a distinct elevated appearance. Interior content uses Zed Mono typography.
 
 ## Do's and Don'ts
 
 ### Do
-- Use #000000 as the absolute page background — never a near-black like #0a0a0a or #111; the true black is what makes the gradient glows feel luminous
-- Apply the radial blue glow (rgba(0,71,253,0.8) → transparent) behind hero content at ~87% width spread, centered on the content, so text appears spotlit from behind
-- Use Neon Pink (#f31199) only for category labels and brand punctuation — 1-3 instances per page maximum; it reads as a signal color, not a fill color
-- Set all card and feature panel border-radius to 24px; use 4px only for badges, never mix these on the same component
-- Use translucent fills for card backgrounds: rgba(90,31,208,0.3) for violet-tinted cards, rgba(243,17,180,0.2) for pink-tinted cards — never opaque colored fills
-- Apply JetBrains Sans with fontFeatureSettings '"calt", "kern", "liga"' active at all sizes, and apply negative letter-spacing (-0.005em) at display sizes 43px and above
-- Give each JetBrains product its own distinct multicolor icon — the chromatic icon grid is the primary visual diversity mechanism; do not apply a single brand color to all icons
+- Use Midnight Blue (#1348dc) for all primary calls to action, prominent links, and main interactive button states.
+- Employ the 2px border-radius consistently across all interactive elements, cards, and image containers, giving a subtle but unified crispness.
+- Maintain a clear visual hierarchy by utilizing Plex Serif weight 340 for major headings and Writer weight 400 for all body text.
+- Apply specific letter-spacing: -0.0250em for Writer font to optimize readability for dense UI, and 0.0500em for Zed Mono to distinguish code/technical text.
+- Use Page Background (#e5e7eb) as the canvas for most content sections, ensuring a clean and bright base.
+- Incorporate subtle inset box-shadows (e.g., rgba(111, 123, 144, 0.1) 0px -2px 0px 0px inset) on interactive elements or cards to create depth without heavy drop shadows.
+- Limit the use of saturated colors like Pine Green (#a1c181), Rosewood Red (#d07277), and Golden Ochre (#dec184) to semantic indicators or specific highlights to maximize their impact.
 
 ### Don't
-- Do not use #18a3fa (Electric Blue) as a fill color for buttons or large surfaces — it is a text/border/link color only; as a fill it would overpower the dark palette
-- Do not add box-shadows to cards — elevation is expressed through gradient fills and translucent backgrounds, never drop shadows
-- Do not use border-radius below 16px on interactive elements (buttons, cards); sharp-cornered shapes are reserved exclusively for badges (4-6px)
-- Do not place white text directly on the pure black background without a gradient zone or translucent card beneath for longer body text — use #bababb for body on raw black
-- Do not use Neon Pink (#f31199) as a background fill for large areas — its opacity 0.2 translucent form (rgba(243,17,180,0.2)) is the maximum surface application
-- Do not add a visible border-bottom to the navigation bar — the #19191c header transitions into the hero gradient without a line
-- Do not apply uniform icon color — product icons must retain their individual per-product chromatic gradient identity; monochromatic treatment breaks the identity system
-
-## Surfaces
-
-| Level | Name | Value | Purpose |
-|-------|------|-------|---------|
-| 0 | Void | `#000000` | Absolute page background — the black base from which all gradients emerge |
-| 1 | Deep Charcoal | `#19191c` | Navigation bar, footer — surfaces that need to sit above the background but below content cards |
-| 2 | Violet Glass | `#2e106a` | Translucent violet card fills (rgba(90,31,208,0.3)) — feature announcement cards, business section panels |
-| 3 | Pink Glass | `#45173a` | Translucent pink card fills (rgba(243,17,180,0.2)) — highlight feature cards for specific products |
-
-## Elevation
-
-Zero box-shadows anywhere on the site. Elevation and depth are created exclusively through gradient fills, translucent backgrounds with color tint (rgba violet/pink), and radial glow effects — not shadow casting. A card 'rises' because its colored translucent fill catches the light of the background gradient behind it, not because it casts a shadow below it. This approach keeps the dark theme feeling like illumination from within rather than objects floating above a surface.
+- Do not introduce strong drop shadows; rely on the subtle inset shadows or lighter elevated box-shadows.
+- Avoid large, ornate typography. The design prioritizes small, precise text with generous line heights over oversized headlines.
+- Do not use generic system fonts where custom fonts Writer, Zed Mono, or Plex Serif are specified, as their unique letter-spacing and weights are crucial to the brand identity.
+- Refrain from using heavily saturated background colors for content sections; stick to the neutral scale and slight blue tints.
+- Do not apply rounded corners greater than 2px to general UI elements, as this contradicts the overall crisp, engineered aesthetic.
+- Avoid cluttering layouts with excessive elements; maintain generous elementGap (6px, 10px, 12px) and sectionGap (64px) for clear information separation.
+- Do not use more than two saturated brand colors prominently in any single view, to keep the focus on clarity and code editor aesthetic.
 
 ## Imagery
 
-Heavy use of abstract 3D rendered data-mesh visuals — luminous wireframe surfaces in pink/purple/blue forming curved grid planes, as seen in the 'JetBrains IDEs 2026.1' announcement card. These renders have no photographic elements; they're pure light-on-dark mathematical geometry suggesting data structures or network topology. Product screenshots are treated as dark-themed UI mockups (the IDE itself shown with dark editor theme) with rounded 8-16px corners, embedded within dark card contexts rather than on white backgrounds. No lifestyle photography or people imagery visible. Icons are 32px product logos with individual per-product multicolor gradient fills — each is a distinct chromatic identity mark, not a unified icon set. The overall image language is code-and-compute: abstract renders + UI screenshots + chromatic product icons, with zero real-world photography.
+The site's visual language is a blend of product screenshots, user avatars, and abstract, geometric line-art illustrations. Product screenshots are typically high-fidelity captures of the Zed editor in a dark mode theme, shown in context or isolated as compelling visuals. They are often full-bleed or centrally placed, occupying significant visual real estate to showcase the UI. User avatars are small, circular, and appear in grids to convey community and social proof. Abstract illustrations are sparse, utilize thin linework, and soft blue fills (e.g., Sky Blue #2b7fff), serving a decorative atmospheric role without distracting from the UI. There's a notable absence of lifestyle photography. The overall density is balanced, with imagery serving as key focal points amidst text-heavy sections, acting as explanatory content and product showcase.
 
 ## Layout
 
-Full-bleed dark canvas with a max-width content container of ~1280px centered. Hero is full-viewport with centered headline text over a radial blue glow, with an IDE screenshot mockup below the fold. Section rhythm moves from the blue-glow hero → card carousel section (full-bleed black) → audience segmentation tabs with gradient feature panels → product grid sections. No alternating light/dark bands — the entire page stays on the dark black ground, with section separation achieved via gradient card backgrounds and spacing (80-120px between sections) rather than background color changes. The 'For businesses' section temporarily shifts to a near-black #19191c ground for contrast. Card grids use 2-column layouts for feature panels and 4-5 column grids for the IDE product icon array. Navigation is a fixed top bar at 72px with logo-left, nav-center, utilities-right structure.
-
-## Gradient System
-
-Five gradient roles operate on the site: (1) HERO GLOW — radial-gradient(87.36% 97.44% at 54.14% 23.32%, rgba(0,71,253,0.8) 0px, rgba(0,71,253,0.8) 15%, rgba(0,0,0,0) 75%) — the defining visual of the homepage, a blue spotlight over absolute black. (2) VIOLET NEBULA — linear-gradient(130deg, rgb(90,31,208) 10%, rgba(46,16,106,0) 70%) — used on announcement card backgrounds, creates directional light bloom. (3) AURORA SWEEP — linear-gradient(90deg, rgb(8,222,170) -12.99%, rgb(0,170,250) 176.77%) — teal-to-blue, used on feature callout headings and icon fills. (4) EMERALD FADE — linear-gradient(130deg, rgba(33,215,137,0.6) -10%, rgba(106,16,70,0) 80%) — green-to-void, used as secondary section accent. (5) PRODUCT ILLUSTRATION — complex teal-to-navy multi-stop gradient (linear-gradient(0deg, rgb(78,197,185) 2.53%, ... rgb(22,24,27) 99.4%)) used in specific product feature visuals. All gradients fade to transparent or near-black — none have hard stops on both ends.
+The page primarily uses a max-width contained layout, approximately 1200px, centered on a light Page Background (#e5e7eb). The hero section is centered with a prominent headline and call-to-action buttons. Content sections often alternate between wide, full-width blocks and narrower, centered content divisions. There's a consistent vertical rhythm, with sections separated by significant sectionGap (64px). Text-heavy sections frequently use a 2-column layout or a single centered column. Feature descriptions often employ a 3-column grid for overview. Embedded code editor previews are typically wide, visually striking blocks. The navigation is a sticky top bar with clearly defined interactive elements.
 
 ## Agent Prompt Guide
 
-QUICK COLOR REFERENCE:
-• Text (primary): #ffffff
-• Text (secondary): #bababb
-• Page background: #000000
-• Nav/footer surface: #19191c
-• CTA border/badge fill: #7b61ff
-• CTA button text: #18a3fa
-• CTA button background: #2e106a
-• Accent/category label: #f31199
-• Border (subtle): #474749
+### Quick Color Reference
+- **Text (Primary):** #3a3d43
+- **Background (Page):** #e5e7eb
+- **CTA (Primary):** #1348dc
+- **Border (Neutral):** #b2b5bb
+- **Accent (Semantic Red):** #d07277
 
-EXAMPLE COMPONENT PROMPTS:
-
-1. HERO SECTION: Black background (#000000) with centered radial glow (rgba(0,71,253,0.8) spreading to transparent over ~87% width). Headline 'Purpose-Built IDEs for Every Language and Stack' at 72px JetBrains Sans weight 600, #ffffff, letter-spacing -0.36px, line-height 1.0, centered. Subtext at 20px weight 400, #bababb, centered below. Two CTA buttons side by side: (a) White pill button — #ffffff bg, #19191c text, 26px radius, 12px/32px padding, 16px weight 500; (b) Ghost outline — transparent bg, #ffffff text, 1px #ffffff border, 20px radius, 8px padding.
-
-2. ANNOUNCEMENT CARD: Full-width card, 24px radius, 1px solid #5a1fd0 border, background linear-gradient(130deg, rgb(90,31,208) 10%, rgba(46,16,106,0) 70%). Left half: headline at 35px weight 600 #ffffff, badge 'Now Live' at 13px weight 500 #ffffff on #6b57ff bg 4px radius 7px padding. Product icon grid at 32px, labels at 13px #bababb. Right half: abstract 3D mesh illustration. Overall padding 24-64px.
-
-3. AUDIENCE TAB ROW: Horizontally centered pill selector, three tabs ('For developers' / 'For teams' / 'For businesses'). Each tab: JetBrains Sans 16px weight 400, 20px radius, 8px padding. Active state: 1px solid #7b61ff border, #ffffff text, transparent background. Inactive: no border, #bababb text.
-
-4. FEATURE CARD — PINK TINTED: 24px radius, background rgba(243,17,180,0.2), 23px padding all sides. Category label in #f31199 at 16px weight 500 above headline. Headline 29-35px weight 600 #ffffff. Body 16px #bababb. No border, no shadow.
-
-5. BADGE: Background #6b57ff, #ffffff text, 4px radius, 1px vertical padding, 7px horizontal padding, JetBrains Sans 13px weight 500, font-features calt/kern/liga active.
+### 3-5 Example Component Prompts
+1. **Create a hero section:** Background is Page Background (#e5e7eb). Centered headline 'Love your editor again' in Plex Serif, weight 340, size 48px, color Midnight Blue (#1348dc), letterSpacing -0.96px. Subtext 'Zed is a minimal code editor crafted for speed and collaboration with humans and AI.' in Writer, weight 400, size 16px, color Off-Black Text (#3a3d43), lineHeight 1.5.
+2. **Generate a primary button for download:** Background Midnight Blue (#1348dc), text 'Download now D' in Writer, weight 400, size 14px, color White Surface (#ffffff), with 4px border-radius, padding 10px 16px (top/bottom/left/right by inference).
+3. **Design a feature card:** Background White Surface (#ffffff), padding 16px all around, 2px border-radius. Apply subtle inset shadow rgba(111, 123, 144, 0.05) 0px -2px 0px 0px. Headline in Plex Serif, weight 400, size 26px, color Off-Black Text (#3a3d43), letterSpacing -0.52px. Body text in Writer, weight 400, size 14px, color Carbon Gray (#5d636f).
+4. **Create an embedded code editor preview section:** Background Dark Editor Surface (#282c33), with box-shadow rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px. Content uses Zed Mono, weight 400, size 12px, color rgb(220, 224, 229).
+5. **Build a navigation link:** Text 'Product' in Writer, weight 400, size 16px, color Off-Black Text (#3a3d43). On hover, display a subtle bottom border of Midnight Blue (#1348dc) 2px solid.
 
 ## Similar Brands
 
-- **GitHub** — Same black-ground dark theme with blue radial hero glow and product screenshot embedded in the hero
-- **Vercel** — Absolute black (#000) page background with white type and gradient accent cards — no shadows, gradient-as-elevation approach
-- **Linear** — Dark developer tool site with violet as primary brand accent color and pill-shaped navigation segmentation tabs
-- **Raycast** — Dark UI with translucent gradient card panels, chromatic icon ecosystem per product/extension, and black-void backgrounds
-- **Framer** — Abstract 3D mesh/grid visuals on dark backgrounds as primary hero imagery, with vivid accent gradients bleeding into pure black
+- **VS Code** — Developer tool with a focus on clean, functional UI, high contrast, and dark mode for code display, using minimal visual flourishes.
+- **Linear** — SaaS product for developers/teams featuring a minimalist design, strong typography, and a refined use of small radius and subtle shadows on interactive elements.
+- **Superhuman** — Productivity application with a clean, high-performance aesthetic, prioritizing information density and crisp typography with limited color accents.
+- **Vercel** — DevOps platform with a strong emphasis on dark mode UI, precise spacing, and subtle blue/gray color palettes for technical content presentation.
+- **Raycast** — Utility tool with an emphasis on speed and efficiency reflected in its UI, featuring a dark/light mode toggle with simple typography and minimal visual clutter, focusing on functional aesthetics.
 
 ## Quick Start
 
@@ -245,102 +217,84 @@ EXAMPLE COMPONENT PROMPTS:
 ```css
 :root {
   /* Colors */
-  --color-obsidian-ground: #000000;
-  --color-deep-charcoal: #19191c;
-  --color-graphite: #343434;
-  --color-iron: #474749;
-  --color-ash: #757577;
-  --color-slate: #8c8c8;
-  --color-silver: #a3a3a4;
-  --color-fog: #bababb;
-  --color-pure-white: #ffffff;
-  --color-electric-blue: #18a3fa;
-  --color-violet-pulse: #7b61ff;
-  --color-iris: #6b57ff;
-  --color-amethyst: #8473ff;
-  --color-deep-violet: #2e106a;
-  --color-neon-pink: #f31199;
-  --color-magenta-glow: #5a1fd0;
-  --color-nebula-violet: #5a1fd0;
-  --gradient-nebula-violet: linear-gradient(130deg, rgb(90, 31, 208) 10%, rgba(46, 16, 106, 0) 70%);
-  --color-aurora-teal: #08deaa;
-  --gradient-aurora-teal: linear-gradient(90deg, rgb(8, 222, 170) -12.99%, rgb(0, 170, 250) 176.77%);
-  --color-hero-blue-glow: #0047fd;
-  --gradient-hero-blue-glow: radial-gradient(87.36% 97.44% at 54.14% 23.32%, rgba(0, 71, 253, 0.8) 0px, rgba(0, 71, 253, 0.8) 15%, rgba(0, 0, 0, 0) 75%);
-  --color-danger-red: #f45c4a;
-  --color-success-green: #4dbb5f;
-  --color-warning-amber: #f3c033;
+  --color-midnight-blue: #1348dc;
+  --color-sky-blue: #2b7fff;
+  --color-deep-harbor: #464b57;
+  --color-iceberg-blue: #8ec5ff;
+  --color-pale-arctic: #bedbff;
+  --color-cerulean-haze: #74ade8;
+  --color-carbon-gray: #5d636f;
+  --color-pine-green: #a1c181;
+  --color-rosewood-red: #d07277;
+  --color-golden-ochre: #dec184;
+  --color-page-background: #e5e7eb;
+  --color-off-black-text: #3a3d43;
+  --color-medium-gray: #b2b5bb;
+  --color-light-gray-border: #cccfd3;
+  --color-white-surface: #ffffff;
+  --color-dark-editor-surface: #282c33;
+  --color-input-background: #f4f4f2;
+  --color-dark-modal-background: #2f343;
+  --color-accent-blue-shadow: #053794;
 
   /* Typography — Font Families */
-  --font-jetbrains-sans: 'JetBrains Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-writer: 'Writer', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-zed-mono: 'Zed Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-plex-serif: 'Plex Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-ui-monospace: 'ui-monospace', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Typography — Scale */
-  --text-caption: 13px;
-  --leading-caption: 1.2;
-  --tracking-caption: 0.065px;
-  --text-body-sm: 16px;
-  --leading-body-sm: 1.5;
-  --tracking-body-sm: 0.032px;
-  --text-body: 20px;
-  --leading-body: 1.4;
-  --text-subheading: 29px;
-  --leading-subheading: 1.34;
-  --tracking-subheading: -0.029px;
-  --text-heading-sm: 35px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.035px;
-  --text-heading: 43px;
-  --leading-heading: 1.14;
-  --tracking-heading: -0.043px;
-  --text-heading-lg: 72px;
-  --leading-heading-lg: 1;
-  --tracking-heading-lg: -0.36px;
-  --text-display: 79px;
-  --leading-display: 0.9;
-  --tracking-display: -0.395px;
+  --text-caption: 10px;
+  --leading-caption: 1.1;
+  --tracking-caption: -0.25px;
+  --text-heading: 26px;
+  --leading-heading: 1.25;
+  --tracking-heading: -0.52px;
+  --text-display: 48px;
+  --leading-display: 1.1;
+  --tracking-display: -0.96px;
 
   /* Typography — Weights */
-  --font-weight-light: 300;
+  --font-weight-w340: 340;
   --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* Spacing */
-  --spacing-unit: 8px;
+  --spacing-4: 4px;
+  --spacing-6: 6px;
   --spacing-8: 8px;
+  --spacing-10: 10px;
+  --spacing-12: 12px;
+  --spacing-14: 14px;
   --spacing-16: 16px;
+  --spacing-20: 20px;
   --spacing-24: 24px;
   --spacing-32: 32px;
+  --spacing-36: 36px;
+  --spacing-40: 40px;
   --spacing-48: 48px;
-  --spacing-64: 64px;
-  --spacing-96: 96px;
-  --spacing-144: 144px;
-  --spacing-200: 200px;
+  --spacing-224: 224px;
 
   /* Layout */
-  --page-max-width: 1280px;
-  --section-gap: 80-120px;
-  --card-padding: 24px;
-  --element-gap: 8-16px;
+  --section-gap: 64px;
 
   /* Border Radius */
-  --radius-md: 4px;
-  --radius-2xl: 16px;
-  --radius-2xl-2: 20px;
-  --radius-3xl: 24px;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-3xl: 32px;
+  --radius-3xl-2: 40px;
 
   /* Named Radii */
-  --radius-cards: 24px;
-  --radius-badges: 4-6px;
-  --radius-images: 16px;
-  --radius-modals: 24px;
-  --radius-buttons: 20-26px;
+  --radius-cards: 2px;
+  --radius-buttons: 2px;
+  --radius-default: 2px;
 
-  /* Surfaces */
-  --surface-void: #000000;
-  --surface-deep-charcoal: #19191c;
-  --surface-violet-glass: #2e106a;
-  --surface-pink-glass: #45173a;
+  /* Shadows */
+  --shadow-subtle: rgba(111, 123, 144, 0.1) 0px -2px 0px 0px inset;
+  --shadow-subtle-2: rgba(111, 123, 144, 0.05) 0px -2px 0px 0px inset;
+  --shadow-subtle-3: rgb(5, 55, 148) 0px -2px 0px 0px inset, rgb(230, 239, 254) 0px 1px 3px 0px;
+  --shadow-subtle-4: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+  --shadow-md: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
 }
 ```
 
@@ -349,72 +303,70 @@ EXAMPLE COMPONENT PROMPTS:
 ```css
 @theme {
   /* Colors */
-  --color-obsidian-ground: #000000;
-  --color-deep-charcoal: #19191c;
-  --color-graphite: #343434;
-  --color-iron: #474749;
-  --color-ash: #757577;
-  --color-slate: #8c8c8;
-  --color-silver: #a3a3a4;
-  --color-fog: #bababb;
-  --color-pure-white: #ffffff;
-  --color-electric-blue: #18a3fa;
-  --color-violet-pulse: #7b61ff;
-  --color-iris: #6b57ff;
-  --color-amethyst: #8473ff;
-  --color-deep-violet: #2e106a;
-  --color-neon-pink: #f31199;
-  --color-magenta-glow: #5a1fd0;
-  --color-nebula-violet: #5a1fd0;
-  --color-aurora-teal: #08deaa;
-  --color-hero-blue-glow: #0047fd;
-  --color-danger-red: #f45c4a;
-  --color-success-green: #4dbb5f;
-  --color-warning-amber: #f3c033;
+  --color-midnight-blue: #1348dc;
+  --color-sky-blue: #2b7fff;
+  --color-deep-harbor: #464b57;
+  --color-iceberg-blue: #8ec5ff;
+  --color-pale-arctic: #bedbff;
+  --color-cerulean-haze: #74ade8;
+  --color-carbon-gray: #5d636f;
+  --color-pine-green: #a1c181;
+  --color-rosewood-red: #d07277;
+  --color-golden-ochre: #dec184;
+  --color-page-background: #e5e7eb;
+  --color-off-black-text: #3a3d43;
+  --color-medium-gray: #b2b5bb;
+  --color-light-gray-border: #cccfd3;
+  --color-white-surface: #ffffff;
+  --color-dark-editor-surface: #282c33;
+  --color-input-background: #f4f4f2;
+  --color-dark-modal-background: #2f343;
+  --color-accent-blue-shadow: #053794;
 
   /* Typography */
-  --font-jetbrains-sans: 'JetBrains Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-writer: 'Writer', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-zed-mono: 'Zed Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-plex-serif: 'Plex Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-ui-monospace: 'ui-monospace', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Typography — Scale */
-  --text-caption: 13px;
-  --leading-caption: 1.2;
-  --tracking-caption: 0.065px;
-  --text-body-sm: 16px;
-  --leading-body-sm: 1.5;
-  --tracking-body-sm: 0.032px;
-  --text-body: 20px;
-  --leading-body: 1.4;
-  --text-subheading: 29px;
-  --leading-subheading: 1.34;
-  --tracking-subheading: -0.029px;
-  --text-heading-sm: 35px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.035px;
-  --text-heading: 43px;
-  --leading-heading: 1.14;
-  --tracking-heading: -0.043px;
-  --text-heading-lg: 72px;
-  --leading-heading-lg: 1;
-  --tracking-heading-lg: -0.36px;
-  --text-display: 79px;
-  --leading-display: 0.9;
-  --tracking-display: -0.395px;
+  --text-caption: 10px;
+  --leading-caption: 1.1;
+  --tracking-caption: -0.25px;
+  --text-heading: 26px;
+  --leading-heading: 1.25;
+  --tracking-heading: -0.52px;
+  --text-display: 48px;
+  --leading-display: 1.1;
+  --tracking-display: -0.96px;
 
   /* Spacing */
+  --spacing-4: 4px;
+  --spacing-6: 6px;
   --spacing-8: 8px;
+  --spacing-10: 10px;
+  --spacing-12: 12px;
+  --spacing-14: 14px;
   --spacing-16: 16px;
+  --spacing-20: 20px;
   --spacing-24: 24px;
   --spacing-32: 32px;
+  --spacing-36: 36px;
+  --spacing-40: 40px;
   --spacing-48: 48px;
-  --spacing-64: 64px;
-  --spacing-96: 96px;
-  --spacing-144: 144px;
-  --spacing-200: 200px;
+  --spacing-224: 224px;
 
   /* Border Radius */
-  --radius-md: 4px;
-  --radius-2xl: 16px;
-  --radius-2xl-2: 20px;
-  --radius-3xl: 24px;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-3xl: 32px;
+  --radius-3xl-2: 40px;
+
+  /* Shadows */
+  --shadow-subtle: rgba(111, 123, 144, 0.1) 0px -2px 0px 0px inset;
+  --shadow-subtle-2: rgba(111, 123, 144, 0.05) 0px -2px 0px 0px inset;
+  --shadow-subtle-3: rgb(5, 55, 148) 0px -2px 0px 0px inset, rgb(230, 239, 254) 0px 1px 3px 0px;
+  --shadow-subtle-4: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+  --shadow-md: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
 }
 ```

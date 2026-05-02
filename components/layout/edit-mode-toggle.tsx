@@ -20,10 +20,10 @@ export function EditModeToggle({ isEditMode, onToggle }: EditModeToggleProps) {
             onClick={onToggle}
             aria-label={isEditMode ? "Finalizar reordenamiento" : "Reordenar elementos"}
             aria-pressed={isEditMode}
-            className={`h-8 w-8 rounded-2xl ${
+            className={`h-8 w-8 ${
               isEditMode
-                ? "border-violet-pulse bg-[rgba(107,87,255,0.3)] text-white hover:bg-[rgba(107,87,255,0.4)]"
-                : "border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
+                ? "border-electric-blue bg-graphite text-white"
+                : ""
             }`}
           >
             <MoveIcon aria-hidden="true" className="h-3.5 w-3.5" />

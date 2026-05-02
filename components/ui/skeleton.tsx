@@ -2,7 +2,7 @@ import type React from "react"
 import { cn } from "@/lib/utils"
 
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("animate-pulse rounded-2xl bg-graphite/70", className)} {...props} />
+  return <div className={cn("animate-pulse rounded-sm bg-graphite/70", className)} {...props} />
 }
 
 export { Skeleton }

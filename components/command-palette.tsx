@@ -103,7 +103,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             value="ir a proyectos inicio"
             onSelect={() => runCommand(() => router.push("/"))}
           >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[rgba(24,163,250,0.16)] text-electric-blue">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-electric-blue">
               <Sparkles aria-hidden="true" className="h-4 w-4" />
             </span>
             <span className="text-white">Todos los proyectos</span>
@@ -121,21 +121,21 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   value={`proyecto ${project.name} ${project.id}`}
                   onSelect={() => runCommand(() => router.push(`/projects/${project.id}`))}
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[rgba(107,87,255,0.22)] text-amethyst">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-amethyst">
                     <Icon aria-hidden="true" className="h-4 w-4" />
                   </span>
-                  <span className="flex min-w-0 flex-col">
+                  <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-white">{project.name}</span>
                     <span className="text-xs text-silver">
                       {project.promptSets.length} set{project.promptSets.length !== 1 ? "s" : ""}
                     </span>
                   </span>
                   {project.pinned && (
-                    <span className="ml-auto rounded-md bg-[rgba(123,97,255,0.32)] px-1.5 py-0.5 text-[10px] font-medium text-white">
+                    <span className="rounded-sm border border-iron/70 bg-black/40 px-1.5 py-0.5 font-mono-tight text-[10px] text-electric-blue">
                       Fijado
                     </span>
                   )}
-                  <ArrowRight aria-hidden="true" className="ml-2 h-3.5 w-3.5 shrink-0 text-silver" />
+                  <ArrowRight aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-silver" />
                 </CommandItem>
               )
             })}
@@ -154,16 +154,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   )
                 }
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[rgba(24,163,250,0.16)] text-electric-blue">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-electric-blue">
                   <Layers3 aria-hidden="true" className="h-4 w-4" />
                 </span>
-                <span className="flex min-w-0 flex-col">
+                <span className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate text-white">{set.name}</span>
                   <span className="text-xs text-silver">
                     {set.prompts.length} prompt{set.prompts.length !== 1 ? "s" : ""} · {set.variables.length} variable{set.variables.length !== 1 ? "s" : ""}
                   </span>
                 </span>
-                <ArrowRight aria-hidden="true" className="ml-auto h-3.5 w-3.5 shrink-0 text-silver" />
+                <ArrowRight aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-silver" />
               </CommandItem>
             ))}
           </CommandGroup>
@@ -180,16 +180,17 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     runCommand(() => router.push(`/projects/${project.id}/prompt-sets?set=${set.id}`))
                   }
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[rgba(24,163,250,0.16)] text-electric-blue">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-electric-blue">
                     <Layers3 aria-hidden="true" className="h-4 w-4" />
                   </span>
-                  <span className="flex min-w-0 flex-col">
+                  <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-white">{set.name}</span>
                     <span className="flex items-center gap-1 text-xs text-silver">
                       <FolderKanban aria-hidden="true" className="h-3 w-3" />
                       <span className="truncate">{project.name}</span>
                     </span>
                   </span>
+                  <ArrowRight aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-silver" />
                 </CommandItem>
               )),
             )}
@@ -203,7 +204,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             value="crear nuevo proyecto"
             onSelect={() => runCommand(handleCreateProject)}
           >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[rgba(243,17,180,0.18)] text-neon-pink">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-electric-blue">
               <Plus aria-hidden="true" className="h-4 w-4" />
             </span>
             <span className="flex flex-col">
@@ -216,7 +217,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               value={`crear nuevo prompt set ${currentProject.name}`}
               onSelect={() => runCommand(() => handleCreatePromptSet(currentProject))}
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[rgba(123,97,255,0.22)] text-violet-pulse">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-iron/70 bg-black/40 text-violet-pulse">
                 <Plus aria-hidden="true" className="h-4 w-4" />
               </span>
               <span className="flex flex-col">

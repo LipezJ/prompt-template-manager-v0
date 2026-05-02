@@ -4,7 +4,7 @@ import type React from "react"
 import Link from "next/link"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Download, FileTextIcon, GripVertical, MoreVertical, Trash2 } from "lucide-react"
+import { BracesIcon, Download, FileTextIcon, GripVertical, MoreVertical, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -53,7 +53,7 @@ export function PromptSetItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "app-card-subtle group relative min-h-40 p-5 transition hover:border-violet-pulse/80 hover:bg-[rgba(90,31,208,0.16)]",
+        "hover-clone group relative cursor-pointer rounded-sm border border-iron/60 bg-deep-charcoal p-2.5 transition [box-shadow:hsl(218,_13%,_70%,_0.08)_0_-2px_0_0_inset] hover:border-amethyst/50",
         isDragging && "opacity-70",
       )}
     >
@@ -61,42 +61,45 @@ export function PromptSetItem({
         <button
           type="button"
           aria-label={`Reordenar conjunto: ${name}`}
-          className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-10 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
+          className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-6 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
           {...attributes}
           {...listeners}
         >
-          <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
+          <GripVertical aria-hidden="true" className="h-3.5 w-3.5 text-ash" />
         </button>
       )}
       <Link
         href={`/projects/${projectId}/prompt-sets?set=${promptSetId}`}
-        className={`app-focus block ${isEditMode ? "pointer-events-none pl-8" : ""}`}
+        className={cn("app-focus flex flex-col items-start gap-0.5", isEditMode && "pointer-events-none pl-5")}
       >
-        <div className="mb-8 flex items-start gap-3 pr-8">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[rgba(24,163,250,0.14)]">
-            <FileTextIcon className="h-4 w-4 text-electric-blue" />
-          </div>
+        <div className="flex w-full items-center justify-between gap-2 pr-5">
+          <p className="truncate text-left text-sm text-white group-hover:text-amethyst">{name}</p>
+          <p className="flex shrink-0 items-center gap-1.5 text-xs text-silver">
+            <FileTextIcon aria-hidden="true" className="size-3" />
+            {promptsCount}
+          </p>
         </div>
-        <h3 className="truncate text-base font-semibold text-white">{name}</h3>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-fog">
-          <span className="rounded-md bg-[rgba(107,87,255,0.48)] px-2 py-1 text-white">
-            {promptsCount} prompt{promptsCount !== 1 ? "s" : ""}
-          </span>
-          <span>
+        <p className="w-[95%] truncate text-left text-[.75rem] text-silver">
+          {promptsCount} prompt{promptsCount !== 1 ? "s" : ""} usando {variablesCount} variable
+          {variablesCount !== 1 ? "s" : ""}
+        </p>
+        <div className="flex min-h-4.5 max-w-full items-center gap-1 text-[.75rem] text-ash">
+          <BracesIcon aria-hidden="true" className="size-3 text-silver" />
+          <p className="truncate">
             {variablesCount} variable{variablesCount !== 1 ? "s" : ""}
-          </span>
+          </p>
         </div>
       </Link>
-      <div className="absolute top-2 right-2">
+      <div className="absolute top-2 right-2 opacity-0 transition group-hover:opacity-100">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
+              className="h-6 w-6 rounded-sm text-silver hover:bg-graphite hover:text-white"
               onClick={onOptionsClick}
             >
-              <MoreVertical className="h-4 w-4" />
+              <MoreVertical className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
@@ -106,7 +109,7 @@ export function PromptSetItem({
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDeleteClick(promptSetId)}
-              className="text-red-400 focus:text-red-400 cursor-pointer"
+              className="cursor-pointer text-danger-red focus:text-danger-red"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Eliminar

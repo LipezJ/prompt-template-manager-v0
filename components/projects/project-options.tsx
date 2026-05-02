@@ -49,7 +49,7 @@ export function ProjectIconPicker({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Buscar icono"
-          className="h-9 rounded-xl pl-9"
+          className="h-9 pl-9"
         />
       </div>
       <div className="grid max-h-64 grid-cols-5 gap-1 overflow-y-auto pr-1 custom-scrollbar">
@@ -60,8 +60,8 @@ export function ProjectIconPicker({
               key={option.name}
               type="button"
               className={cn(
-                "app-focus flex h-9 w-9 items-center justify-center rounded-xl text-fog transition hover:bg-graphite/70 hover:text-white",
-                selectedIconName === option.name && "bg-[rgba(107,87,255,0.4)] text-white",
+                "app-focus flex h-8 w-8 items-center justify-center rounded-sm text-fog transition hover:bg-graphite hover:text-white",
+                selectedIconName === option.name && "border border-electric-blue bg-graphite text-electric-blue",
               )}
               onClick={() => onSelect(option.name)}
               aria-label={`Usar icono ${option.label}`}

@@ -55,9 +55,9 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
             ref={setNodeRef}
             style={style}
             className={cn(
-              "relative h-52 cursor-pointer rounded-2xl border border-iron/60 bg-black/20 p-4 transition hover:border-violet-pulse/80 hover:bg-[rgba(90,31,208,0.14)]",
+              "relative h-52 cursor-pointer rounded-sm border border-iron bg-deep-charcoal p-3 transition hover:border-electric-blue/50 hover:bg-graphite",
               isDragging && "opacity-70",
-              copied && "border-electric-blue bg-[rgba(24,163,250,0.12)]",
+              copied && "border-electric-blue bg-graphite",
             )}
             onClick={handleClick}
           >
@@ -65,17 +65,17 @@ export function PromptCard({ prompt, variables, isEditMode = false, onOpenModal 
               <button
                 type="button"
                 aria-label="Reordenar prompt"
-                className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-8 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
+                className="app-focus absolute bottom-0 left-0 top-0 z-10 flex w-7 cursor-grab items-center justify-center border-0 bg-transparent active:cursor-grabbing"
                 {...attributes}
                 {...listeners}
               >
-                <GripVertical aria-hidden="true" className="h-5 w-5 text-silver" />
+                <GripVertical aria-hidden="true" className="h-4 w-4 text-ash" />
               </button>
             )}
-            <div className={`flex h-full flex-col overflow-auto p-1 custom-scrollbar ${isEditMode ? "ml-6" : ""}`}>
-              <pre className="flex-1 overflow-hidden whitespace-pre-wrap text-xs text-fog">{prompt.content}</pre>
+            <div className={cn("flex h-full flex-col overflow-auto custom-scrollbar", isEditMode && "ml-5")}>
+              <pre className="font-mono-tight flex-1 overflow-hidden whitespace-pre-wrap text-xs text-fog">{prompt.content}</pre>
               {prompt.description && (
-                <p className="mt-2 line-clamp-2 border-t border-iron/50 pt-2 text-[10px] italic text-silver">
+                <p className="mt-2 line-clamp-2 border-t border-iron/60 pt-2 text-[10px] text-ash">
                   {prompt.description}
                 </p>
               )}

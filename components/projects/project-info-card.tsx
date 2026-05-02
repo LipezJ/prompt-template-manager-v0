@@ -5,16 +5,16 @@ interface ProjectInfoCardProps {
 
 export function ProjectInfoCard({ name, promptSetsCount }: ProjectInfoCardProps) {
   return (
-    <div className="app-card-subtle mb-6 p-5">
-      <h2 className="text-lg font-semibold mb-3">Información del Proyecto</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <p className="text-sm text-fog">Nombre del Proyecto</p>
-          <p className="text-base">{name}</p>
+    <div className="mb-6 rounded-sm border border-iron bg-deep-charcoal p-4">
+      <h2 className="mb-3 text-eyebrow">Información del Proyecto</h2>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs text-ash">Nombre del Proyecto</p>
+          <p className="text-sm text-white">{name}</p>
         </div>
-        <div>
-          <p className="text-sm text-fog">Conjuntos de Prompts</p>
-          <p className="text-base">{promptSetsCount}</p>
+        <div className="flex flex-col gap-1">
+          <p className="text-xs text-ash">Conjuntos de Prompts</p>
+          <p className="font-mono-tight text-sm text-electric-blue">{promptSetsCount}</p>
         </div>
       </div>
     </div>

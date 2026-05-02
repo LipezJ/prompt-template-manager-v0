@@ -88,13 +88,13 @@ export function EditPromptModal({ isOpen, onClose, prompt, variables, onSave }: 
             />
           </div>
 
-          <div className="rounded-2xl border border-iron/70 bg-black/40 p-3">
-            <h4 className="mb-2 text-sm font-medium text-white">Variables disponibles:</h4>
-            <div className="flex flex-wrap gap-2">
+          <div className="rounded-sm border border-iron bg-graphite p-3">
+            <h4 className="mb-2 text-eyebrow">Variables disponibles</h4>
+            <div className="flex flex-wrap gap-1.5">
               {variables.map((variable) => (
                 <span
                   key={variable.id}
-                  className="cursor-pointer rounded-md bg-[rgba(107,87,255,0.4)] px-2 py-1 text-xs text-white hover:bg-[rgba(107,87,255,0.55)]"
+                  className="font-mono-tight cursor-pointer rounded-sm border border-iron bg-deep-charcoal px-2 py-1 text-[11px] text-electric-blue hover:border-electric-blue/60 hover:text-white"
                   onClick={() => {
                     if (textareaRef.current) {
                       const textarea = textareaRef.current

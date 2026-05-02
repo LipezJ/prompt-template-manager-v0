@@ -14,7 +14,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-deep-charcoal text-white",
+      "flex h-full w-full flex-col overflow-hidden rounded-md bg-deep-charcoal text-white",
       className,
     )}
     {...props}
@@ -39,7 +39,7 @@ const CommandDialog = ({
         className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
       />
       <DialogPrimitive.Content
-        className="fixed left-1/2 top-[18%] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-[24px] border border-magenta-glow/60 bg-deep-charcoal text-white shadow-[0_24px_80px_rgba(0,0,0,0.6)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+        className="fixed left-1/2 top-[18%] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-md border border-iron bg-deep-charcoal text-white shadow-[0_18px_60px_rgba(0,0,0,0.7)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
       >
         <DialogPrimitive.Title className="sr-only">{label}</DialogPrimitive.Title>
         <DialogPrimitive.Description className="sr-only">
@@ -60,12 +60,12 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center gap-2 border-b border-iron/60 px-4" cmdk-input-wrapper="">
-    <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-silver" />
+  <div className="flex items-center gap-2 border-b border-iron px-3" cmdk-input-wrapper="">
+    <Search aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-ash" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-12 w-full bg-transparent py-3 text-sm text-white outline-none placeholder:text-silver disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-11 w-full bg-transparent py-3 text-sm text-white outline-none placeholder:text-ash disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}
@@ -92,7 +92,7 @@ const CommandEmpty = React.forwardRef<
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className="py-6 text-center text-sm text-fog"
+    className="py-6 text-center text-sm text-ash"
     {...props}
   />
 ))
@@ -116,7 +116,7 @@ const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-iron/60", className)}
+    className={cn("-mx-1 my-1 h-px bg-iron", className)}
     {...props}
   />
 ))
@@ -129,7 +129,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-pointer select-none items-center gap-3 rounded-2xl px-3 py-2 text-sm text-fog outline-none transition-colors data-[selected=true]:bg-[rgba(123,97,255,0.22)] data-[selected=true]:text-white data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+      "relative flex cursor-pointer select-none items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-sm text-fog outline-none transition-colors data-[selected=true]:bg-graphite data-[selected=true]:text-white data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
       className,
     )}
     {...props}
@@ -140,7 +140,7 @@ CommandItem.displayName = CommandPrimitive.Item.displayName
 const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
     className={cn(
-      "ml-auto rounded-md border border-iron/70 bg-black/40 px-1.5 py-0.5 text-[10px] font-medium tracking-wider text-silver",
+      "ml-auto rounded-sm border border-iron/70 bg-black/40 px-1.5 py-0.5 font-mono-tight text-[10px] text-silver",
       className,
     )}
     {...props}

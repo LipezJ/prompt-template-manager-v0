@@ -79,24 +79,19 @@ export function VariablesEditor({
   }
 
   return (
-    <div className="app-card-subtle flex h-full min-h-0 flex-col p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium text-white">Variables</h3>
-          <p className="text-xs text-fog">{variables.length} en este set</p>
+    <div className="flex h-full min-h-0 flex-col rounded-sm border border-iron bg-deep-charcoal px-4 py-4">
+      <div className="flex items-center justify-between border-b border-iron/60 pb-3">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-eyebrow">Variables</span>
         </div>
         <div className="flex items-center gap-2">
+          <span className="font-mono-tight text-[11px] text-ash">{variables.length}</span>
           {onHidePanel && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onHidePanel}
-                    className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" onClick={onHidePanel} className="h-7 w-7">
+                    <ChevronLeft className="h-3.5 w-3.5" />
                     <span className="sr-only">Ocultar panel de variables</span>
                   </Button>
                 </TooltipTrigger>
@@ -108,21 +103,16 @@ export function VariablesEditor({
           )}
           {variables.length > 0 && (
             <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleClearAllClick}
-                  className="h-8 w-8 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
-                >
-                  <Eraser className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Vaciar todos los valores</p>
-              </TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" onClick={handleClearAllClick} className="h-7 w-7">
+                    <Eraser className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Vaciar todos los valores</p>
+                </TooltipContent>
+              </Tooltip>
             </TooltipProvider>
           )}
         </div>
@@ -152,13 +142,8 @@ export function VariablesEditor({
       </div>
       {!isEditMode && (
         <div className="sticky bottom-0 pt-3">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onAddVariable}
-            className="h-9 w-full rounded-2xl border-iron/70 bg-transparent text-fog hover:bg-graphite/40 hover:text-white"
-          >
-            <PlusIcon className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={onAddVariable} className="h-8 w-full">
+            <PlusIcon className="h-3.5 w-3.5" />
           </Button>
         </div>
       )}

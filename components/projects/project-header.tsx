@@ -64,12 +64,12 @@ export function ProjectHeader({
 
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-5 md:flex-row md:items-end md:justify-between">
-      <div className="flex min-w-0 items-start gap-4">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-magenta-glow/60 bg-[rgba(123,97,255,0.18)] text-electric-blue md:h-16 md:w-16">
-          <ProjectIcon aria-hidden="true" className="h-6 w-6 md:h-7 md:w-7" />
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-iron/60 bg-graphite text-electric-blue [box-shadow:hsl(218,_13%,_70%,_0.08)_0_-2px_0_0_inset] md:h-11 md:w-11">
+          <ProjectIcon aria-hidden="true" className="h-4 w-4 md:h-5 md:w-5" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-neon-pink">Proyecto</p>
+          <span className="text-eyebrow">Proyecto</span>
           {isEditingName ? (
             <Input
               ref={inputRef}
@@ -80,31 +80,31 @@ export function ProjectHeader({
                 if (e.key === "Enter") saveName()
                 if (e.key === "Escape") setIsEditingName(false)
               }}
-              className="h-12 w-full max-w-xl rounded-2xl border-iron bg-deep-charcoal text-lg font-semibold text-white focus-visible:ring-violet-pulse md:text-2xl"
+              className="h-10 w-full max-w-xl text-base"
             />
           ) : (
-            <h1 className="group flex min-w-0 items-center text-3xl font-semibold leading-tight text-white md:text-5xl">
+            <h1 className="font-serif-display group flex min-w-0 items-center text-2xl leading-tight text-electric-blue md:text-3xl">
               <span className="truncate">{project.name}</span>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={startEditing}
-                className="ml-2 h-9 w-9 shrink-0 rounded-2xl text-silver opacity-100 transition hover:bg-graphite/70 hover:text-white md:opacity-0 md:group-hover:opacity-100"
+                className="ml-2 h-7 w-7 shrink-0 text-silver opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-3.5 w-3.5" />
               </Button>
             </h1>
           )}
-          <p className="max-w-2xl text-sm leading-6 text-fog">
-            Dashboard operativo para revisar y abrir los conjuntos de prompts de este proyecto.
+          <p className="max-w-2xl text-sm leading-6 text-silver">
+            Revisa y abre los conjuntos de prompts de este proyecto.
           </p>
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-2xl text-silver hover:bg-graphite/70 hover:text-white">
-              <MoreVertical className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreVertical className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="z-50 border-iron bg-deep-charcoal text-white">
@@ -117,7 +117,7 @@ export function ProjectHeader({
               Editar nombre
             </DropdownMenuItem>
             {canDelete && (
-              <DropdownMenuItem onClick={onDelete} className="text-red-400 focus:text-red-400 cursor-pointer">
+              <DropdownMenuItem onClick={onDelete} className="cursor-pointer text-danger-red focus:text-danger-red">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Eliminar proyecto
               </DropdownMenuItem>

@@ -1,53 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@300;400;500&family=Inter:wght@400;500;600&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --color-obsidian-ground: #000000;
-  --color-deep-charcoal: #19191c;
-  --color-graphite: #343434;
-  --color-iron: #474749;
-  --color-ash: #757577;
-  --color-slate: #8c8c8c;
-  --color-silver: #a3a3a4;
-  --color-fog: #bababb;
+  /* Zed-inspired neutrals on a dark canvas. Names are kept stable for backwards compatibility. */
+  --color-obsidian-ground: #0d0f13;
+  --color-deep-charcoal: #14171c;
+  --color-graphite: #1c2027;
+  --color-iron: #2a2f37;
+  --color-ash: #5d636f;
+  --color-slate: #6f7682;
+  --color-silver: #b2b5bb;
+  --color-fog: #cccfd3;
   --color-pure-white: #ffffff;
-  --color-electric-blue: #18a3fa;
-  --color-violet-pulse: #7b61ff;
-  --color-iris: #6b57ff;
-  --color-amethyst: #8473ff;
-  --color-deep-violet: #2e106a;
-  --color-neon-pink: #f31199;
-  --color-magenta-glow: #5a1fd0;
-  --color-danger-red: #f45c4a;
-  --color-success-green: #4dbb5f;
-  --color-warning-amber: #f3c033;
-  --gradient-hero-blue-glow: radial-gradient(87.36% 97.44% at 54.14% 23.32%, rgba(0, 71, 253, 0.8) 0px, rgba(0, 71, 253, 0.8) 15%, rgba(0, 0, 0, 0) 75%);
-  --gradient-nebula-violet: linear-gradient(130deg, rgb(90, 31, 208) 10%, rgba(46, 16, 106, 0) 70%);
-  --gradient-aurora-teal: linear-gradient(90deg, rgb(8, 222, 170) -12.99%, rgb(0, 170, 250) 176.77%);
-  --font-jetbrains-sans: "JetBrains Sans", Inter, "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
-  --card: 240 6% 10%;
-  --card-foreground: 0 0% 100%;
-  --popover: 240 6% 10%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 0 0% 100%;
-  --primary-foreground: 240 6% 10%;
-  --secondary: 240 5% 20%;
-  --secondary-foreground: 0 0% 100%;
-  --muted: 240 5% 20%;
-  --muted-foreground: 240 1% 73%;
-  --accent: 250 100% 69%;
+  /* Accents: Zed blues replace the prior violet/magenta palette. */
+  --color-electric-blue: #2b7fff;
+  --color-violet-pulse: #74ade8;
+  --color-iris: #1348dc;
+  --color-amethyst: #8ec5ff;
+  --color-deep-violet: #053794;
+  --color-neon-pink: #2b7fff;
+  --color-magenta-glow: #1348dc;
+
+  /* Semantic colors. */
+  --color-danger-red: #d07277;
+  --color-success-green: #a1c181;
+  --color-warning-amber: #dec184;
+
+  /* Surface helpers. */
+  --color-page-background: #0d0f13;
+  --color-dark-editor-surface: #14171c;
+  --color-light-gray-border: #2a2f37;
+  --color-input-background: #181b21;
+
+  /* Card/icon hover ring + glow — kept for fallback. The "clone" effect below is preferred. */
+  --sh-alt: hsl(218, 13%, 70%, 0.08) 0 -2px 0 0 inset;
+
+  /* Soft glow used very sparingly behind the hero. Kept dim so nothing feels playful. */
+  --gradient-hero-blue-glow: radial-gradient(70% 70% at 54.14% 6%, rgba(43, 127, 255, 0.16) 0px, rgba(43, 127, 255, 0.06) 32%, rgba(0, 0, 0, 0) 70%);
+  --gradient-nebula-violet: linear-gradient(130deg, rgba(19, 72, 220, 0.18) 0%, rgba(19, 72, 220, 0) 70%);
+  --gradient-aurora-teal: linear-gradient(90deg, rgba(43, 127, 255, 0.6) -12.99%, rgba(116, 173, 232, 0.6) 176.77%);
+
+  --font-jetbrains-sans: "Inter", "Writer", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-plex-serif: "IBM Plex Serif", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-plex-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --background: 222 26% 7%;
+  --foreground: 218 13% 92%;
+  --card: 220 16% 9%;
+  --card-foreground: 218 13% 92%;
+  --popover: 220 16% 9%;
+  --popover-foreground: 218 13% 92%;
+  --primary: 218 13% 92%;
+  --primary-foreground: 220 16% 9%;
+  --secondary: 220 12% 14%;
+  --secondary-foreground: 218 13% 92%;
+  --muted: 220 12% 14%;
+  --muted-foreground: 218 5% 71%;
+  --accent: 217 100% 58%;
   --accent-foreground: 0 0% 100%;
-  --destructive: 7 88% 62%;
+  --destructive: 357 53% 64%;
   --destructive-foreground: 0 0% 100%;
-  --border: 240 1% 28%;
-  --input: 240 5% 20%;
-  --ring: 250 100% 69%;
-  --radius: 1.5rem;
+  --border: 220 11% 19%;
+  --input: 220 12% 12%;
+  --ring: 217 100% 58%;
+  --radius: 0.25rem;
   overflow: hidden;
 }
 
@@ -69,6 +89,8 @@
   --color-neon-pink: var(--color-neon-pink);
   --color-magenta-glow: var(--color-magenta-glow);
   --font-jetbrains-sans: var(--font-jetbrains-sans);
+  --font-plex-serif: var(--font-plex-serif);
+  --font-plex-mono: var(--font-plex-mono);
 
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -90,9 +112,13 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  /* Sharp, engineered radii. Tailwind names retained but flattened to 2-6px. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+  --radius-2xl: 4px;
+  --radius-3xl: 6px;
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -118,10 +144,23 @@
 body {
   font-family: var(--font-jetbrains-sans);
   font-feature-settings: "calt", "kern", "liga";
+  letter-spacing: -0.0125em;
 }
 
 @utility text-balance {
   text-wrap: balance;
+}
+
+@utility font-serif-display {
+  font-family: var(--font-plex-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+@utility font-mono-tight {
+  font-family: var(--font-plex-mono);
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 @layer base {
@@ -134,7 +173,6 @@ body {
   }
   body {
     @apply bg-obsidian-ground text-pure-white;
-    letter-spacing: 0;
   }
 
   button:not(:disabled),
@@ -144,7 +182,7 @@ body {
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(123, 97, 255, 0.45) rgba(25, 25, 28, 0.55);
+    scrollbar-color: rgba(116, 173, 232, 0.32) rgba(20, 23, 28, 0.6);
   }
 
   ::-webkit-scrollbar {
@@ -153,22 +191,22 @@ body {
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(25, 25, 28, 0.55);
-    border-radius: 4px;
+    background: rgba(20, 23, 28, 0.6);
+    border-radius: 2px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(123, 97, 255, 0.45);
-    border-radius: 4px;
+    background: rgba(116, 173, 232, 0.32);
+    border-radius: 2px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(24, 163, 250, 0.6);
+    background: rgba(43, 127, 255, 0.55);
   }
 
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(123, 97, 255, 0.45) rgba(25, 25, 28, 0.55);
+    scrollbar-color: rgba(116, 173, 232, 0.32) rgba(20, 23, 28, 0.6);
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -177,46 +215,53 @@ body {
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(25, 25, 28, 0.55);
-    border-radius: 3px;
+    background: rgba(20, 23, 28, 0.6);
+    border-radius: 2px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(123, 97, 255, 0.45);
-    border-radius: 3px;
+    background: rgba(116, 173, 232, 0.32);
+    border-radius: 2px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(24, 163, 250, 0.6);
+    background: rgba(43, 127, 255, 0.55);
   }
 }
 
 @layer components {
   .app-surface {
     background: var(--color-deep-charcoal);
-    border: 1px solid rgba(71, 71, 73, 0.72);
-    border-radius: 24px;
+    border: 1px solid rgba(42, 47, 55, 0.9);
+    border-radius: 4px;
   }
 
   .app-card {
-    background:
-      linear-gradient(130deg, rgba(90, 31, 208, 0.22) 0%, rgba(46, 16, 106, 0.04) 58%),
-      rgba(25, 25, 28, 0.86);
-    border: 1px solid rgba(90, 31, 208, 0.68);
-    border-radius: 24px;
+    background: rgba(20, 23, 28, 0.96);
+    border: 1px solid rgba(42, 47, 55, 0.95);
+    border-radius: 2px;
+    box-shadow: rgba(111, 123, 144, 0.05) 0px -2px 0px 0px inset;
+    transition: border-color 120ms ease, background-color 120ms ease;
+  }
+
+  .app-card:hover {
+    border-color: rgba(116, 173, 232, 0.45);
+    background: rgba(24, 28, 35, 1);
   }
 
   .app-card-subtle {
-    background: rgba(25, 25, 28, 0.78);
-    border: 1px solid rgba(71, 71, 73, 0.7);
-    border-radius: 24px;
+    background: rgba(20, 23, 28, 0.78);
+    border: 1px solid rgba(42, 47, 55, 0.7);
+    border-radius: 2px;
   }
 
   .app-pill {
-    border: 1px solid rgba(123, 97, 255, 0.72);
-    border-radius: 999px;
-    background: rgba(46, 16, 106, 0.58);
-    color: var(--color-electric-blue);
+    border: 1px solid rgba(42, 47, 55, 0.95);
+    border-radius: 4px;
+    background: rgba(20, 23, 28, 0.85);
+    color: var(--color-fog);
+    font-size: 12px;
+    letter-spacing: -0.01em;
   }
 
   .app-focus {
@@ -224,8 +269,74 @@ body {
   }
 
   .app-focus:focus-visible {
-    outline: 2px solid var(--color-violet-pulse);
+    outline: 1px solid var(--color-electric-blue);
     outline-offset: 2px;
   }
 
+  .text-display {
+    font-family: var(--font-plex-serif);
+    font-weight: 340;
+    letter-spacing: -0.02em;
+    color: var(--color-electric-blue);
+  }
+
+  .text-heading {
+    font-family: var(--font-plex-serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    color: var(--color-pure-white);
+  }
+
+  .text-eyebrow {
+    font-family: var(--font-plex-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-silver);
+  }
+
+  /* Card "clone" hover effect — a striped blue rectangle peeks out from behind the
+     element on hover, like a duplicate stamp offset to the bottom-right.
+     We use `clip-path` (not z-index) to mask the overlap with the parent so only the
+     L-shape sticking out is visible. This sidesteps stacking-context pitfalls: the
+     clone may paint above the parent, but the part covering it is clipped away. */
+  .hover-clone {
+    position: relative;
+  }
+
+  .hover-clone::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid hsl(219, 93%, 55%);
+    background: repeating-linear-gradient(
+      45deg,
+      hsl(219, 93%, 55%, 0.28) 0,
+      hsl(219, 93%, 55%, 0.28) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+    border-radius: inherit;
+    /* Keep only the bottom-right L-shape (right 6px strip + bottom 6px strip). The
+       rest of the clone — the part that would sit on top of the parent — is clipped. */
+    clip-path: polygon(
+      calc(100% - 6px) 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 calc(100% - 6px),
+      calc(100% - 6px) calc(100% - 6px)
+    );
+    transform: translate(0, 0);
+    opacity: 0;
+    transition:
+      transform 160ms ease,
+      opacity 160ms ease;
+    pointer-events: none;
+  }
+
+  .hover-clone:hover::before {
+    opacity: 1;
+    transform: translate(6px, 6px);
+  }
 }

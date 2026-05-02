@@ -97,14 +97,8 @@ export default function PromptSetsPage() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={exportActivePromptSet}
-                  disabled={!ready}
-                  className="h-8 w-8 shrink-0 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
-                >
-                  <Download className="h-4 w-4" />
+                <Button variant="outline" size="icon" onClick={exportActivePromptSet} disabled={!ready} className="h-8 w-8 shrink-0">
+                  <Download className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -116,7 +110,7 @@ export default function PromptSetsPage() {
       }
     >
       <div className="flex h-full min-h-0 flex-col">
-        <div className="shrink-0 border-b border-iron/45 bg-black/25 px-4 py-3">
+        <div className="shrink-0 bg-deep-charcoal/95 px-4">
           <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar">
             {ready && currentProject && (
               <PromptSetTabs
@@ -127,14 +121,8 @@ export default function PromptSetsPage() {
                 onDeletePromptSet={deletePromptSet}
               />
             )}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={addPromptSet}
-              disabled={!ready}
-              className="h-9 w-9 shrink-0 rounded-2xl border-iron bg-deep-charcoal text-fog hover:bg-graphite hover:text-white"
-            >
-              <PlusIcon className="h-4 w-4" />
+            <Button variant="ghost" size="icon" onClick={addPromptSet} disabled={!ready} className="h-8 w-8 shrink-0">
+              <PlusIcon className="h-3.5 w-3.5" />
               <span className="sr-only">Nuevo Conjunto</span>
             </Button>
           </div>
