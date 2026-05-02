@@ -1,7 +1,7 @@
 import { z } from "zod"
 import type { Project, PromptSet } from "@/types/prompt"
 
-export const VariableTypeSchema = z.enum(["string", "multiline", "boolean", "select"])
+export const VariableTypeSchema = z.enum(["string", "boolean", "select"])
 
 export const SelectOptionSchema = z.object({
   id: z.string(),

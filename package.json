@@ -18,6 +18,7 @@
     "@dnd-kit/utilities": "latest",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-dropdown-menu": "latest",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "1.2.4",
     "@radix-ui/react-tooltip": "latest",
     "class-variance-authority": "^0.7.1",

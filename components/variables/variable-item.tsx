@@ -14,9 +14,9 @@ import {
 } from "lucide-react"
 import type { PromptVariable, VariableType } from "@/types/prompt"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,12 +48,11 @@ interface VariableItemProps {
 
 const TYPE_LABELS: Record<VariableType, string> = {
   string: "Texto",
-  multiline: "Texto largo",
   boolean: "Booleano",
   select: "Selección",
 }
 
-const TYPE_ORDER: VariableType[] = ["string", "multiline", "boolean", "select"]
+const TYPE_ORDER: VariableType[] = ["string", "boolean", "select"]
 
 export function VariableItem({
   variable,
@@ -123,14 +122,13 @@ export function VariableItem({
             />
           ) : (
             <span className="flex min-w-0 items-center gap-1.5">
-              <span
-                className={cn(
-                  "font-mono-tight truncate text-xs",
-                  isMissing ? "text-danger-red" : "text-electric-blue",
-                )}
-              >
+              <span className="font-mono-tight truncate text-xs text-electric-blue">
                 {variable.name}
-                {isMissing && <span aria-hidden="true"> *</span>}
+                {isMissing && (
+                  <span aria-hidden="true" style={{ color: "var(--color-danger-red)" }}>
+                    {" *"}
+                  </span>
+                )}
               </span>
               {isOptional && (
                 <span className="rounded-sm border border-iron/70 bg-black/30 px-1 py-px text-[9px] uppercase tracking-wide text-ash">
@@ -204,6 +202,7 @@ export function VariableItem({
         options={options}
         isMissing={isMissing}
         onUpdateVariable={onUpdateVariable}
+        onEditOptions={() => onEditOptions(variable)}
         onTextareaFocus={onTextareaFocus}
         textareaRef={textareaRef}
       />
@@ -221,6 +220,7 @@ interface VariableValueInputProps {
   options: NonNullable<PromptVariable["options"]>
   isMissing: boolean
   onUpdateVariable: (id: string, value: string) => void
+  onEditOptions: () => void
   onTextareaFocus: (e: React.FocusEvent<HTMLTextAreaElement>) => void
   textareaRef: React.Ref<HTMLTextAreaElement>
 }
@@ -231,10 +231,11 @@ function VariableValueInput({
   options,
   isMissing,
   onUpdateVariable,
+  onEditOptions,
   onTextareaFocus,
   textareaRef,
 }: VariableValueInputProps) {
-  const errorBorder = isMissing ? "border-danger-red focus-visible:border-danger-red" : ""
+  const errorStyle = isMissing ? { borderColor: "var(--color-danger-red)" } : undefined
 
   if (type === "boolean") {
     const value = variable.value === "true" ? "true" : "false"
@@ -257,37 +258,28 @@ function VariableValueInput({
   if (type === "select") {
     if (options.length === 0) {
       return (
-        <p className="mt-2 rounded-sm border border-dashed border-iron/60 bg-black/20 px-2.5 py-2 text-xs text-ash">
-          Sin opciones definidas. Usa el menú para añadirlas.
-        </p>
+        <button
+          type="button"
+          onClick={onEditOptions}
+          className="app-focus mt-2 w-full rounded-sm border border-dashed border-iron/60 bg-black/20 px-2.5 py-2 text-left text-xs text-ash transition hover:border-iron hover:bg-graphite/50 hover:text-silver"
+        >
+          Definir opciones…
+        </button>
       )
     }
     return (
-      <select
-        value={variable.value}
-        onChange={(e) => onUpdateVariable(variable.id, e.target.value)}
-        className={cn(
-          "mt-2 flex h-9 w-full appearance-none rounded-sm border border-iron bg-graphite px-2.5 py-2 text-sm text-white focus-visible:outline-none focus-visible:border-electric-blue/70 focus-visible:ring-1 focus-visible:ring-electric-blue/40",
-          errorBorder,
-        )}
-      >
-        {options.map((option) => (
-          <option key={option.id} value={option.value}>
-            {option.label.trim() === "" ? option.value : option.label}
-          </option>
-        ))}
-      </select>
-    )
-  }
-
-  if (type === "string") {
-    return (
-      <Input
-        value={variable.value}
-        onChange={(e) => onUpdateVariable(variable.id, e.target.value)}
-        className={cn("font-mono-tight mt-2 h-9 text-sm", errorBorder)}
-        onFocus={(e) => e.currentTarget.select()}
-      />
+      <Select value={variable.value} onValueChange={(v) => onUpdateVariable(variable.id, v)}>
+        <SelectTrigger className="mt-2" style={errorStyle}>
+          <SelectValue placeholder="Selecciona una opción" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.id} value={option.value}>
+              {option.label.trim() === "" ? option.value : option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     )
   }
 
@@ -296,7 +288,8 @@ function VariableValueInput({
       ref={textareaRef}
       value={variable.value}
       onChange={(e) => onUpdateVariable(variable.id, e.target.value)}
-      className={cn("font-mono-tight mt-2 custom-scrollbar", errorBorder)}
+      className="font-mono-tight mt-2 custom-scrollbar"
+      style={errorStyle}
       minRows={2}
       maxRows={10}
       onFocus={onTextareaFocus}

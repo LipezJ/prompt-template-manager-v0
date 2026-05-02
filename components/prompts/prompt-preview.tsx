@@ -14,7 +14,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { getMissingRequiredVariables, replaceVariables } from "@/lib/prompt-utils"
+import { highlightPromptContent } from "@/lib/highlight-prompt"
 import { cn } from "@/lib/utils"
+
+const DANGER_SURFACE_STYLE = {
+  backgroundColor: "var(--color-graphite)",
+  borderColor: "var(--color-iron)",
+  color: "#ffffff",
+  boxShadow: "var(--color-danger-red) 0 -2px 0 0 inset",
+}
 
 interface PromptPreviewProps {
   prompt: Prompt
@@ -61,7 +69,7 @@ export function PromptPreview({
     if (missing.length > 0) {
       setMissingNames(missing.map((v) => v.name))
       onMissingVariables?.(missing.map((v) => v.id))
-      setTimeout(() => setMissingNames([]), 2200)
+      setTimeout(() => setMissingNames([]), 3000)
       return
     }
     const processedText = replaceVariables(prompt.content, variables)
@@ -155,7 +163,9 @@ export function PromptPreview({
               }`}
               onClick={!isEditMode ? handleEdit : undefined}
             >
-              {isPreviewMode ? replaceVariables(prompt.content, variables) : prompt.content}
+              {isPreviewMode
+                ? replaceVariables(prompt.content, variables)
+                : highlightPromptContent(prompt.content)}
             </pre>
             <div className="absolute top-1 right-1">
               <DropdownMenu>
@@ -209,11 +219,9 @@ export function PromptPreview({
                       <TooltipTrigger asChild>
                         <Button
                           size="icon"
+                          variant={missingNames.length > 0 ? "destructive" : "default"}
                           onClick={handleCopy}
-                          className={cn(
-                            "h-8 w-8",
-                            missingNames.length > 0 && "border-danger-red bg-danger-red text-white hover:bg-danger-red",
-                          )}
+                          className="h-8 w-8"
                         >
                           <CopyIcon className="h-3.5 w-3.5" />
                           <span className="sr-only">Copy</span>
@@ -221,7 +229,7 @@ export function PromptPreview({
                       </TooltipTrigger>
                       <TooltipContent
                         side="top"
-                        className={cn(missingNames.length > 0 && "border-danger-red bg-danger-red text-white")}
+                        style={missingNames.length > 0 ? DANGER_SURFACE_STYLE : undefined}
                       >
                         {missingNames.length > 0
                           ? `Faltan variables: ${missingNames.join(", ")}`

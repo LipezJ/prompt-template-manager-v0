@@ -1,4 +1,4 @@
-export type VariableType = "string" | "multiline" | "boolean" | "select"
+export type VariableType = "string" | "boolean" | "select"
 
 export interface SelectOption {
   id: string

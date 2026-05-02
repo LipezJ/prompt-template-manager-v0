@@ -12,7 +12,7 @@ const buttonVariants = cva(
         default:
           "border-transparent bg-electric-blue text-white [box-shadow:hsl(218,_93%,_30%)_0_-2px_0_0_inset,hsl(0,_0%,_0%,_0.4)_0_1px_3px_0] hover:bg-iris hover:[box-shadow:none]",
         destructive:
-          "border-transparent bg-danger-red text-white [box-shadow:hsl(0,_60%,_30%)_0_-2px_0_0_inset,hsl(0,_0%,_0%,_0.4)_0_1px_3px_0] hover:bg-danger-red/90 hover:[box-shadow:none]",
+          "border-iron/60 bg-graphite text-white [box-shadow:var(--color-danger-red)_0_-2px_0_0_inset] hover:bg-iron hover:[box-shadow:none]",
         outline:
           "border-iron/60 bg-graphite/50 text-fog [box-shadow:hsl(218,_13%,_70%,_0.08)_0_-2px_0_0_inset] hover:bg-graphite hover:text-white hover:[box-shadow:none]",
         secondary:
