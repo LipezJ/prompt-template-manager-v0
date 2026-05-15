@@ -169,10 +169,6 @@ export function VariablesEditor({
         <SortableContext items={allItemIds} strategy={verticalListSortingStrategy}>
           {globalVariables.length > 0 && (
             <div className="border-b border-iron/40 pb-1">
-              <div className="flex items-center gap-1.5 pt-3 pb-1 text-eyebrow text-amethyst">
-                <Globe aria-hidden="true" className="h-3 w-3" />
-                <span>Globales</span>
-              </div>
               {globalVariables.map((variable) => renderItem(variable, true))}
             </div>
           )}
