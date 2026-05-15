@@ -29,6 +29,7 @@ export const UiPreferencesSchema = z.object({
   splitPosition: z.number().default(50),
   variablesPanelVisible: z.boolean().default(true),
   cardView: z.boolean().default(false),
+  variablesTwoColumn: z.boolean().optional(),
 })
 
 export const PromptSetSchema = z.object({

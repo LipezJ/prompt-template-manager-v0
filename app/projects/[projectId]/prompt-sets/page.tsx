@@ -77,6 +77,7 @@ export default function PromptSetsPage() {
   const splitPosition = activePromptSet?.uiPreferences?.splitPosition ?? 50
   const variablesPanelVisible = activePromptSet?.uiPreferences?.variablesPanelVisible ?? true
   const cardView = activePromptSet?.uiPreferences?.cardView ?? false
+  const variablesTwoColumn = activePromptSet?.uiPreferences?.variablesTwoColumn ?? false
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -174,7 +175,11 @@ export default function PromptSetsPage() {
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
-                  modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+                  modifiers={
+                    variablesTwoColumn
+                      ? [restrictToParentElement]
+                      : [restrictToVerticalAxis, restrictToParentElement]
+                  }
                   onDragEnd={handleVariableDragEnd}
                   accessibility={{ announcements: dndAnnouncements }}
                 >
@@ -195,6 +200,10 @@ export default function PromptSetsPage() {
                     onHidePanel={() => updateUiPreferences({ variablesPanelVisible: false })}
                     isEditMode={isEditMode}
                     missingVariableIds={effectiveMissingVariableIds}
+                    twoColumn={variablesTwoColumn}
+                    onToggleTwoColumn={() =>
+                      updateUiPreferences({ variablesTwoColumn: !variablesTwoColumn })
+                    }
                   />
                 </DndContext>
               </ErrorBoundary>

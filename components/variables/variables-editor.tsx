@@ -4,13 +4,14 @@ import type React from "react"
 
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, Globe, PlusIcon, Eraser } from "lucide-react"
+import { ChevronLeft, Columns2, PlusIcon, Eraser } from "lucide-react"
 import type { PromptVariable, SelectOption, VariableType } from "@/types/prompt"
 import { ConfirmationDialog } from "@/components/dialogs/confirmation-dialog"
 import { DescriptionDialog } from "@/components/dialogs/description-dialog"
 import { SelectOptionsDialog } from "@/components/dialogs/select-options-dialog"
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { SortableContext, rectSortingStrategy, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 import { VariableItem } from "./variable-item"
 
 interface VariablesEditorProps {
@@ -30,6 +31,8 @@ interface VariablesEditorProps {
   onHidePanel?: () => void
   isEditMode?: boolean
   missingVariableIds?: string[]
+  twoColumn?: boolean
+  onToggleTwoColumn?: () => void
 }
 
 export function VariablesEditor({
@@ -49,6 +52,8 @@ export function VariablesEditor({
   onHidePanel,
   isEditMode = false,
   missingVariableIds,
+  twoColumn = false,
+  onToggleTwoColumn,
 }: VariablesEditorProps) {
   const missingSet = missingVariableIds ? new Set(missingVariableIds) : undefined
   const [editingVariable, setEditingVariable] = useState<string | null>(null)
@@ -163,16 +168,45 @@ export function VariablesEditor({
               </Tooltip>
             </TooltipProvider>
           )}
+          {onToggleTwoColumn && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onToggleTwoColumn}
+                    className={cn("h-7 w-7", twoColumn && "border-electric-blue text-white")}
+                  >
+                    <Columns2 className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{twoColumn ? "Una columna" : "Dos columnas"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto pr-1 custom-scrollbar">
-        <SortableContext items={allItemIds} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={allItemIds}
+          strategy={twoColumn ? rectSortingStrategy : verticalListSortingStrategy}
+        >
           {globalVariables.length > 0 && (
-            <div className="border-b border-iron/40 pb-1">
+            <div
+              className={cn(
+                "border-b border-iron/40 pb-1",
+                twoColumn && "grid grid-cols-2 gap-x-4",
+              )}
+            >
               {globalVariables.map((variable) => renderItem(variable, true))}
             </div>
           )}
-          {variables.map((variable) => renderItem(variable, false))}
+          <div className={cn(twoColumn && "grid grid-cols-2 gap-x-4")}>
+            {variables.map((variable) => renderItem(variable, false))}
+          </div>
         </SortableContext>
       </div>
       {!isEditMode && (

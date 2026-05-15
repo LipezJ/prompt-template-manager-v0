@@ -31,6 +31,7 @@ export interface PromptSet {
     splitPosition: number
     variablesPanelVisible: boolean
     cardView: boolean
+    variablesTwoColumn?: boolean
   }
 }
 
